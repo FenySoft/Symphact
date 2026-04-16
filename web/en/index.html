@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neuron OS — Capability-based actor runtime for .NET, co-designed with the CFPU</title>
+  <meta name="description" content="Neuron OS: a capability-based actor runtime for secure .NET computing, co-designed with the Cognitive Fabric Processing Unit (CFPU). Apache-2.0 license. Every entity is an actor, hardware-enforced isolation, formal verifiability.">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --bg-card: #161b22;
+      --border: #30363d;
+      --text: #c9d1d9;
+      --text-dim: #8b949e;
+      --accent: #58a6ff;
+      --accent-hover: #79c0ff;
+      --green: #3fb950;
+      --orange: #d29922;
+      --mono: 'SF Mono', 'Cascadia Code', 'Fira Code', 'JetBrains Mono', 'Consolas', monospace;
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--sans);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: color 0.15s;
+    }
+
+    a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+    .container {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 24px;
+      width: 100%;
+    }
+
+    header {
+      padding: 80px 0 48px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    header h1 {
+      font-family: var(--mono);
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: #f0f6fc;
+      letter-spacing: -0.02em;
+    }
+
+    header .subtitle {
+      font-family: var(--mono);
+      font-size: 1.1rem;
+      color: var(--green);
+      margin-top: 8px;
+      font-weight: 400;
+    }
+
+    header .tagline {
+      margin-top: 24px;
+      font-size: 1.05rem;
+      color: var(--text-dim);
+      max-width: 620px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .status-badge {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 4px 14px;
+      border: 1px solid var(--orange);
+      border-radius: 20px;
+      color: var(--orange);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+    }
+
+    main {
+      flex: 1;
+      padding: 48px 0;
+    }
+
+    .abstract {
+      font-size: 1.05rem;
+      line-height: 1.75;
+      color: var(--text);
+      margin-bottom: 48px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 48px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+      transition: border-color 0.15s;
+    }
+
+    .card:hover { border-color: var(--accent); }
+
+    .card h3 {
+      font-family: var(--mono);
+      font-size: 0.95rem;
+      color: #f0f6fc;
+      margin-bottom: 8px;
+    }
+
+    .card p {
+      font-size: 0.9rem;
+      color: var(--text-dim);
+      margin-bottom: 12px;
+    }
+
+    .card a {
+      font-size: 0.85rem;
+      font-family: var(--mono);
+    }
+
+    .highlights {
+      margin-bottom: 48px;
+    }
+
+    .highlights h2 {
+      font-family: var(--mono);
+      font-size: 1.2rem;
+      color: #f0f6fc;
+      margin-bottom: 20px;
+    }
+
+    .highlights ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .highlights li {
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.95rem;
+    }
+
+    .highlights li:last-child { border-bottom: none; }
+
+    .highlights li strong {
+      color: var(--green);
+      font-family: var(--mono);
+      font-size: 0.85rem;
+    }
+
+    .codesign {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 6px;
+      padding: 20px 24px;
+      margin-bottom: 48px;
+    }
+
+    .codesign h2 {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    .codesign p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    footer a { color: var(--text-dim); }
+    footer a:hover { color: var(--accent); }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 600px) {
+      header { padding: 48px 0 32px; }
+      header h1 { font-size: 1.6rem; }
+      header .subtitle { font-size: 0.95rem; }
+      .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div style="position:fixed;top:0;right:0;padding:12px 20px;z-index:100;font-family:var(--sans);font-size:14px;">
+  <a href="../hu/" style="color:var(--text-dim);text-decoration:none;padding:4px 12px;border:1px solid var(--border);border-radius:4px;">🇭🇺 Magyar</a>
+  <span style="color:var(--accent);padding:4px 12px;border:1px solid var(--accent);border-radius:4px;margin-left:4px;">🇬🇧 English</span>
+</div>
+
+<header>
+  <div class="container">
+    <h1>Neuron&nbsp;OS</h1>
+    <div class="subtitle">Capability-based actor runtime, co-designed with the CFPU</div>
+    <div class="tagline">
+      Every entity is an actor. Communication is exclusively by message. Hardware-enforced isolation, formal verifiability, and co-evolution with open silicon.
+    </div>
+    <div class="status-badge">v0.1 pre-alpha — 29 tests green</div>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+
+    <div class="abstract">
+      <p>
+        Neuron OS is a <strong>capability-based actor runtime</strong> for .NET, built on a single simple idea:
+        every stateful entity is an actor; actors communicate exclusively through immutable messages over mailboxes;
+        isolation is a hardware property, not a software convention.
+      </p>
+      <p style="margin-top: 16px;">
+        Today, Neuron OS runs on <strong>any .NET host</strong> (Windows, Linux, macOS) as a reference runtime. Tomorrow,
+        it will run natively on the <a href="https://clicpu.org">Cognitive Fabric Processing Unit (CFPU)</a> &mdash; a new
+        category of processor where each core is physically an actor, with private SRAM and hardware mailbox FIFOs.
+      </p>
+    </div>
+
+    <div class="codesign">
+      <h2>// hw/os co-design</h2>
+      <p>
+        Apple&rsquo;s M-series achieves tight OS/silicon integration because macOS existed before the chip was
+        designed &mdash; the OS&rsquo;s needs shaped the hardware. Neuron OS applies the same philosophy to open-source
+        silicon: by running on a simulator from day one, it discovers CFPU requirements (mailbox depth, capability
+        token width, context size, interrupt model) <em>before</em> the hardware is fixed. The feedback flows
+        through the <a href="https://github.com/FenySoft/NeuronOS/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
+        workflow.
+      </p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Design Principles</h3>
+        <p>Everything is an actor. No shared memory. Let it crash. Supervision. Location transparency. Capability security. Hot code loading. Determinism.</p>
+        <a href="https://github.com/FenySoft/NeuronOS#design-principles">Read &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Source Code</h3>
+        <p>TMailbox, TActorRef, TActor&lt;T&gt;, TActorSystem. TDD from day one. Apache-2.0 licensed.</p>
+        <a href="https://github.com/FenySoft/NeuronOS/tree/main/src/NeuronOS.Core">Browse &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>CFPU Hardware</h3>
+        <p>The processor Neuron OS co-designs with. Cognitive Fabric Processing Unit &mdash; the first MIMD actor-native PU.</p>
+        <a href="https://clicpu.org">Visit &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>OS Requirements for CFPU</h3>
+        <p>Issues opened by the OS team that should shape the hardware. Mailbox depth, capability width, interrupt structure.</p>
+        <a href="https://github.com/FenySoft/NeuronOS/issues?q=is%3Aissue+label%3Aosreq-to-cfpu">View issues &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>Contributing</h3>
+        <p>TDD is required. Bilingual XML docs. T/I/A/F naming conventions. Apache-2.0 license with patent grant.</p>
+        <a href="https://github.com/FenySoft/NeuronOS/blob/main/CONTRIBUTING.md">Read &rarr;</a>
+      </div>
+      <div class="card">
+        <h3>GitHub</h3>
+        <p>Source code, tests, CI for Linux + Windows + macOS. Star us and follow the OS-side of the journey.</p>
+        <a href="https://github.com/FenySoft/NeuronOS">View repo &rarr;</a>
+      </div>
+    </div>
+
+    <div class="highlights">
+      <h2>// highlights</h2>
+      <ul>
+        <li><strong>Every entity</strong> &mdash; an actor with private state, communicating via immutable messages</li>
+        <li><strong>No shared memory</strong> &mdash; isolation is a hardware property, not a software convention</li>
+        <li><strong>Supervision tree</strong> &mdash; let it crash, restart strategies proven in 40 years of Erlang/OTP</li>
+        <li><strong>Capability security</strong> &mdash; an actor can message another only if it holds an unforgeable reference</li>
+        <li><strong>Location transparency</strong> &mdash; same code runs local, cross-core, or across chips</li>
+        <li><strong>Hot code loading</strong> &mdash; update a running system without downtime, Erlang-style</li>
+        <li><strong>Formal verification target</strong> &mdash; in the spirit of seL4 and Singularity</li>
+        <li><strong>Apache-2.0</strong> &mdash; permissive license with patent grant, aligned with the .NET ecosystem</li>
+      </ul>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="container">
+    <div class="footer-links">
+      <span>Apache-2.0</span>
+      <a href="https://github.com/FenySoft/NeuronOS">GitHub</a>
+      <a href="https://clicpu.org">CLI-CPU / CFPU</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
