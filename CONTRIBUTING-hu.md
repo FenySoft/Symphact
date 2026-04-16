@@ -46,7 +46,7 @@ Minden új funkció, hibajavítás, refaktor **teszt-elsővel** készül:
 
 ## Elnevezési konvenciók
 
-Ez a projekt ugyanazokat a konvenciókat követi, mint a [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU), a konzisztencia érdekében:
+Ez a projekt ugyanazokat a konvenciókat követi, mint a [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU/blob/main/README-hu.md), a konzisztencia érdekében:
 
 | Elem | Prefix | Példa |
 |------|--------|-------|
@@ -112,7 +112,7 @@ Kétnyelvű commit üzenet ajánlott (magyar először, utána angol külön sor
 
 ## Hardver / CFPU visszajelzés
 
-Ha a Neuron OS-en dolgozva felfedezel egy követelményt, amit a CFPU hardvernek biztosítania kellene (mailbox mélység, interrupt struktúra, capability szélesség, stb.), nyiss issue-t az [`osreq-for-cfpu`](.github/ISSUE_TEMPLATE/osreq-for-cfpu.md) sablonnal. Ezek az issue-k közvetlenül a [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) hardveres tervezési viták bemenetét képezik.
+Ha a Neuron OS-en dolgozva felfedezel egy követelményt, amit a CFPU hardvernek biztosítania kellene (mailbox mélység, interrupt struktúra, capability szélesség, stb.), nyiss issue-t az [`osreq-for-cfpu`](.github/ISSUE_TEMPLATE/osreq-for-cfpu.md) sablonnal. Ezek az issue-k közvetlenül a [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU/blob/main/README-hu.md) hardveres tervezési viták bemenetét képezik.
 
 ## Pull request ellenőrzőlista
 

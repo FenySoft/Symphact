@@ -25,7 +25,7 @@ A Neuron OS három okból kapott önálló repót:
 2. **Független életciklus** — a Neuron OS bármely CIL host-on fut ma; nem blokkol a szilícium elkészültén
 3. **Tiszta licensz** — Apache-2.0 (permisszív) illeszkedik a szélesebb .NET ökoszisztémához; a CFPU hardver repo CERN-OHL-S-t használ (strong reciprocal), ami hardver design-okhoz megfelelő
 
-A hardveres co-development szál itt található: [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) — a CFPU nyílt forráskódú referencia implementációja.
+A hardveres co-development szál itt található: [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU/blob/main/README-hu.md) — a CFPU nyílt forráskódú referencia implementációja.
 
 ## Gyors indulás
 
