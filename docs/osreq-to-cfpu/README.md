@@ -1,5 +1,7 @@
 # OS requirements for the CFPU hardware
 
+> Magyar verzió: [README-hu.md](README-hu.md)
+
 This directory collects **OS-driven requirements** surfaced during Neuron OS development that should be considered in the CFPU hardware design (tracked in [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU)).
 
 ## Workflow
