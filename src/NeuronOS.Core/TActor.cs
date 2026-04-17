@@ -31,14 +31,14 @@ public abstract class TActor<TState>
     public abstract TState Init();
 
     /// <summary>
-    /// hu: Egy üzenet feldolgozása. A jelenlegi állapotot és az üzenetet kapja, visszaadja
-    /// az új állapotot. Nem lehet side-effect-es; az egyetlen legitim "side-effect" más
-    /// aktoroknak küldött üzenet (majd egy későbbi iteráción át lesz bevezetve a context
-    /// paraméterrel).
+    /// hu: Egy üzenet feldolgozása. A jelenlegi állapotot, az üzenetet és a futtatási
+    /// kontextust kapja, visszaadja az új állapotot. A handler az aktor állapota szempontjából
+    /// pure — az egyetlen megengedett mellékhatás más aktoroknak küldött üzenet a context.Send-en
+    /// keresztül.
     /// <br />
-    /// en: Handle a single message. Receives the current state and the message, returns the
-    /// new state. Must be side-effect-free; the only legitimate "side-effect" is sending
-    /// messages to other actors (to be introduced via a context parameter in a later iteration).
+    /// en: Handle a single message. Receives the current state, the message, and the execution
+    /// context, returns the new state. The handler is pure w.r.t. actor state — the only
+    /// legitimate side-effect is sending messages to other actors via context.Send.
     /// </summary>
     /// <param name="AState">
     /// hu: A jelenlegi aktor állapot.
@@ -50,10 +50,15 @@ public abstract class TActor<TState>
     /// <br />
     /// en: The message to handle. Never null.
     /// </param>
+    /// <param name="AContext">
+    /// hu: A futtatási kontextus: Self referencia és üzenetküldési képesség.
+    /// <br />
+    /// en: The execution context: Self reference and message-sending capability.
+    /// </param>
     /// <returns>
     /// hu: Az új aktor állapot üzenet után.
     /// <br />
     /// en: The new actor state after the message.
     /// </returns>
-    public abstract TState Handle(TState AState, object AMessage);
+    public abstract TState Handle(TState AState, object AMessage, IActorContext AContext);
 }

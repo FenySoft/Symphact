@@ -34,7 +34,7 @@ public sealed class TActorSystem : IDisposable
 
         var id = Interlocked.Increment(ref FNextActorId);
         var actor = new TActorType();
-        var entry = new TActorEntry(actor, actor.Init()!, (state, msg) => actor.Handle((TState)state, msg)!);
+        var entry = new TActorEntry(actor, actor.Init()!, (state, msg, ctx) => actor.Handle((TState)state, msg, ctx)!);
 
         FActors[id] = entry;
         return new TActorRef(id);
@@ -60,28 +60,50 @@ public sealed class TActorSystem : IDisposable
 
     /// <summary>
     /// hu: Feldolgozza az összes aktor összes várakozó üzenetét. Mivel az aktorok üzeneteket
-    /// küldhetnek egymásnak, több fordulót futtathat, amíg minden mailbox üres. Egyszerű,
-    /// single-threaded drain — későbbi iterációkban core-onkénti szálak jönnek.
+    /// küldhetnek egymásnak, több fordulót futtathat, amíg minden mailbox üres. Ha a körök
+    /// száma eléri az AMaxRounds korlátot, InvalidOperationException keletkezik (végtelen loop
+    /// védelem). Egyszerű, single-threaded drain — later iterációkban core-onkénti szálak jönnek.
     /// <br />
     /// en: Processes every pending message on every actor. Because actors may send messages
-    /// to each other, this may iterate multiple rounds until all mailboxes are empty. Simple
-    /// single-threaded drain — per-core threads arrive in later iterations.
+    /// to each other, this may iterate multiple rounds until all mailboxes are empty. If the
+    /// round count reaches AMaxRounds, throws InvalidOperationException (infinite-loop guard).
+    /// Simple single-threaded drain — per-core threads arrive in later iterations.
     /// </summary>
-    public Task DrainAsync()
+    /// <param name="AMaxRounds">
+    /// hu: Maximálisan megengedett körök száma. Ha eléri, InvalidOperationException keletkezik.
+    /// Alapértelmezett: 1000 — tipikus tesztekhez és lineáris lánc-feldolgozáshoz elegendő.
+    /// <br />
+    /// en: Maximum allowed rounds. If reached, throws InvalidOperationException.
+    /// Default: 1000 — sufficient for typical tests and linear chain processing.
+    /// </param>
+    /// <exception cref="InvalidOperationException">
+    /// hu: Ha az üzenetfeldolgozás nem konvergál AMaxRounds körön belül (pl. végtelen ping-pong).
+    /// <br />
+    /// en: If message processing does not converge within AMaxRounds rounds (e.g. infinite ping-pong).
+    /// </exception>
+    public Task DrainAsync(int AMaxRounds = 1000)
     {
         ThrowIfDisposed();
 
+        var rounds = 0;
         bool anyProcessed;
 
         do
         {
+            if (++rounds > AMaxRounds)
+                throw new InvalidOperationException(
+                    $"DrainAsync did not converge within {AMaxRounds} rounds. " +
+                    "Possible cause: actors are sending messages in an infinite cycle.");
+
             anyProcessed = false;
 
-            foreach (var entry in FActors.Values)
+            foreach (var (actorId, entry) in FActors)
             {
+                var context = new TActorContext(this, new TActorRef(actorId));
+
                 while (entry.Mailbox.TryReceive(out var message))
                 {
-                    entry.State = entry.Handler(entry.State, message!);
+                    entry.State = entry.Handler(entry.State, message!, context);
                     anyProcessed = true;
                 }
             }
@@ -130,7 +152,7 @@ public sealed class TActorSystem : IDisposable
 
     private sealed class TActorEntry
     {
-        public TActorEntry(object AActor, object AInitialState, Func<object, object, object> AHandler)
+        public TActorEntry(object AActor, object AInitialState, Func<object, object, IActorContext, object> AHandler)
         {
             Actor = AActor;
             State = AInitialState;
@@ -140,7 +162,7 @@ public sealed class TActorSystem : IDisposable
 
         public object Actor { get; }
         public object State { get; set; }
-        public Func<object, object, object> Handler { get; }
+        public Func<object, object, IActorContext, object> Handler { get; }
         public IMailbox Mailbox { get; }
     }
 }

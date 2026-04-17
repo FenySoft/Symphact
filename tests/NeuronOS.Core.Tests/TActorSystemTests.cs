@@ -20,7 +20,7 @@ public sealed class TActorSystemTests
     {
         public override int Init() => 0;
 
-        public override int Handle(int AState, object AMessage) => AMessage switch
+        public override int Handle(int AState, object AMessage, IActorContext AContext) => AMessage switch
         {
             "increment" => AState + 1,
             "decrement" => AState - 1,
@@ -151,11 +151,62 @@ public sealed class TActorSystemTests
     public async Task DrainAsync_WithoutMessages_CompletesImmediately()
     {
         using var system = new TActorSystem();
-        system.Spawn<TCounterActor, int>();
+        var actorRef = system.Spawn<TCounterActor, int>();
 
         await system.DrainAsync();
 
-        // No messages posted, nothing to assert beyond "did not hang"
-        Assert.True(true);
+        Assert.Equal(0, system.GetState<int>(actorRef));
+    }
+
+    [Fact]
+    public void GetState_UnknownRef_Throws()
+    {
+        using var system = new TActorSystem();
+
+        Assert.Throws<InvalidOperationException>(() =>
+            system.GetState<int>(new TActorRef(9999)));
+    }
+
+    [Fact]
+    public void Dispose_CalledTwice_DoesNotThrow()
+    {
+        var system = new TActorSystem();
+        system.Spawn<TCounterActor, int>();
+
+        system.Dispose();
+        system.Dispose();
+    }
+
+    [Fact]
+    public void Spawn_AfterDispose_ThrowsObjectDisposedException()
+    {
+        var system = new TActorSystem();
+        system.Dispose();
+
+        Assert.Throws<ObjectDisposedException>(() =>
+            system.Spawn<TCounterActor, int>());
+    }
+
+    [Fact]
+    public void Send_AfterDispose_ThrowsObjectDisposedException()
+    {
+        var system = new TActorSystem();
+        var actorRef = system.Spawn<TCounterActor, int>();
+        system.Dispose();
+
+        Assert.Throws<ObjectDisposedException>(() =>
+            system.Send(actorRef, "increment"));
+    }
+
+    [Fact]
+    public void Send_ToNonExistentButValidRef_Throws()
+    {
+        using var system = new TActorSystem();
+
+        var fakeRef = new TActorRef(999);
+
+        Assert.True(fakeRef.IsValid);
+        Assert.Throws<InvalidOperationException>(() =>
+            system.Send(fakeRef, "test"));
     }
 }
