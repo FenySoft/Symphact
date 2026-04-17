@@ -56,7 +56,7 @@ dotnet test
 - [ ] `TActor<TState>` + `TActorSystem` with `Spawn` / `Send` / `Receive` (~10 tests)
 - [ ] First end-to-end demo: `CounterActor`
 
-Full roadmap: [`docs/roadmap.md`](docs/roadmap.md) (coming soon).
+Full roadmap: [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Relationship with CLI-CPU / CFPU
 

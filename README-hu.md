@@ -56,7 +56,7 @@ dotnet test
 - [ ] `TActor<TState>` + `TActorSystem` a `Spawn` / `Send` / `Receive` primitívekkel (~10 teszt)
 - [ ] Első end-to-end demó: `CounterActor`
 
-Teljes roadmap: [`docs/roadmap-hu.md`](docs/roadmap-hu.md) (hamarosan).
+Teljes roadmap: [`docs/roadmap-hu.md`](docs/roadmap-hu.md).
 
 ## Kapcsolat a CLI-CPU-val / CFPU-val
 
