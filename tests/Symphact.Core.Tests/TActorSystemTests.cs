@@ -1,6 +1,6 @@
-using NeuronOS.Core;
+using Symphact.Core;
 
-namespace NeuronOS.Core.Tests;
+namespace Symphact.Core.Tests;
 
 /// <summary>
 /// hu: A TActorSystem és TActor integráció tesztjei. Ez a runtime szíve: aktor spawn,

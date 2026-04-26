@@ -1,6 +1,6 @@
-using NeuronOS.Core;
+using Symphact.Core;
 
-namespace NeuronOS.Core.Tests;
+namespace Symphact.Core.Tests;
 
 /// <summary>
 /// hu: Az in-memory mailbox (TMailbox) viselkedésének tesztjei. Ez az alapköve a teljes aktor

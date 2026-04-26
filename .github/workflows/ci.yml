@@ -22,10 +22,10 @@ jobs:
           dotnet-version: '10.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore NeuronOS.sln
+        run: dotnet restore Symphact.sln
 
       - name: Build (Debug)
-        run: dotnet build NeuronOS.sln -c Debug --no-restore
+        run: dotnet build Symphact.sln -c Debug --no-restore
 
       - name: Test
-        run: dotnet test NeuronOS.sln -c Debug --no-build --verbosity normal
+        run: dotnet test Symphact.sln -c Debug --no-build --verbosity normal

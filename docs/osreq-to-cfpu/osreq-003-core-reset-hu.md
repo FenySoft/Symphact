@@ -8,11 +8,11 @@
 
 ## Összefoglaló
 
-A Neuron OS **„let it crash"** modellje megköveteli, hogy egy supervisor actor újra tudja indítani egy hibás child actor core-ját. Ehhez **hardveres core reset** szükséges, ami atomilag törli a core SRAM-ját és mailbox FIFO-ját, majd a core-t újraindítható állapotba hozza.
+A Symphact **„let it crash"** modellje megköveteli, hogy egy supervisor actor újra tudja indítani egy hibás child actor core-ját. Ehhez **hardveres core reset** szükséges, ami atomilag törli a core SRAM-ját és mailbox FIFO-ját, majd a core-t újraindítható állapotba hozza.
 
 ## Kontextus
 
-Az Erlang/OTP supervision modell a Neuron OS alapja (M0.3 milestone). Amikor egy actor hibát dob:
+Az Erlang/OTP supervision modell a Symphact alapja (M0.3 milestone). Amikor egy actor hibát dob:
 
 ```
 1. Actor crash (pl. hibás üzenet, assertion failure)
@@ -86,6 +86,6 @@ A **let-it-crash** modellben a restart **gyakori, normális művelet** — nem k
 
 ## Kereszthivatkozások
 
-- Neuron OS roadmap: M0.3 (Supervision / Let-it-crash)
+- Symphact roadmap: M0.3 (Supervision / Let-it-crash)
 - Boot sequence: `docs/boot-sequence-hu.md` — 1. lépés (POR)
 - CLI-CPU architecture: Seal Core self-test analógia

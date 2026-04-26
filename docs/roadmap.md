@@ -15,7 +15,7 @@
 | **Phase 5** Security | M5.1-M5.4 | ~100-140 | Capability security, audit, formal verification |
 | **Phase 6** Developer Experience | M6.1-M6.5 | ~100-140 | CLI, IDE, profiler, NuGet, docs |
 | **Phase 7** First Product | M7.1-M7.5 | ~80-120 | Reference apps, enterprise, launch |
-| **Összesen / Total** | | **~728-1024** | **Production-ready Neuron OS** |
+| **Összesen / Total** | | **~728-1024** | **Production-ready Symphact** |
 
 ### Phase 1 részletezés / Phase 1 details
 
@@ -169,10 +169,10 @@
 > en: Per-core DMA engine access: dedicated DMA or central controller?
 
 **Becsült óra / Est. hours:** ~16-24
-> hu: Új projekt lehetséges (NeuronOS.Persistence). Külső függőség (SQLite). Snapshot + replay logika.
+> hu: Új projekt lehetséges (Symphact.Persistence). Külső függőség (SQLite). Snapshot + replay logika.
 > Integráció M0.3 supervision-nel (recovery restart után). ~4-5 új fájl, ~300-400 sor runtime, ~400-500 sor teszt.
 >
-> en: Possible new project (NeuronOS.Persistence). External dependency (SQLite). Snapshot + replay logic.
+> en: Possible new project (Symphact.Persistence). External dependency (SQLite). Snapshot + replay logic.
 > Integration with M0.3 supervision (recovery after restart). ~4-5 new files, ~300-400 lines runtime, ~400-500 lines test.
 
 ---
@@ -202,11 +202,11 @@
 **Becsült óra / Est. hours:** ~28-36
 > hu: TActorRef formátum változás (location info). Serialization layer (message → byte → message).
 > Hálózati kód: connection management, reconnection, hibakezelés. Location-transparent Send routing.
-> Új projekt (NeuronOS.Remoting). ~5-7 új fájl, ~500-700 sor runtime, ~500-700 sor teszt.
+> Új projekt (Symphact.Remoting). ~5-7 új fájl, ~500-700 sor runtime, ~500-700 sor teszt.
 >
 > en: TActorRef format change (location info). Serialization layer (message → bytes → message).
 > Network code: connection management, reconnection, error handling. Location-transparent Send routing.
-> New project (NeuronOS.Remoting). ~5-7 new files, ~500-700 lines runtime, ~500-700 lines test.
+> New project (Symphact.Remoting). ~5-7 new files, ~500-700 lines runtime, ~500-700 lines test.
 
 ---
 
@@ -445,10 +445,10 @@
 > en: Every device actor runs on a Rich core and owns an MMIO region. Nano cores get no device capability — they access peripherals only through the OS.
 
 **Becsült óra / Est. hours:** ~20-28
-> hu: Új projekt lehetséges (NeuronOS.Devices). MMIO szimulációs réteg .NET-re.
+> hu: Új projekt lehetséges (Symphact.Devices). MMIO szimulációs réteg .NET-re.
 > ~4-5 új fájl, ~250-350 sor runtime, ~300-400 sor teszt.
 >
-> en: Possible new project (NeuronOS.Devices). MMIO simulation layer for .NET.
+> en: Possible new project (Symphact.Devices). MMIO simulation layer for .NET.
 > ~4-5 new files, ~250-350 lines runtime, ~300-400 lines test.
 
 ---
@@ -539,10 +539,10 @@
 > en: Not POSIX: `Send(fsActor, new ReadMsg(path))` — not `open()`/`read()`. File handle actor has its own capability — only the opener receives it.
 
 **Becsült óra / Est. hours:** ~28-36
-> hu: Legösszetettebb device milestone. Új projekt lehetséges (NeuronOS.Storage). Flash device actor CFPU-specifikus.
+> hu: Legösszetettebb device milestone. Új projekt lehetséges (Symphact.Storage). Flash device actor CFPU-specifikus.
 > ~5-7 új fájl, ~400-500 sor runtime, ~500-600 sor teszt.
 >
-> en: Most complex device milestone. Possible new project (NeuronOS.Storage). Flash device actor is CFPU-specific.
+> en: Most complex device milestone. Possible new project (Symphact.Storage). Flash device actor is CFPU-specific.
 > ~5-7 new files, ~400-500 lines runtime, ~500-600 lines test.
 
 ---
@@ -843,12 +843,12 @@
 
 | Elem / Item | Leírás / Description |
 |---|---|
-| `NeuronOS.Core` | hu: Runtime primitívek. / en: Runtime primitives. |
-| `NeuronOS.Supervision` | hu: Supervisor strategies. / en: Supervisor strategies. |
-| `NeuronOS.Persistence` | hu: Event sourcing. / en: Event sourcing. |
-| `NeuronOS.Remoting` | hu: Distribution. / en: Distribution. |
-| `NeuronOS.Security` | hu: Capability model. / en: Capability model. |
-| `NeuronOS.Devices` | hu: Device actor framework. / en: Device actor framework. |
+| `Symphact.Core` | hu: Runtime primitívek. / en: Runtime primitives. |
+| `Symphact.Supervision` | hu: Supervisor strategies. / en: Supervisor strategies. |
+| `Symphact.Persistence` | hu: Event sourcing. / en: Event sourcing. |
+| `Symphact.Remoting` | hu: Distribution. / en: Distribution. |
+| `Symphact.Security` | hu: Capability model. / en: Capability model. |
+| `Symphact.Devices` | hu: Device actor framework. / en: Device actor framework. |
 | API reference site | hu: DocFX vagy hasonló eszközzel generálva. / en: Generated with DocFX or similar. |
 
 **Becsült óra / Est. hours:** ~16-24

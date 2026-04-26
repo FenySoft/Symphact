@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Symphact.Core</RootNamespace>
+    <AssemblyName>Symphact.Core</AssemblyName>
+    <Description>Capability-based actor runtime for .NET. Reference software implementation of the Symphact primitives (actors, mailboxes, supervisors, capabilities), co-designed with the Cognitive Fabric Processing Unit (CFPU).</Description>
+    <PackageId>FenySoft.Symphact.Core</PackageId>
+    <PackageTags>actor;runtime;supervision;capability;symphact;cfpu</PackageTags>
+  </PropertyGroup>
+
+</Project>

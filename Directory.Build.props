@@ -17,8 +17,8 @@
     <Copyright>Copyright © 2026 FenySoft. Licensed under the Apache License, Version 2.0.</Copyright>
     <Version>0.1.0</Version>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/FenySoft/NeuronOS</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/FenySoft/NeuronOS</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/FenySoft/Symphact</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/FenySoft/Symphact</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 

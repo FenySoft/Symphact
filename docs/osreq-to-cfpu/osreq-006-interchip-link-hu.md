@@ -8,11 +8,11 @@
 
 ## Összefoglaló
 
-A Neuron OS distribution modellje (M0.6 — Remoting) megköveteli, hogy **több CFPU chip** egyetlen logikai fabric-ként működjön. Ehhez szabványosított, alacsony-latenciájú **inter-chip link** kell, amelyen az actor mailbox üzenetek áthaladnak — a location transparency megőrzésével.
+A Symphact distribution modellje (M0.6 — Remoting) megköveteli, hogy **több CFPU chip** egyetlen logikai fabric-ként működjön. Ehhez szabványosított, alacsony-latenciájú **inter-chip link** kell, amelyen az actor mailbox üzenetek áthaladnak — a location transparency megőrzésével.
 
 ## Kontextus
 
-A Neuron OS alapelve: **`TActorRef` nem árulja el, hogy a cél actor lokális, más core-on, vagy más chip-en van**. Ez location transparency — ugyanaz a `Send(ref, msg)` hívás, akárhol van a cél. De ehhez a HW-nek transzparensen kell routolnia a chip-határokon át.
+A Symphact alapelve: **`TActorRef` nem árulja el, hogy a cél actor lokális, más core-on, vagy más chip-en van**. Ez location transparency — ugyanaz a `Send(ref, msg)` hívás, akárhol van a cél. De ehhez a HW-nek transzparensen kell routolnia a chip-határokon át.
 
 Az OSREQ-001 fa topológia multi-chip szintre terjed:
 
@@ -79,7 +79,7 @@ Send(ref, msg):
 | Chip offline (tápelvesztés) | **Timeout + supervisor értesítés** → actor migration |
 | Link hiba (CRC mismatch) | **Retry** (max 3×) → ha nem sikerül, link down → supervisor |
 
-## Hatás a Neuron OS-re
+## Hatás a Symphact-re
 
 | OS komponens | Változás |
 |-------------|---------|
@@ -99,7 +99,7 @@ Send(ref, msg):
 
 ## Kereszthivatkozások
 
-- Neuron OS roadmap: M0.6 (Remoting / Distribution)
+- Symphact roadmap: M0.6 (Remoting / Distribution)
 - CLI-CPU architecture: `Mailbox bridge (inter-chip): 4 pin`, pin budget tábla
 - OSREQ-001: fa topológia (multi-chip kiterjesztés)
 - OSREQ-002: MMIO térkép (`CHIP_ID` regiszter)

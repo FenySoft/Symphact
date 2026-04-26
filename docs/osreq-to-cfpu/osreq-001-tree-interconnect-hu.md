@@ -8,13 +8,13 @@
 
 ## Összefoglaló
 
-A Neuron OS supervisor tree, a capability delegation modell és a memóriakezelés **fa szerkezetű hierarchiát** feltételez. Az interconnect topológiának ezt a fát kell tükröznie — nem flat bus, nem uniform mesh, hanem **hierarchikus fa (fat tree)**.
+A Symphact supervisor tree, a capability delegation modell és a memóriakezelés **fa szerkezetű hierarchiát** feltételez. Az interconnect topológiának ezt a fát kell tükröznie — nem flat bus, nem uniform mesh, hanem **hierarchikus fa (fat tree)**.
 
 ## Kontextus — miért fa?
 
 ### 1. A szoftver természetesen fa
 
-A Neuron OS alapstruktúrája — az actor supervisor tree — fa:
+A Symphact alapstruktúrája — az actor supervisor tree — fa:
 
 ```
 TRootSupervisor [Admin]              ← Rich Core
@@ -146,7 +146,7 @@ A **fa topológia** azért természetes a CFPU-hoz, mert:
 3. **A capability delegation fa** — a routing fa tükrözi a jogosultsági hierarchiát
 4. **Skálázható** — cluster hozzáadása O(1) routing bővítés, nem O(N) tábla-újraépítés
 
-## Hatás a Neuron OS-re
+## Hatás a Symphact-re
 
 | OS komponens | Változás |
 |-------------|---------|
@@ -168,6 +168,6 @@ A **fa topológia** azért természetes a CFPU-hoz, mert:
 ## Kereszthivatkozások
 
 - CLI-CPU issue: #TODO (osreq-from-os címkével)
-- Neuron OS roadmap: M2.3 (Router), M2.4 (Memory Manager)
+- Symphact roadmap: M2.3 (Router), M2.4 (Memory Manager)
 - Boot sequence: `docs/boot-sequence-hu.md` — 8. lépés (Nano Core-ok Wake)
 - CLI-CPU architecture: `docs/architecture-hu.md` — „Skálázódás F6-ra" szekció

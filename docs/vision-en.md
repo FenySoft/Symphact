@@ -1,12 +1,12 @@
-# Neuron OS -- the actor-based operating system of the Cognitive Fabric Processing Unit (CFPU)
+# Symphact -- the actor-based operating system of the Cognitive Fabric Processing Unit (CFPU)
 
-> **📦 Implementation:** [`src/NeuronOS.Core`](../src/NeuronOS.Core) — the actual runtime code, tests and API live under `src/` and `tests/`. This document captures the long-term **vision**.
+> **📦 Implementation:** [`src/Symphact.Core`](../src/Symphact.Core) — the actual runtime code, tests and API live under `src/` and `tests/`. This document captures the long-term **vision**.
 
 > **Vision document.** This is the long-term plan for the OS, which begins to take shape with the F4 multi-core simulator, reaches its first real usability with F5-F6 hardware, and reaches mature developer platform level in F7.
 >
 > **The content is a compass, not a final spec.** Details will be refined along the way, based on F4-F6 experience. The goal here is to give design decisions a **direction**, so we don't re-debate fundamentals at every F4 iteration.
 
-> *Neuron OS targets the **CFPU** hardware platform -- the reference implementation of the CFPU is the **CLI-CPU** project ([github.com/FenySoft/CLI-CPU](https://github.com/FenySoft/CLI-CPU)). For details on the CFPU ↔ CLI-CPU relationship see [CLI-CPU FAQ #1](https://github.com/FenySoft/CLI-CPU/blob/main/docs/faq-en.md#1-what-is-the-cfpu-and-how-does-it-relate-to-cli-cpu).*
+> *Symphact targets the **CFPU** hardware platform -- the reference implementation of the CFPU is the **CLI-CPU** project ([github.com/FenySoft/CLI-CPU](https://github.com/FenySoft/CLI-CPU)). For details on the CFPU ↔ CLI-CPU relationship see [CLI-CPU FAQ #1](https://github.com/FenySoft/CLI-CPU/blob/main/docs/faq-en.md#1-what-is-the-cfpu-and-how-does-it-relate-to-cli-cpu).*
 
 > Magyar verzió: [vision-hu.md](vision-hu.md)
 
@@ -14,7 +14,7 @@
 
 ## Philosophy -- replacing the Unix legacy, realizing the Erlang vision
 
-The purpose of **Neuron OS** is to build an operating system where **every entity is an actor**, and communication happens **exclusively through message passing**. But this is not just an alternative approach alongside Linux -- it is **a new paradigm that, in the long run, replaces the inherited 1970s decisions carried by current operating systems**.
+The purpose of **Symphact** is to build an operating system where **every entity is an actor**, and communication happens **exclusively through message passing**. But this is not just an alternative approach alongside Linux -- it is **a new paradigm that, in the long run, replaces the inherited 1970s decisions carried by current operating systems**.
 
 ### The Linux and Unix legacy -- why it is an outdated foundation
 
@@ -43,9 +43,9 @@ The **fork/exec/fd/signal/shared memory + mutex/POSIX permissions** model was de
 
 **These problems cannot be fixed with patches.** They are architectural, and as hardware changes (more cores, more memory, faster networks, more serious security threats, AI-generated code), they become **increasingly painful**. Linux engineers are constantly battling them (copy-on-write, RCU, lockless algorithms, eBPF, seccomp, io_uring), but **the fundamental paradigm cannot be changed**, because backward compatibility requirements bind it.
 
-### Neuron OS as a clean slate
+### Symphact as a clean slate
 
-Neuron OS is designed in a **modern era**, for modern conditions:
+Symphact is designed in a **modern era**, for modern conditions:
 
 - **Many cores** (10k+ will be the norm) -- not with shared memory, but with shared-nothing
 - **AI-era threats** -- hardware memory safety, capability-based security
@@ -71,7 +71,7 @@ Until now, actor-based operating systems have remained in a **marginal niche** b
 
 In this architecture, **the actor model's biggest disadvantage (performance overhead) vanishes**, and what remains is all of its advantages -- **far stronger than what Linux could ever provide** under the burden of backward compatibility.
 
-Neuron OS therefore does **not sit alongside Linux**, but is **the successor to Linux**. Just as x86 replaced the mainframe, mobile replaced the desktop, and cloud replaced the physical server -- **Cognitive Fabric + Neuron OS replaces the shared-memory + Linux combination** in the now-emerging AI-driven, safety-critical, massively distributed era.
+Symphact therefore does **not sit alongside Linux**, but is **the successor to Linux**. Just as x86 replaced the mainframe, mobile replaced the desktop, and cloud replaced the physical server -- **Cognitive Fabric + Symphact replaces the shared-memory + Linux combination** in the now-emerging AI-driven, safety-critical, massively distributed era.
 
 ## Design principles
 
@@ -91,7 +91,7 @@ Messages are **immutable value types** (CIL `struct`s or immutable classes) that
 
 No single actor **defends** against every possible error. When a fault occurs, the actor **dies**, and the **supervisor** decides what happens: restart, escalate, or shut down. This is the Erlang OTP model, proven for 40+ years in telecommunications, financial, and critical infrastructure environments.
 
-In Neuron OS this applies **at every level**, from the smallest device driver to the topmost application actor.
+In Symphact this applies **at every level**, from the smallest device driver to the topmost application actor.
 
 ### 4. Supervision hierarchy
 
@@ -116,24 +116,24 @@ An actor reference **does not reveal** whether the target is local (on this same
 
 **Consequences:**
 - Actors **can be relocated** between cores at runtime (load balancing)
-- A single Neuron OS instance **can span multiple chips** (F7+ distributed)
+- A single Symphact instance **can span multiple chips** (F7+ distributed)
 - Local and distributed systems **run the same code**
 
 ### 6. Capability-based security
 
 An actor can **only** send a message to another if it knows its reference. The reference is a **capability** -- possession equals authorization. There is no global namespace (like Unix `/dev/sda`), no all-powerful "root" user.
 
-This is the security model of CHERI and seL4, which Neuron OS uses natively, **because the hardware (CLI-CPU) is inherently shared-nothing**.
+This is the security model of CHERI and seL4, which Symphact uses natively, **because the hardware (CLI-CPU) is inherently shared-nothing**.
 
 ### 7. Hot code loading
 
-**New CIL code can be loaded into a running system** without downtime. An actor can receive its last message with `v1` and the next one with `v2` -- the **supervisor** coordinates the transition. This is a 40-year-old feature of Erlang OTP, which Neuron OS natively supports.
+**New CIL code can be loaded into a running system** without downtime. An actor can receive its last message with `v1` and the next one with `v2` -- the **supervisor** coordinates the transition. This is a 40-year-old feature of Erlang OTP, which Symphact natively supports.
 
 The **writable microcode SRAM** (F6+ Rich core) makes it possible to **override opcode semantics at runtime** as well, if needed -- e.g., pushing a hotfix into a live system.
 
 ### 8. Determinism by default
 
-Neuron OS is **deterministic by default**: the same sequence of inputs produces the same state. This:
+Symphact is **deterministic by default**: the same sequence of inputs produces the same state. This:
 - Yields reproducible bugs
 - Enables **message replay** based debugging
 - Is amenable to formal verification
@@ -141,11 +141,11 @@ Neuron OS is **deterministic by default**: the same sequence of inputs produces 
 
 Non-deterministic behavior is **explicit** -- timing, random numbers, external I/O -- and is always visible in the code.
 
-## The inherited problems of Linux and the Neuron OS answer
+## The inherited problems of Linux and the Symphact answer
 
 This section provides a concrete comparison showing why we do **not** want to exist **alongside** Linux, but rather **replace the Linux legacy** on foundations tailored to modern requirements.
 
-| Problem category | Linux (Unix legacy) | Neuron OS |
+| Problem category | Linux (Unix legacy) | Symphact |
 |-----------------|---------------------|-----------|
 | **Kernel architecture** | Monolithic kernel, ~40M lines of C, a single driver bug = system crash | Microkernel actor hierarchy, ~1-2k lines of kernel, driver crash = supervisor restart |
 | **Security incidents** | ~500+ CVEs/year, kernel exploits are common (Dirty Pipe, Dirty COW, etc.) | Architecturally excluded ROP/JOP/buffer overflow/JIT spray, formally verifiable |
@@ -172,7 +172,7 @@ This section provides a concrete comparison showing why we do **not** want to ex
 
 ### What we learn from the success of Linux
 
-Let us be honest: Linux is a **tremendous success**. A $15+ billion annual enterprise ecosystem, running every modern cloud, every Android phone, every supercomputer. This **cannot be ignored**, and Neuron OS should not believe it will replace it overnight.
+Let us be honest: Linux is a **tremendous success**. A $15+ billion annual enterprise ecosystem, running every modern cloud, every Android phone, every supercomputer. This **cannot be ignored**, and Symphact should not believe it will replace it overnight.
 
 What we learn from the success of Linux:
 - **Open source** -- community development, transparent decisions
@@ -182,24 +182,24 @@ What we learn from the success of Linux:
 - **Tool ecosystem** -- compilers, debuggers, profilers, testers
 - **Hardware support** -- many drivers, many platforms
 
-Neuron OS **aspires to all of these**, but **on different foundations**.
+Symphact **aspires to all of these**, but **on different foundations**.
 
 ### What will happen to Linux?
 
-Neuron OS **does not want Linux to disappear from one day to the next**. The real transition is long-term, perhaps **10-20 years**:
+Symphact **does not want Linux to disappear from one day to the next**. The real transition is long-term, perhaps **10-20 years**:
 
-| Period | Linux position | Neuron OS position |
+| Period | Linux position | Symphact position |
 |--------|---------------|-------------------|
 | **2026-2030** | Dominant everywhere | F1-F6 development, F6 first silicon, Cognitive Fabric proof, embedded niche |
 | **2030-2035** | Dominant on desktop, server, mobile; facing challenges in regulated industries | Commercial products in specific verticals: AI safety, critical infra, automotive, medical |
 | **2035-2040** | Conservative cloud, legacy | New cloud architectures on Cognitive Fabric (actor-based hyperscalers); edge computing dominant |
-| **2040-2050** | Legacy support | Default platform for new systems, Neuron OS fills the role Linux once held |
+| **2040-2050** | Legacy support | Default platform for new systems, Symphact fills the role Linux once held |
 
-**This is not a guarantee**, just one possible future. But **let us be clear**: the goal is not to **coexist alongside** Linux, but to **fill the role of Linux's successor** through a long, organic transition. Just as x86 replaced the mainframe (1980-2000), mobile replaced the desktop (2007-2020), and cloud replaced on-prem (2010-2025) -- **Cognitive Fabric + Neuron OS will be the next replacement cycle**, starting in 2026.
+**This is not a guarantee**, just one possible future. But **let us be clear**: the goal is not to **coexist alongside** Linux, but to **fill the role of Linux's successor** through a long, organic transition. Just as x86 replaced the mainframe (1980-2000), mobile replaced the desktop (2007-2020), and cloud replaced on-prem (2010-2025) -- **Cognitive Fabric + Symphact will be the next replacement cycle**, starting in 2026.
 
 ## System architecture -- as a hierarchy of actors
 
-Neuron OS is **not a kernel/user mode** system. There is no kernel space and user space separation, because **hardware isolation** (shared-nothing multi-core) already guarantees what other OSes achieve with kernel/user mode switches. Instead, **privilege levels are expressed through actor relationships**: an actor can perform a privileged operation (e.g., DMA, network hardware) only if it knows the **device actor** reference.
+Symphact is **not a kernel/user mode** system. There is no kernel space and user space separation, because **hardware isolation** (shared-nothing multi-core) already guarantees what other OSes achieve with kernel/user mode switches. Instead, **privilege levels are expressed through actor relationships**: an actor can perform a privileged operation (e.g., DMA, network hardware) only if it knows the **device actor** reference.
 
 ### Boot-time actor hierarchy
 
@@ -234,7 +234,7 @@ Neuron OS is **not a kernel/user mode** system. There is no kernel space and use
 
 ### Kernel actors (root level)
 
-These are the "kernel" of Neuron OS, but they do not run in kernel mode -- rather, they are **special actors running on a few Rich cores**:
+These are the "kernel" of Symphact, but they do not run in kernel mode -- rather, they are **special actors running on a few Rich cores**:
 
 1. **`root_supervisor`** -- the first actor, parent of all others. Very simple, only restart logic. It never fails, because there is nothing it can do wrong.
 2. **`scheduler`** -- decides which actor runs on which core. Not preemptive (actors cooperatively yield control at message-processing boundaries), **but the supervisor can stop** a stuck actor.
@@ -311,7 +311,7 @@ If the actor causes a fault (`OVERFLOW` trap, `NULL_REFERENCE` trap, etc.), the 
 - Receives the `{crashed, actor_ref, reason}` message
 - Decides: **restart** (to the same state as spawn), **escalate** (to its own supervisor), or **stop** (permanent shutdown)
 
-Erlang OTP defines four restart strategies: `one_for_one`, `one_for_all`, `rest_for_one`, `simple_one_for_one`. Neuron OS supports all of them.
+Erlang OTP defines four restart strategies: `one_for_one`, `one_for_all`, `rest_for_one`, `simple_one_for_one`. Symphact supports all of them.
 
 ## Message routing
 
@@ -321,7 +321,7 @@ A message can reach its target via **four routes**, in order of increasing cost:
 
 1. **Local** (on the same core, internal messages within the same actor) -- ~1-3 cycles, zero copy
 2. **Inter-core** (on the same chip, different core) -- ~10-20 cycles, through hardware mailbox FIFO
-3. **Inter-chip** (distributed, on another Neuron OS node) -- ~100-1000 cycles, through a dedicated network actor
+3. **Inter-chip** (distributed, on another Symphact node) -- ~100-1000 cycles, through a dedicated network actor
 4. **Wide area** (over the internet to another geographic node) -- ~ms, also through a network actor
 
 The router handles all four **transparently**. The developer uses the same `send(ref, msg)` call.
@@ -366,7 +366,7 @@ Cores **cannot see each other's memory**. "Sharing" is only possible through mes
 
 Rich cores have their own **bump allocator + mark-sweep GC**. There is **no global GC**, **no stop-the-world across the entire chip**. When one core runs GC, all other cores work **completely independently**.
 
-This is **one of the greatest simplifications** of the shared-nothing model. In Akka.NET the global .NET GC is the bottleneck under high load; on Neuron OS **this problem does not exist**.
+This is **one of the greatest simplifications** of the shared-nothing model. In Akka.NET the global .NET GC is the bottleneck under high load; on Symphact **this problem does not exist**.
 
 ### Zero-copy messaging (local)
 
@@ -378,7 +378,7 @@ When an actor sends a message to another actor **on the same core**, the runtime
 
 ### The concept of a capability
 
-A **capability** is an unforgeable token representing a specific authorization. In Neuron OS, **the actor reference itself is a capability**:
+A **capability** is an unforgeable token representing a specific authorization. In Symphact, **the actor reference itself is a capability**:
 
 ```csharp
 ActorRef uartDevice = ...;  // this is a capability
@@ -410,13 +410,13 @@ The CLI-CPU's hardware **shared-nothing** architecture guarantees:
 - An actor **cannot** access a peripheral unless it knows the device actor reference
 - An actor **cannot** send a deceptive message on behalf of another actor -- the router verifies the sender's capability
 
-**This is a hardware-implemented capability-based OS** -- what until now only seL4 and CHERI offered at an academic level, and what Neuron OS brings to the .NET world.
+**This is a hardware-implemented capability-based OS** -- what until now only seL4 and CHERI offered at an academic level, and what Symphact brings to the .NET world.
 
 ## Dynamic code loading
 
 ### Hot code loading
 
-**New CIL code can be loaded** into a running Neuron OS without downtime. The process:
+**New CIL code can be loaded** into a running Symphact without downtime. The process:
 
 1. An external source (flash update, network message, USB) sends the new CIL binary to the `hot_code_loader` actor
 2. The loader **verifies**: opcode whitelist, capability check, signature check
@@ -452,7 +452,7 @@ The Rich core will have **writable microcode SRAM** from F6. This makes it possi
 
 ### Device actors
 
-Every hardware peripheral is a **device actor** in Neuron OS. The device actor:
+Every hardware peripheral is a **device actor** in Symphact. The device actor:
 - Owns the MMIO region of the given peripheral
 - Can receive messages requesting peripheral operations
 - Can send messages (e.g., notifying a subscribed reader actor about received UART bytes)
@@ -513,7 +513,7 @@ The developer does **not** think as a kernel programmer, but as a **C# programme
 ### Basic actor
 
 ```csharp
-using NeuronOS;
+using Symphact;
 
 public class CounterActor : Actor<CounterState> {
     public override CounterState Init() => new CounterState(Value: 0);
@@ -579,7 +579,7 @@ public class SnnCoordinatorActor : Actor<CoordinatorState> {
 ### Distributed actor (F7)
 
 ```csharp
-// If Neuron OS runs distributed across multiple chips:
+// If Symphact runs distributed across multiple chips:
 var remoteActor = ActorRef.FromUri("neuron://chip2.local/neural_workers/neuron_0042");
 remoteActor.Send(new SpikeMsg(weight: 100));
 // the local router detects it is remote and routes through the network_device actor
@@ -587,7 +587,7 @@ remoteActor.Send(new SpikeMsg(weight: 100));
 
 ## Relationship to the Cognitive Fabric positioning
 
-Neuron OS is **not a separate product** from the CLI-CPU hardware -- **it is the software layer that makes the Cognitive Fabric positioning real**. The same hardware (CLI-CPU multi-core + mailbox + heterogeneous Nano+Rich) supports **different** usage modes on **the same** Neuron OS foundation:
+Symphact is **not a separate product** from the CLI-CPU hardware -- **it is the software layer that makes the Cognitive Fabric positioning real**. The same hardware (CLI-CPU multi-core + mailbox + heterogeneous Nano+Rich) supports **different** usage modes on **the same** Symphact foundation:
 
 | Usage mode | What the actors run | Supervisor tree characteristics |
 |-----------|---------------------|-------------------------------|
@@ -598,11 +598,11 @@ Neuron OS is **not a separate product** from the CLI-CPU hardware -- **it is the
 | **Telecommunications stack** | Call handling, session management | Per-call supervisor (Erlang style) |
 | **Blockchain validator** | Consensus + transaction verification | Flat, peer-based |
 
-**The same operating system**, **the same hardware**, **the same programming model** -- **different** application actors, **different** roles. Neuron OS is the "lingua franca" that places every Cognitive Fabric application on a unified platform.
+**The same operating system**, **the same hardware**, **the same programming model** -- **different** application actors, **different** roles. Symphact is the "lingua franca" that places every Cognitive Fabric application on a unified platform.
 
 ## Phased implementation
 
-Neuron OS is **not one big leap**, but **builds organically** over the F1-F7 phases, adding the next layer in each phase.
+Symphact is **not one big leap**, but **builds organically** over the F1-F7 phases, adding the next layer in each phase.
 
 ### F1 -- Minimal runtime in the C# simulator
 **Output:** a simple "actor runner" that provides actor-like abstractions within the simulator.
@@ -629,7 +629,7 @@ This is the **first hardware approximation** — the F1 software abstraction mee
 - Starts a single actor (e.g., the "echo neuron")
 - Forwards bytes arriving on UART through a mailbox, takes output bytes from there as well
 
-**This is the first real hardware "Neuron OS"**, albeit still single-actor.
+**This is the first real hardware "Symphact"**, albeit still single-actor.
 
 ### F4 -- Multi-core scheduler + router
 **Output:** on the 4-core FPGA system:
@@ -648,7 +648,7 @@ This is a **4-actor system**, where the scheduler + router already play a real r
 - Actor migration from Nano to Rich via trap
 - `[RunsOn]` attribute via Roslyn source generator
 
-This is **the first usable Neuron OS**, capable of running real C# programs in an actor-oriented fashion.
+This is **the first usable Symphact**, capable of running real C# programs in an actor-oriented fashion.
 
 ### F6-FPGA -- Hot code loading, distributed multi-board
 **Output:** on a 3x A7-Lite 200T multi-board Ethernet network:
@@ -657,7 +657,7 @@ This is **the first usable Neuron OS**, capable of running real C# programs in a
 - Real test of location transparency -- cross-chip actor communication
 - Full capability registry with signing
 
-This is the **FPGA-verified, distributed** Neuron OS -- the first demonstration of a true multi-chip Cognitive Fabric.
+This is the **FPGA-verified, distributed** Symphact -- the first demonstration of a true multi-chip Cognitive Fabric.
 
 ### F6-Silicon -- Writable microcode, silicon verification
 **Output:** ChipIgnite real silicon (only after F6-FPGA verification):
@@ -665,17 +665,17 @@ This is the **FPGA-verified, distributed** Neuron OS -- the first demonstration 
 - Writable microcode SRAM (silicon-specific)
 - Power efficiency and clock frequency measurement
 
-This is the **silicon-mature** Neuron OS.
+This is the **silicon-mature** Symphact.
 
 ### F7 -- Developer SDK + reference applications
 **Output:** a public platform:
-- `dotnet publish` target for Neuron OS
+- `dotnet publish` target for Symphact
 - VSCode / VS extension debugger
-- NuGet packages (`NeuronOS.Core`, `NeuronOS.Actor`, `NeuronOS.Devices`)
+- NuGet packages (`Symphact.Core`, `Symphact.Actor`, `Symphact.Devices`)
 - Reference demo applications: SNN, Akka.NET port, IoT gateway, multi-agent sim
 - Publication + talks + Linux Foundation project status
 
-**This is Neuron OS graduating from research level to a real developer platform.**
+**This is Symphact graduating from research level to a real developer platform.**
 
 ### Long-term applications -- beyond F7
 
@@ -687,7 +687,7 @@ The CFPU actor-fabric architecture naturally scales to problems based on **massi
 
 - **Spiking Neural Networks (SNN)** -- a natural mapping of biological neural networks: each neuron is an actor, spikes are messages, and actor references (`TActorRef`) are synaptic connections -- holding a reference grants the ability to send a spike, just like in biology. The CFPU's hardware mailboxes model synaptic transmission natively, without software overhead.
 
-These are not promises but **architectural motivation**: validation that the CFPU + Neuron OS design decisions -- the actor-based, shared-nothing model -- are not merely theoretical elegance but the natural language for future computational problems.
+These are not promises but **architectural motivation**: validation that the CFPU + Symphact design decisions -- the actor-based, shared-nothing model -- are not merely theoretical elegance but the natural language for future computational problems.
 
 ## Prior art -- what we learn from other systems
 
@@ -737,7 +737,7 @@ These are not promises but **architectural motivation**: validation that the CFP
 
 **What we adopt:** the API in part, the programming model, the toolkit.
 
-## What Neuron OS deliberately does **not** replicate -- conscious architectural decisions
+## What Symphact deliberately does **not** replicate -- conscious architectural decisions
 
 These are **not limitations** but **conscious design decisions** -- rejecting inherited 1970s compromises that no longer meet today's requirements. What we do not do the **same way** as Linux, we do **better**.
 
@@ -745,51 +745,51 @@ These are **not limitations** but **conscious design decisions** -- rejecting in
 
 There is no `fork()`, `exec()`, `open()`, `close()`, `read()`, `write()` in the traditional sense. **Why this is fine:** these APIs were designed for 1970s single-core, low-memory Unix systems operating on character terminals. `fork()`, for instance, **copies an address space identical to another process** -- this is the **least secure** symptom of the shared memory model, and an increasingly severe performance and security problem in modern multi-core systems.
 
-Instead, Neuron OS provides **modern alternatives**: `Spawn<Actor>()` (not `fork`), `Send(actorRef, msg)` (not `write()` to an fd), `Receive()` (not blocking `read()`), `ActorRef` (not `fd`). If porting an old POSIX application is needed, **a software compatibility layer** can be built on Neuron OS (like Windows WSL2 in reverse) -- but **the native programming model is clearly more modern and secure**.
+Instead, Symphact provides **modern alternatives**: `Spawn<Actor>()` (not `fork`), `Send(actorRef, msg)` (not `write()` to an fd), `Receive()` (not blocking `read()`), `ActorRef` (not `fd`). If porting an old POSIX application is needed, **a software compatibility layer** can be built on Symphact (like Windows WSL2 in reverse) -- but **the native programming model is clearly more modern and secure**.
 
 ### 2. Not a monolithic kernel -- instead, an actor hierarchy
 
-No kernel space, no user space, no system call overhead. **Why this is better:** the kernel/user mode switch costs ~1000 cycles on every system call, and Spectre/Meltdown/L1TF all attempt to cross privilege boundaries. On Neuron OS **there are no such boundaries** -- every component is an actor, and hardware shared-nothing isolation guarantees what other OSes provide via kernel/user mode switching. An actor cannot write to another actor's memory **not because the kernel stops it**, but because **no such physical path exists**.
+No kernel space, no user space, no system call overhead. **Why this is better:** the kernel/user mode switch costs ~1000 cycles on every system call, and Spectre/Meltdown/L1TF all attempt to cross privilege boundaries. On Symphact **there are no such boundaries** -- every component is an actor, and hardware shared-nothing isolation guarantees what other OSes provide via kernel/user mode switching. An actor cannot write to another actor's memory **not because the kernel stops it**, but because **no such physical path exists**.
 
 ### 3. Not a global filesystem scheme -- instead, a structured storage service
 
-A file is **not a byte stream** in Neuron OS. **Why this is better:** the Unix "everything is a file" abstraction obscures many modern data structures (time-series data, graphs, object schemas, eventually-consistent stores). Today these are **all layered on top of the filesystem** (SQLite, RocksDB, LevelDB), adding complexity and vulnerability.
+A file is **not a byte stream** in Symphact. **Why this is better:** the Unix "everything is a file" abstraction obscures many modern data structures (time-series data, graphs, object schemas, eventually-consistent stores). Today these are **all layered on top of the filesystem** (SQLite, RocksDB, LevelDB), adding complexity and vulnerability.
 
-On Neuron OS, **data arrives and departs as actor messages**, and the "storage service" is a **structured actor system** that directly understands data structures. A POSIX compatibility layer at the edge can provide the traditional filesystem API if needed.
+On Symphact, **data arrives and departs as actor messages**, and the "storage service" is a **structured actor system** that directly understands data structures. A POSIX compatibility layer at the edge can provide the traditional filesystem API if needed.
 
 ### 4. Not shared memory + mutex -- instead, actor message passing
 
 There is no `pthread_mutex_lock`, `pthread_cond_wait`, `shm_open`, `mmap(MAP_SHARED)`. **Why this is better:** these primitives **architecturally enable** race conditions, deadlocks, and data corruption. For decades, they have been the **hardest class of bugs to fix** in programming.
 
-Actor message passing **architecturally excludes** these. It does not make them harder -- it makes them **physically impossible**. The performance that shared memory promised is available in the Neuron OS + CLI-CPU combination as **zero-copy mailbox**, but **without** the risk of race conditions.
+Actor message passing **architecturally excludes** these. It does not make them harder -- it makes them **physically impossible**. The performance that shared memory promised is available in the Symphact + CLI-CPU combination as **zero-copy mailbox**, but **without** the risk of race conditions.
 
 ### 5. Not POSIX user/group permissions -- instead, capability-based security
 
 There is no `chmod`, `chown`, `setuid`, `setgid`, `/etc/passwd`. **Why this is better:** the Unix permission model was born in 1970, when 10-20 users shared a machine and trust was assumed. In today's world of containers, multi-tenant cloud, and AI agents, this is **absurd**. A single root user holds **every** permission, which with a single bug leads to **total compromise**.
 
-Neuron OS's **capability-based security** model is **more nuanced, finer-grained, and delegatable**. An actor has authorization for an operation **only if** someone has **given** it the appropriate capability. There is no global "root" -- everyone can only do what they have been explicitly authorized to do. This is the model of CHERI and seL4, proven by decades of research.
+Symphact's **capability-based security** model is **more nuanced, finer-grained, and delegatable**. An actor has authorization for an operation **only if** someone has **given** it the appropriate capability. There is no global "root" -- everyone can only do what they have been explicitly authorized to do. This is the model of CHERI and seL4, proven by decades of research.
 
 ### 6. Not manual memory management in unsafe-by-default languages -- instead, type-safe, garbage-collected actors
 
 There is no `malloc`/`free`, no `char *`, no `void *`. **Why this is better:** C/C++ memory management is the **primary source** of security bugs. More than 70% of CVEs stem from memory safety errors. Rust solves this at the software level, but the existing 30+ million lines of C/C++ code will **never be fully rewritten**.
 
-On Neuron OS, everything is **type-safe by default**, with hardware GC, built on CIL ECMA-335 verifiable code semantics. A developer **cannot** write a memory corruption bug for Neuron OS, because neither the language (C#), nor the runtime (CLI-CPU), nor the ISA (CIL-T0/Rich) **allows it**.
+On Symphact, everything is **type-safe by default**, with hardware GC, built on CIL ECMA-335 verifiable code semantics. A developer **cannot** write a memory corruption bug for Symphact, because neither the language (C#), nor the runtime (CLI-CPU), nor the ISA (CIL-T0/Rich) **allows it**.
 
 ### 7. Not kernel panic + reboot -- instead, let it crash + supervision
 
 When a driver fails in Linux, it is a **kernel panic**, and the system reboots. Modern Linux does much to avoid this (recovery subsystems, kprobes, live patching), but the **basic model** is "kernel bug leads to system halt."
 
-On Neuron OS, a driver is **an actor**, and when it fails, the **supervisor restarts it**. The rest of the system **remains unaffected**. This is an approach **proven over 40 years** in Erlang (Ericsson AXD301, 9-nines availability), and Neuron OS naturally uses it.
+On Symphact, a driver is **an actor**, and when it fails, the **supervisor restarts it**. The rest of the system **remains unaffected**. This is an approach **proven over 40 years** in Erlang (Ericsson AXD301, 9-nines availability), and Symphact naturally uses it.
 
-## Long-term possibilities -- what Neuron OS **naturally** opens up
+## Long-term possibilities -- what Symphact **naturally** opens up
 
-This section describes areas that are **not first-generation goals**, but where the Neuron OS architecture is **inherently** suited, and which **in the long term** (after F7, 2035+ timeframe) can become reality -- and in certain areas can be **dramatically better** than current Linux/Windows/macOS solutions. These are not "someday maybe" afterthoughts, but **the project's future opportunity horizon**.
+This section describes areas that are **not first-generation goals**, but where the Symphact architecture is **inherently** suited, and which **in the long term** (after F7, 2035+ timeframe) can become reality -- and in certain areas can be **dramatically better** than current Linux/Windows/macOS solutions. These are not "someday maybe" afterthoughts, but **the project's future opportunity horizon**.
 
 ### 1. Interactive desktop UI -- natively actor-based
 
-On Neuron OS, **a desktop UI is a natural fit**, because every UI element is fundamentally actor-like:
+On Symphact, **a desktop UI is a natural fit**, because every UI element is fundamentally actor-like:
 
-| UI component | On traditional OS | On Neuron OS |
+| UI component | On traditional OS | On Symphact |
 |-------------|-------------------|--------------|
 | Widget | Shared state, callback chain | **Actor** (own state, `Receive` method) |
 | Window | Kernel+compositor shared resource | **Actor hierarchy** (window + child widgets) |
@@ -811,15 +811,15 @@ On Neuron OS, **a desktop UI is a natural fit**, because every UI element is fun
 - **Elm architecture** -- explicit update + view, a clear actor pattern
 - **Jetpack Compose** (Android) -- declarative, reactive
 
-**A Neuron OS Desktop** would not replicate the X11/Wayland model, but would be **natively actor-based**: every widget is a `UiWidgetActor`, every window is a `WindowActor`, compositing is a `RenderSupervisorActor`. A **React/Flutter-like API** in C#, built directly on the Neuron OS runtime. This is **much simpler** than the Linux stack, and **much more robust**.
+**A Symphact Desktop** would not replicate the X11/Wayland model, but would be **natively actor-based**: every widget is a `UiWidgetActor`, every window is a `WindowActor`, compositing is a `RenderSupervisorActor`. A **React/Flutter-like API** in C#, built directly on the Symphact runtime. This is **much simpler** than the Linux stack, and **much more robust**.
 
-**When:** 2035+ timeframe, after F7 in a separate "Neuron OS Desktop" project. Not first generation, but **not unattainable either** -- there just **isn't time yet**. When the moment comes, the system **will be ready**.
+**When:** 2035+ timeframe, after F7 in a separate "Symphact Desktop" project. Not first generation, but **not unattainable either** -- there just **isn't time yet**. When the moment comes, the system **will be ready**.
 
 ### 2. Gaming platform -- native ECS + deterministic multiplayer
 
 Modern games are **actor-like by nature**. The **Entity Component System (ECS)** paradigm (followed by Unity DOTS, Unreal Engine Mass, and Bevy) approximates the actor model.
 
-| Game component | Traditional implementation | On Neuron OS |
+| Game component | Traditional implementation | On Symphact |
 |---------------|--------------------------|--------------|
 | Player entity | Shared memory object, protected by mutex | **Actor** (own state, messages) |
 | NPC / AI agent | Thread pool, synchronization | **Actor** (one per NPC), native parallelism |
@@ -830,11 +830,11 @@ Modern games are **actor-like by nature**. The **Entity Component System (ECS)**
 | Input | Polling vs event | **Mailbox-based** |
 
 **What is fundamentally better:**
-- **No data races** between NPCs -- traditional games are **full of** synchronization bugs that on Neuron OS are **physically impossible**
+- **No data races** between NPCs -- traditional games are **full of** synchronization bugs that on Symphact are **physically impossible**
 - **Massively parallel AI** -- 10,000 NPCs in an MMO? Every NPC on its own Nano core, with real parallelism. **A scale** that today's game engines cannot achieve
 - **Deterministic multiplayer sync** -- since every message arrives in strict order and every actor is deterministic, **lockstep** multiplayer synchronization is **natively** achievable (which is very difficult on traditional systems)
 - **Hot modding** -- new NPC behaviors, new rules, new items can be **loaded at runtime** with Erlang-style hot code loading. The Minecraft modding ecosystem would be **exponentially simpler** on this model
-- **Formally verifiable game logic** -- a competitive game's (esport) logic can be **provably fair mathematically** when running on Neuron OS -- no anti-cheat heuristics needed, the system **architecturally** prevents cheating
+- **Formally verifiable game logic** -- a competitive game's (esport) logic can be **provably fair mathematically** when running on Symphact -- no anti-cheat heuristics needed, the system **architecturally** prevents cheating
 - **Entity isolation** -- if an NPC AI script fails, **only that NPC** dies, the supervisor restarts it. The game continues
 
 **Current examples already moving toward the actor direction:**
@@ -843,9 +843,9 @@ Modern games are **actor-like by nature**. The **Entity Component System (ECS)**
 - **Path of Exile 2** -- the new engine explicitly works on an "everything is an actor" philosophy
 - **No Man's Sky** -- procedural generation runs in parallel per entity
 
-**Unity DOTS** and **Unreal Mass** try to achieve in software on traditional CPUs what Neuron OS would provide **in hardware for free**.
+**Unity DOTS** and **Unreal Mass** try to achieve in software on traditional CPUs what Symphact would provide **in hardware for free**.
 
-**When:** 2030+ timeframe, if a game studio or indie team starts using it **as a partner**. A **realtime engine** takes years to develop, but **architecturally** Neuron OS is the **ideal** foundation for a next-generation game engine.
+**When:** 2030+ timeframe, if a game studio or indie team starts using it **as a partner**. A **realtime engine** takes years to develop, but **architecturally** Symphact is the **ideal** foundation for a next-generation game engine.
 
 ### 3. AI in a new dimension -- an AI-native operating system
 
@@ -861,9 +861,9 @@ The current AI hardware and software **stack** is a pile of layers:
 - Training / inference runtime
 - Agent framework (LangChain, AutoGen, Claude Agent)
 
-**Every layer has overhead, vulnerability, and complexity**. Neuron OS **drastically** simplifies this, because **the system itself is actor-oriented, which naturally fits AI**.
+**Every layer has overhead, vulnerability, and complexity**. Symphact **drastically** simplifies this, because **the system itself is actor-oriented, which naturally fits AI**.
 
-#### Seven AI domains where Neuron OS is fundamentally better
+#### Seven AI domains where Symphact is fundamentally better
 
 ##### (1) Hardware neural network execution -- not simulation
 
@@ -881,7 +881,7 @@ The memory manager, network router, GC, supervisor strategies -- **all** can be 
 
 ##### (3) Agent hierarchy in hardware
 
-Today's **LLM agent** systems (AutoGen, Claude Agent, OpenAI Swarm) are **software layers** on top of a traditional OS, in Python. On Neuron OS, **every agent is its own hardware actor**, running a full LLM on a Rich core, or a small specialist model on a Nano core.
+Today's **LLM agent** systems (AutoGen, Claude Agent, OpenAI Swarm) are **software layers** on top of a traditional OS, in Python. On Symphact, **every agent is its own hardware actor**, running a full LLM on a Rich core, or a small specialist model on a Nano core.
 
 The agent hierarchy is **natively** a supervisor tree: a supervisor agent oversees worker agents, restarts them on failure, or escalates. This is **production-grade** agent-based AI -- what today's software solutions only **promise**.
 
@@ -889,7 +889,7 @@ The agent hierarchy is **natively** a supervisor tree: a supervisor agent overse
 
 **This is the biggest deal.** Today's AI systems (LLMs, neural networks) are **unprovable** -- we cannot mathematically verify that for a given input, the model guarantees a safe response. This blocks AI adoption in safety-critical domains (medical diagnosis, autonomous vehicles, critical infrastructure).
 
-On **Neuron OS**, however:
+On **Symphact**, however:
 - The **operating system** is formally verifiable (in the seL4 size class)
 - The **CLI-CPU ISA** is formally verifiable
 - The **actor system topology** is deterministic and describable
@@ -897,23 +897,23 @@ On **Neuron OS**, however:
 
 This means that **an AI agent's range of action is mathematically provable**, even if the AI model itself is stochastic. We know that the agent will **never** reach resource X, **never** send data Y, **never** perform operation Z -- because the capability model **does not allow it**. The non-deterministic LLM runs **within deterministic boundaries**.
 
-This is **revolutionarily important** for the future of **regulated AI**. The EU AI Act and similar regulations will demand precisely **this** -- and Neuron OS is the **only platform** that can provide it **architecturally**.
+This is **revolutionarily important** for the future of **regulated AI**. The EU AI Act and similar regulations will demand precisely **this** -- and Symphact is the **only platform** that can provide it **architecturally**.
 
 ##### (5) Architectural defense against prompt injection
 
 The biggest security problem of today's LLM agents is **prompt injection**: a malicious input manipulates the agent into performing an unauthorized action. Today's defenses are **software heuristics** (guardrails, output filters, jailbreak detectors) -- all **circumventable**.
 
-Neuron OS provides **architectural** defense:
+Symphact provides **architectural** defense:
 - An agent can only perform operations for which it has a **capability**
 - The agent **cannot modify** its own capabilities (hardware isolation)
 - The agent **cannot** reach other actors beyond those whose references it holds
 - A supervisor actor can **monitor** agent behavior and **shut it down** if it detects anomalies
 
-This means that **no matter how prompt injection tricks an LLM**, Neuron OS **physically does not allow** the desired malicious operation to be carried out. **This is an entirely new security paradigm for AI agents.**
+This means that **no matter how prompt injection tricks an LLM**, Symphact **physically does not allow** the desired malicious operation to be carried out. **This is an entirely new security paradigm for AI agents.**
 
 ##### (6) Federated / distributed learning natively
 
-Federated learning (model training across multiple independent datasets without combining the data) today requires complex infrastructure (e.g., NVIDIA FLARE, TensorFlow Federated). On Neuron OS this is **native**: every node is a set of actors, messages (gradients, weights) flow between nodes, and thanks to **location transparency** the developer writes **the same code** locally and distributed.
+Federated learning (model training across multiple independent datasets without combining the data) today requires complex infrastructure (e.g., NVIDIA FLARE, TensorFlow Federated). On Symphact this is **native**: every node is a set of actors, messages (gradients, weights) flow between nodes, and thanks to **location transparency** the developer writes **the same code** locally and distributed.
 
 ##### (7) Swarm intelligence and multi-agent simulation
 
@@ -921,7 +921,7 @@ Cognitive Fabric offers **exactly** what swarm intelligence and multi-agent AI s
 
 #### Concrete opportunities
 
-| AI application | What Neuron OS provides |
+| AI application | What Symphact provides |
 |---------------|------------------------|
 | **Autonomous vehicle AI** | Formally verifiable perception + planning, deterministic realtime, AI safety watchdog |
 | **Medical diagnostic AI** | Class C certifiable, auditability, privacy-preserving |
@@ -935,7 +935,7 @@ Cognitive Fabric offers **exactly** what swarm intelligence and multi-agent AI s
 
 #### Why this is a new dimension
 
-Because until now, the AI platform race has been about **computational throughput**. "More FLOPS, more parameters, bigger model." Cognitive Fabric + Neuron OS **competes on a different axis**: **programmability, security, scalability, certifiability**.
+Because until now, the AI platform race has been about **computational throughput**. "More FLOPS, more parameters, bigger model." Cognitive Fabric + Symphact **competes on a different axis**: **programmability, security, scalability, certifiability**.
 
 This **creates a new category**:
 - Not an "AI accelerator" (like NVIDIA H100, Google TPU)
@@ -945,19 +945,19 @@ This **creates a new category**:
 
 Rather, a **"programmable cognitive substrate"** -- the first platform where AI is **not a layer running on top of a traditional OS, but an integrated part of the system**. Where the operating system itself is **AI-based**, where every agent is **hardware-isolated**, and where **formal verification** is not just a slogan but mathematical reality.
 
-**If the project achieves this, Neuron OS will not only be the successor to Linux, but the first native operating system of the AI era.** This is the CLI-CPU project's **most distant, most ambitious** horizon.
+**If the project achieves this, Symphact will not only be the successor to Linux, but the first native operating system of the AI era.** This is the CLI-CPU project's **most distant, most ambitious** horizon.
 
 ### 4. Ecosystem and platform -- long term
 
-Linux built a massive software ecosystem over 30 years (`apt`, `dnf`, `pacman`, `npm`, `PyPI`, `crates.io`, etc.). Neuron OS **will not replicate this overnight**, because it does not intend to -- the **native .NET ecosystem** (NuGet) + Neuron OS-specific packages will be **built over years**, on a **different** paradigm.
+Linux built a massive software ecosystem over 30 years (`apt`, `dnf`, `pacman`, `npm`, `PyPI`, `crates.io`, etc.). Symphact **will not replicate this overnight**, because it does not intend to -- the **native .NET ecosystem** (NuGet) + Symphact-specific packages will be **built over years**, on a **different** paradigm.
 
-**What is, however, inevitable:** every existing piece of software that compiles with `dotnet publish` and is a NuGet package can **in the long run** run natively on Neuron OS. The .NET ecosystem already has **~400,000+ packages** on NuGet, a significant portion of which **does not require P/Invoke** and **does not require reflection**, meaning they run **natively** on the CLI-CPU + Neuron OS combination.
+**What is, however, inevitable:** every existing piece of software that compiles with `dotnet publish` and is a NuGet package can **in the long run** run natively on Symphact. The .NET ecosystem already has **~400,000+ packages** on NuGet, a significant portion of which **does not require P/Invoke** and **does not require reflection**, meaning they run **natively** on the CLI-CPU + Symphact combination.
 
 **This is a huge springboard** that other new OS projects (Redox, Serenity, Haiku) never received. The .NET ecosystem **by itself** is a product line we can build upon.
 
 ## What we genuinely do not target (narrowed to a tight, conscious list)
 
-The only area where Neuron OS **explicitly does not want to be present**: **native execution of legacy POSIX binaries**. An existing C/C++ Linux program **will not run natively** on Neuron OS. If someone desperately wants it, a **compatibility layer** (Linux Subsystem for Neuron OS, LSNOS) can be built on top -- but this is **not the fundamental model**, and **we do not recommend** it for new code development.
+The only area where Symphact **explicitly does not want to be present**: **native execution of legacy POSIX binaries**. An existing C/C++ Linux program **will not run natively** on Symphact. If someone desperately wants it, a **compatibility layer** (Linux Subsystem for Symphact, LSNOS) can be built on top -- but this is **not the fundamental model**, and **we do not recommend** it for new code development.
 
 **Every other** area is potentially open in the long term -- time, team, and community will decide whether we actually get there.
 
@@ -978,40 +978,40 @@ These questions will be decided based on **F4 simulator + F5 FPGA** experience.
 
 ## Next steps
 
-Neuron OS development is **not a standalone phase** in the roadmap, but **builds organically along** the F1-F7 phases. The first concrete steps:
+Symphact development is **not a standalone phase** in the roadmap, but **builds organically along** the F1-F7 phases. The first concrete steps:
 
-1. **In F1**: the C# reference simulator should have a minimal `NeuronOS.Core` library project providing actor abstractions (`Actor<T>`, `Spawn`, `Send`, `Receive`). **This is not an OS yet**, just a developer convenience, but already enables writing actor-oriented code.
+1. **In F1**: the C# reference simulator should have a minimal `Symphact.Core` library project providing actor abstractions (`Actor<T>`, `Spawn`, `Send`, `Receive`). **This is not an OS yet**, just a developer convenience, but already enables writing actor-oriented code.
 
-2. **At F3 Tiny Tapeout bring-up**: the echo neuron demo should be a **real Neuron OS actor**, not just a C# program. The actor interface is minimal, but it is **explicitly** written as an actor.
+2. **At F3 Tiny Tapeout bring-up**: the echo neuron demo should be a **real Symphact actor**, not just a C# program. The actor interface is minimal, but it is **explicitly** written as an actor.
 
-3. **At the F4 multi-core FPGA demo**: the first **real** Neuron OS alpha -- 4 actors, scheduler, router, minimal supervisor. This is the *project's first milestone* where we can speak of an "OS."
+3. **At the F4 multi-core FPGA demo**: the first **real** Symphact alpha -- 4 actors, scheduler, router, minimal supervisor. This is the *project's first milestone* where we can speak of an "OS."
 
 4. **Document updates**: as real work progresses, this `vision.md` document will be **updated**, and open questions will be **resolved**.
 
 ## Closing thought -- the birth of a new paradigm
 
-Neuron OS is **not just another operating system** alongside the existing Linux, Windows, macOS family. It is **a new paradigm** that **replaces the 1970s Unix foundations inherited by Linux**, exactly as x86 replaced the mainframe, mobile replaced the desktop, and cloud replaced on-prem data centers.
+Symphact is **not just another operating system** alongside the existing Linux, Windows, macOS family. It is **a new paradigm** that **replaces the 1970s Unix foundations inherited by Linux**, exactly as x86 replaced the mainframe, mobile replaced the desktop, and cloud replaced on-prem data centers.
 
 ### Why this replacement **will be** inevitable
 
-1. **Security pressure** -- AI-driven code generation, supply chain attacks, and Spectre successors mean Linux architecturally cannot keep pace. On Neuron OS, **these attack classes are architecturally excluded**.
+1. **Security pressure** -- AI-driven code generation, supply chain attacks, and Spectre successors mean Linux architecturally cannot keep pace. On Symphact, **these attack classes are architecturally excluded**.
 
 2. **Scaling pressure** -- future hardware is **not 16-64 cores** but **10,000+ cores**. The shared memory model fails there. The actor model **scales linearly**.
 
-3. **Distributed-first world** -- cloud, edge, IoT, and AI agents are all **distributed** systems by default. Linux inherited the "local machine + networking bolted on" model. Neuron OS is **natively distributed**.
+3. **Distributed-first world** -- cloud, edge, IoT, and AI agents are all **distributed** systems by default. Linux inherited the "local machine + networking bolted on" model. Symphact is **natively distributed**.
 
-4. **Fault tolerance expectations** -- 9-nines availability, the "never reboot" expectation, and critical applications all demand **supervision**, which Linux can only provide with difficulty and bolted-on layers (systemd + K8s + service mesh). On Neuron OS this is **native**.
+4. **Fault tolerance expectations** -- 9-nines availability, the "never reboot" expectation, and critical applications all demand **supervision**, which Linux can only provide with difficulty and bolted-on layers (systemd + K8s + service mesh). On Symphact this is **native**.
 
-5. **The need for formal verification** -- safety-critical systems (medical, automotive, aviation, critical infrastructure) demand increasingly rigorous certification, which a **40M-line C kernel** will never achieve. Neuron OS is **formally verifiable**.
+5. **The need for formal verification** -- safety-critical systems (medical, automotive, aviation, critical infrastructure) demand increasingly rigorous certification, which a **40M-line C kernel** will never achieve. Symphact is **formally verifiable**.
 
-6. **AI paradigm shift** -- in the AI era, the operating system is **not a passive servant** but an **active participant**. Agent-based AI, federated learning, formally verified AI, prompt injection defense -- all are **architectural** requirements that Linux cannot provide with bolted-on layers, but Neuron OS delivers **natively**.
+6. **AI paradigm shift** -- in the AI era, the operating system is **not a passive servant** but an **active participant**. Agent-based AI, federated learning, formally verified AI, prompt injection defense -- all are **architectural** requirements that Linux cannot provide with bolted-on layers, but Symphact delivers **natively**.
 
-### What might be the long-term impact of Neuron OS
+### What might be the long-term impact of Symphact
 
 If all planned directions succeed:
 
-- **Critical infrastructure** (automotive, medical, aviation, energy) -- Neuron OS as the certified foundation, from 2030
-- **Hyperscale cognitive computing** -- Neuron OS + CLI-CPU as a new-category cloud server, from 2035
+- **Critical infrastructure** (automotive, medical, aviation, energy) -- Symphact as the certified foundation, from 2030
+- **Hyperscale cognitive computing** -- Symphact + CLI-CPU as a new-category cloud server, from 2035
 - **AI agent-cluster platform** -- secure, auditable, capability-based agent systems, **from 2030**
 - **Next-generation game engine** -- actor-native ECS, deterministic multiplayer, hardware NPC crowds, **from 2035**
 - **Next-generation desktop UI** -- reactive, hot-reload, crash-resistant widgets, **from 2040**
@@ -1023,11 +1023,11 @@ If all planned directions succeed:
 
 **Joe Armstrong, the father of Erlang, gave a talk in 2014 titled "The Mess We're In"**, where he explained that current software systems are built on **fundamentally wrong** models, and a new paradigm is needed that takes the Erlang actor model as a natural foundation. **He said there is a need for hardware where every core is an actor.** At the time it seemed unreachable, because **there was no hardware** that natively supported this.
 
-**Now there is.** The CLI-CPU cognitive fabric architecture is the first hardware that **physically makes** the Armstrong vision **possible**. And Neuron OS is the operating system we are building on that hardware.
+**Now there is.** The CLI-CPU cognitive fabric architecture is the first hardware that **physically makes** the Armstrong vision **possible**. And Symphact is the operating system we are building on that hardware.
 
 ### The real stakes
 
-If the project reaches F6-F7 and Neuron OS is operational, then **CLI-CPU + Neuron OS together** will be the first physical realization of a new computational paradigm that neither Erlang, nor QNX, nor seL4, nor Singularity could achieve in their own time:
+If the project reaches F6-F7 and Symphact is operational, then **CLI-CPU + Symphact together** will be the first physical realization of a new computational paradigm that neither Erlang, nor QNX, nor seL4, nor Singularity could achieve in their own time:
 
 > **The actor model natively in hardware**,
 > **faster than a classical shared-memory OS**,
@@ -1038,7 +1038,7 @@ If the project reaches F6-F7 and Neuron OS is operational, then **CLI-CPU + Neur
 
 This is a future that is still a vision today, but one that is **actually achievable** on **current hardware foundations** (Tiny Tapeout, eFabless, SkyWater, IHP, OpenLane2).
 
-**CLI-CPU is just a chip. Neuron OS is a new era.**
+**CLI-CPU is just a chip. Symphact is a new era.**
 
 This is the CLI-CPU project's most distant, **most valuable** horizon, and **this is the real stakes**: not building a small bytecode CPU, but **simultaneously laying the hardware and software foundations of a new computational paradigm**, upon which over 10-20 years **an entire ecosystem can be built** -- from embedded systems to AI agent clusters, through game engines to desktop UIs, from critical infrastructure to hardware neural networks.
 
@@ -1053,4 +1053,4 @@ This is the CLI-CPU project's most distant, **most valuable** horizon, and **thi
 | Version | Date | Summary |
 |---------|------|---------|
 | 1.0 | 2026-04-14 | Initial version, translated from Hungarian |
-| 1.3 | 2026-04-17 | **Moved to the Neuron OS repository** (previously `CLI-CPU/docs/neuron-os-en.md`). A short stub remains in CLI-CPU for historical links. Header boxes updated (the implementation now lives in this same repo). |
+| 1.3 | 2026-04-17 | **Moved to the Symphact repository** (previously `CLI-CPU/docs/symphact-en.md`). A short stub remains in CLI-CPU for historical links. Header boxes updated (the implementation now lives in this same repo). |

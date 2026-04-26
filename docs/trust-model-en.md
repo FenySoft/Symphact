@@ -6,7 +6,7 @@
 
 > Status: finalized deployment policy, basis for F6-Silicon One and later tape-outs
 
-This document records the **trust model** of the Neuron OS / CFPU product line: who issues bytecode-signing identities, how customers obtain signing identities, and **which options are explicitly NOT supported** for security reasons.
+This document records the **trust model** of the Symphact / CFPU product line: who issues bytecode-signing identities, how customers obtain signing identities, and **which options are explicitly NOT supported** for security reasons.
 
 > **Audience:** FenySoft product management, customer partners (chip integrators, OEMs), security audits, legal review.
 
@@ -143,17 +143,17 @@ The following options FenySoft **explicitly rejects** in the CFPU product line, 
 - Open mode chips with "FenySoft Verified" mark = brand integrity damage
 - For those who need Open mode (e.g., entirely independent ecosystem development), the CLI-CPU open-source allows them to **manufacture their own chip** with their own root key — that's the CERN-OHL-S license option
 
-**Replacement:** The customer can manufacture their own chip from CLI-CPU open-source RTL, with their own trust anchor. **This is NOT "FenySoft Verified Neuron OS chip"** — different product, different brand, different category.
+**Replacement:** The customer can manufacture their own chip from CLI-CPU open-source RTL, with their own trust anchor. **This is NOT "FenySoft Verified Symphact chip"** — different product, different brand, different category.
 
 ---
 
 ## Open-source vs closed trust chain — resolving the tension
 
-Neuron OS is Apache-2.0, CLI-CPU is CERN-OHL-S — **open licenses**. The closed trust chain may seem contradictory, but **does not violate the licenses**:
+Symphact is Apache-2.0, CLI-CPU is CERN-OHL-S — **open licenses**. The closed trust chain may seem contradictory, but **does not violate the licenses**:
 
 | Layer | License / status | Who controls |
 |---|---|---|
-| Neuron OS source code | Apache-2.0 | Anyone, forkable, modifiable |
+| Symphact source code | Apache-2.0 | Anyone, forkable, modifiable |
 | CLI-CPU RTL, ISA spec, simulator | CERN-OHL-S | Anyone, forkable, manufacturable |
 | **A specific chip's eFuse content** | **Manufacturer's decision** | The chip's manufacturer (e.g., FenySoft) |
 | **"FenySoft Verified" product brand** | **Trademark** | FenySoft exclusively |
@@ -163,7 +163,7 @@ This is the **Android model**:
 - Google Play Services + Google Apps are closed — only on Google-signed devices
 - Manufacturers must pass Google CTS (Compatibility Test Suite)
 
-Likewise for Neuron OS:
+Likewise for Symphact:
 - **Plain CFPU** (own manufacture, own root): the customer can run their own bytecode with their own signing. **Not "FenySoft Verified"** — different category.
 - **FenySoft Verified CFPU**: the official FenySoft product, with FenySoft root, FenySoft cert issuance, FenySoft support.
 

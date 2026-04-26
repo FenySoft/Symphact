@@ -1,4 +1,4 @@
-namespace NeuronOS.Core;
+namespace Symphact.Core;
 
 /// <summary>
 /// hu: Mailbox absztrakció egy aktor bejövő üzeneteinek tárolására. Az üzenet-feldolgozás

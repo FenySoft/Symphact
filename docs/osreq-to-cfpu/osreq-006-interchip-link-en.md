@@ -8,11 +8,11 @@
 
 ## Summary
 
-The Neuron OS distribution model (M0.6 — Remoting) requires that **multiple CFPU chips** operate as a single logical fabric. This requires a standardized, low-latency **inter-chip link** through which actor mailbox messages pass — while preserving location transparency.
+The Symphact distribution model (M0.6 — Remoting) requires that **multiple CFPU chips** operate as a single logical fabric. This requires a standardized, low-latency **inter-chip link** through which actor mailbox messages pass — while preserving location transparency.
 
 ## Context
 
-The fundamental principle of Neuron OS: **`TActorRef` does not reveal whether the target actor is local, on another core, or on another chip**. This is location transparency — the same `Send(ref, msg)` call regardless of where the target is. But for this, the HW must route transparently across chip boundaries.
+The fundamental principle of Symphact: **`TActorRef` does not reveal whether the target actor is local, on another core, or on another chip**. This is location transparency — the same `Send(ref, msg)` call regardless of where the target is. But for this, the HW must route transparently across chip boundaries.
 
 The OSREQ-001 tree topology extends to multi-chip level:
 
@@ -79,7 +79,7 @@ Send(ref, msg):
 | Chip offline (power loss) | **Timeout + supervisor notification** → actor migration |
 | Link error (CRC mismatch) | **Retry** (max 3×) → if unsuccessful, link down → supervisor |
 
-## Impact on Neuron OS
+## Impact on Symphact
 
 | OS component | Change |
 |-------------|--------|
@@ -99,7 +99,7 @@ Send(ref, msg):
 
 ## Cross-references
 
-- Neuron OS roadmap: M0.6 (Remoting / Distribution)
+- Symphact roadmap: M0.6 (Remoting / Distribution)
 - CLI-CPU architecture: `Mailbox bridge (inter-chip): 4 pin`, pin budget table
 - OSREQ-001: tree topology (multi-chip extension)
 - OSREQ-002: MMIO map (`CHIP_ID` register)

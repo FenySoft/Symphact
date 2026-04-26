@@ -6,7 +6,7 @@
 
 > Státusz: véglegesített deployment policy, F6-Silicon One és későbbi tape-out-ok alapja
 
-Ez a dokumentum rögzíti a Neuron OS / CFPU termékvonal **trust modelljét**: ki bocsát ki bytecode-aláírókat, hogyan jutnak a vásárlók aláírói identitáshoz, és **mely opciók nem támogatottak** biztonsági okokból.
+Ez a dokumentum rögzíti a Symphact / CFPU termékvonal **trust modelljét**: ki bocsát ki bytecode-aláírókat, hogyan jutnak a vásárlók aláírói identitáshoz, és **mely opciók nem támogatottak** biztonsági okokból.
 
 > **Célközönség:** FenySoft termékmenedzsment, vásárlói partnerek (chip-integrátorok, OEM-ek), security auditok, jogi review.
 
@@ -143,17 +143,17 @@ A következő opciókat a FenySoft **explicit elutasítja** a CFPU termékvonalb
 - Open mode chip "FenySoft Verified" jelzéssel = a brand integritásának sérülése
 - Akinek Open mode kell (pl. teljesen saját ökoszisztéma fejlesztése), az a CLI-CPU nyílt forráskódjából **saját chipet gyárthat** saját root key-vel — ez a CERN-OHL-S licensz lehetősége
 
-**Helyettesítő megoldás:** A vásárló a CLI-CPU open-source RTL-ből saját chipet gyárthat, saját trust anchor-ral. **Ez NEM "FenySoft Verified Neuron OS chip"** — más termék, más brand, más kategória.
+**Helyettesítő megoldás:** A vásárló a CLI-CPU open-source RTL-ből saját chipet gyárthat, saját trust anchor-ral. **Ez NEM "FenySoft Verified Symphact chip"** — más termék, más brand, más kategória.
 
 ---
 
 ## Open-source vs zárt trust chain — a feszültség feloldása
 
-A Neuron OS Apache-2.0, a CLI-CPU CERN-OHL-S — **nyílt licenszek**. A trust chain zártsága első ránézésre ellentmondás-szerű, de **nem ütközik a licenszekkel**:
+A Symphact Apache-2.0, a CLI-CPU CERN-OHL-S — **nyílt licenszek**. A trust chain zártsága első ránézésre ellentmondás-szerű, de **nem ütközik a licenszekkel**:
 
 | Réteg | Licensz / status | Ki kontrollálja |
 |---|---|---|
-| Neuron OS forráskód | Apache-2.0 | Bárki, lefork-olható, módosítható |
+| Symphact forráskód | Apache-2.0 | Bárki, lefork-olható, módosítható |
 | CLI-CPU RTL, ISA spec, szimulátor | CERN-OHL-S | Bárki, lefork-olható, gyártható |
 | **Egy konkrét chip eFuse tartalma** | **A gyártó döntése** | A chip gyártója (pl. FenySoft) |
 | **"FenySoft Verified" termék-márka** | **Védjegy** | FenySoft kizárólagosan |
@@ -163,7 +163,7 @@ Ez **az Android-modell**:
 - A Google Play Services + Google Apps zárt — csak Google-aláírt eszközök
 - A gyártóknak Google CTS (Compatibility Test Suite)-en kell átesniük
 
-Ugyanígy a Neuron OS:
+Ugyanígy a Symphact:
 - **Tiszta CFPU** (saját gyártás, saját root): a vásárló saját bytecode-ot futtathat saját aláírással. **Nem "FenySoft Verified"** — más kategória.
 - **FenySoft Verified CFPU**: a hivatalos FenySoft termék, FenySoft root-tal, FenySoft cert kibocsátással, FenySoft támogatással.
 

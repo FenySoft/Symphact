@@ -1,4 +1,4 @@
-namespace NeuronOS.Core;
+namespace Symphact.Core;
 
 /// <summary>
 /// hu: Egy aktorra mutató nem hamisítható referencia — capability token. Jelenleg az ActorId

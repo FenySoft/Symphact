@@ -1,6 +1,6 @@
-using NeuronOS.Core;
+using Symphact.Core;
 
-namespace NeuronOS.Core.Tests;
+namespace Symphact.Core.Tests;
 
 /// <summary>
 /// hu: A TActorRef value type viselkedésének tesztjei. A TActorRef az aktorokra mutató

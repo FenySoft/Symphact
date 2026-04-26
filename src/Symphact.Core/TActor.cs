@@ -1,4 +1,4 @@
-namespace NeuronOS.Core;
+namespace Symphact.Core;
 
 /// <summary>
 /// hu: Egy aktor absztrakt alaposztálya. Az aktornak egyetlen állapotú (TState típusú) belső

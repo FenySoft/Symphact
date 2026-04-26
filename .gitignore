@@ -60,3 +60,6 @@ logs/
 # Environment
 .env
 .env.local
+
+# Claude Telegram bot marker (local only)
+.claude-telegram-bot

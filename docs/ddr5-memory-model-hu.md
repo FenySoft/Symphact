@@ -1,16 +1,16 @@
-# DDR5 Memória Modell — Neuron OS Nézőpont
+# DDR5 Memória Modell — Symphact Nézőpont
 
 > English version: [ddr5-memory-model-en.md](ddr5-memory-model-en.md)
 
 > Version: 1.1
 
-Ez a dokumentum a Neuron OS **DDR5 memóriakezelési modelljét** rögzíti: hogyan kér egy aktor hozzáférést, hogyan használja a memóriát, és hogyan adja vissza. Nem csak a végeredményt, hanem az **érvelési utat** is dokumentálja.
+Ez a dokumentum a Symphact **DDR5 memóriakezelési modelljét** rögzíti: hogyan kér egy aktor hozzáférést, hogyan használja a memóriát, és hogyan adja vissza. Nem csak a végeredményt, hanem az **érvelési utat** is dokumentálja.
 
-> **Célközönség:** OS fejlesztők, Neuron OS API tervezők, aktor-szoftver fejlesztők. A hardveres (RTL) nézőpontot a [CLI-CPU docs/ddr5-architecture-hu.md](https://github.com/FenySoft/CLI-CPU/blob/main/docs/ddr5-architecture-hu.md) tartalmazza.
+> **Célközönség:** OS fejlesztők, Symphact API tervezők, aktor-szoftver fejlesztők. A hardveres (RTL) nézőpontot a [CLI-CPU docs/ddr5-architecture-hu.md](https://github.com/FenySoft/CLI-CPU/blob/main/docs/ddr5-architecture-hu.md) tartalmazza.
 
 ## Kontextus: nincs kernel, nincs kernel/user mód
 
-A Neuron OS-ben **nincs hagyományos kernel réteg**. A hardveres izoláció (shared-nothing multi-core, core-onkénti SRAM) már garantálja azt, amit más OS-ek a kernel/user mód váltással érnek el. Ehelyett **privilégium szinteket az aktor-kapcsolatok** fejezik ki:
+A Symphact-ben **nincs hagyományos kernel réteg**. A hardveres izoláció (shared-nothing multi-core, core-onkénti SRAM) már garantálja azt, amit más OS-ek a kernel/user mód váltással érnek el. Ehelyett **privilégium szinteket az aktor-kapcsolatok** fejezik ki:
 
 ```
          root_supervisor
@@ -198,7 +198,7 @@ Ez az Erlang/OTP "let it crash" modell hardveres implementációja — az aktor 
 
 ## Kapcsolódó HW döntések
 
-A Neuron OS fejlesztőknek fontos tudni a HW korlátokat, amik az API-t befolyásolják:
+A Symphact fejlesztőknek fontos tudni a HW korlátokat, amik az API-t befolyásolják:
 
 | HW tény | OS következmény |
 |---------|----------------|

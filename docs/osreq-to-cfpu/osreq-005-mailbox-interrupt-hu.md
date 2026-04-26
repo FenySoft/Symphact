@@ -8,7 +8,7 @@
 
 ## Összefoglaló
 
-A Neuron OS scheduler-nek (M0.4) tudnia kell, hogyan értesül egy core arról, hogy **új üzenet érkezett a mailbox FIFO-jába**. Ez alapvető kérdés: **hardware interrupt** vagy **software polling**? A válasz befolyásolja az energiafogyasztást, a latenciát és a scheduler algoritmust.
+A Symphact scheduler-nek (M0.4) tudnia kell, hogyan értesül egy core arról, hogy **új üzenet érkezett a mailbox FIFO-jába**. Ez alapvető kérdés: **hardware interrupt** vagy **software polling**? A válasz befolyásolja az energiafogyasztást, a latenciát és a scheduler algoritmust.
 
 ## Kontextus
 
@@ -108,6 +108,6 @@ A `???` a kérdés.
 
 ## Kereszthivatkozások
 
-- Neuron OS roadmap: M0.4 (Scheduler / Per-Actor Parallelism)
+- Symphact roadmap: M0.4 (Scheduler / Per-Actor Parallelism)
 - CLI-CPU architecture: „Event-driven, nem clock-driven" szekció, Sleep/Wake logika
 - OSREQ-002: MMIO térkép (IRQ regiszterek)

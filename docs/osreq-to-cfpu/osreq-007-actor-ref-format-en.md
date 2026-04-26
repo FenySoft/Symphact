@@ -8,17 +8,17 @@
 
 ## Summary
 
-Neuron OS has finalized the 64-bit `TActorRef` bit layout (`docs/actor-ref-scaling-en.md` v2.0). The specification places **three HW requirements** on the CLI-CPU team:
+Symphact has finalized the 64-bit `TActorRef` bit layout (`docs/actor-ref-scaling-en.md` v2.0). The specification places **three HW requirements** on the CLI-CPU team:
 
 1. **Interconnect cell header v2.5**: `src_actor`/`dst_actor` reduced from 16 to 8 bits, with new `perms[8]` and `HMAC[24]` fields (the **header total stays 128 bits**)
 2. **New HW component**: target-core mailbox-edge HMAC verify unit (per-core key, fail-stop trigger, bad-HMAC counter)
 3. **Trust anchor hardening**: `eFuse` holds a single `CaRootHash` slot (NOT an array, NO Open-mode bit, NO deployment-mode toggle)
 
-These are **not optional** — the Neuron OS defense pyramid relies on the HW-side implementation.
+These are **not optional** — the Symphact defense pyramid relies on the HW-side implementation.
 
 ## Background — why now
 
-`TActorRef` is the cornerstone of the Neuron OS public API. The v1.0 spec recorded in `roadmap.md` M0.7 — `[core-id:16][offset:16][HMAC:24][perms:8]` — was **incompatible** with CLI-CPU `interconnect-hu.md` v2.4 header and `architecture-hu.md` 24-bit HW address. The `actor-ref-scaling-en.md` v2.0 document resolves the inconsistencies and locks down a **bit-identical** layout with the canonical CLI-CPU widths:
+`TActorRef` is the cornerstone of the Symphact public API. The v1.0 spec recorded in `roadmap.md` M0.7 — `[core-id:16][offset:16][HMAC:24][perms:8]` — was **incompatible** with CLI-CPU `interconnect-hu.md` v2.4 header and `architecture-hu.md` 24-bit HW address. The `actor-ref-scaling-en.md` v2.0 document resolves the inconsistencies and locks down a **bit-identical** layout with the canonical CLI-CPU widths:
 
 ```
 TActorRef (64 bit, opaque, public):
@@ -139,7 +139,7 @@ Verification:
 | **SipHash-128** | **~5k gate** | **~10 cycle** | Designed specifically for short-message MAC (Aumasson & Bernstein) |
 | HMAC-MD5 trunc | ~10k gate | ~40 cycle | Cryptographically broken |
 
-**SipHash-128** is the choice: 6× smaller and 8× faster than HMAC-SHA256, cryptographically strong for short-message MAC. NIST SP 800-107 allows MSB 24-bit truncation (1:16.8M forgery resistance), and combined with the Neuron OS defense pyramid (see `actor-ref-scaling-en.md` "Defense pyramid") provides post-quantum-grade security.
+**SipHash-128** is the choice: 6× smaller and 8× faster than HMAC-SHA256, cryptographically strong for short-message MAC. NIST SP 800-107 allows MSB 24-bit truncation (1:16.8M forgery resistance), and combined with the Symphact defense pyramid (see `actor-ref-scaling-en.md` "Defense pyramid") provides post-quantum-grade security.
 
 ## Requirement 3 — HW fail-stop and bad-HMAC counter
 
@@ -218,7 +218,7 @@ Forbidden:
 
 **Deployment-mode toggle** — would create a runtime trust decision, contradicting the `authcode-hu.md` SHA-256 binding mandatory invariant. Remove all such mechanisms.
 
-The FenySoft product line **mandatorily** uses this strict configuration (see `docs/trust-model-en.md`). This is a foundational assumption of the Neuron OS defense pyramid.
+The FenySoft product line **mandatorily** uses this strict configuration (see `docs/trust-model-en.md`). This is a foundational assumption of the Symphact defense pyramid.
 
 ## Impact estimate
 
@@ -242,10 +242,10 @@ The FenySoft product line **mandatorily** uses this strict configuration (see `d
 
 ## Related plans and milestones
 
-- **`NeuronOS/docs/actor-ref-scaling-en.md`** — TActorRef bit layout and defense pyramid
-- **`NeuronOS/docs/trust-model-en.md`** — FenySoft Strict whitelist business model
-- **`NeuronOS/docs/roadmap.md`** M0.6, M0.7, M2.5 — implementation milestones
-- **`NeuronOS/docs/vision-en.md`** — capability-based security and location transparency
+- **`Symphact/docs/actor-ref-scaling-en.md`** — TActorRef bit layout and defense pyramid
+- **`Symphact/docs/trust-model-en.md`** — FenySoft Strict whitelist business model
+- **`Symphact/docs/roadmap.md`** M0.6, M0.7, M2.5 — implementation milestones
+- **`Symphact/docs/vision-en.md`** — capability-based security and location transparency
 - **`CLI-CPU/docs/architecture-hu.md`** — 24-bit HW address, Actor Scheduling Pipeline
 - **`CLI-CPU/docs/interconnect-hu.md`** — cell header v2.4 (to be updated to v2.5)
 - **`CLI-CPU/docs/ddr5-architecture-hu.md`** — CAM table v2.4 (`src_actor` 16→8)

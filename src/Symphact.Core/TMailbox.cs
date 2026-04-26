@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace NeuronOS.Core;
+namespace Symphact.Core;
 
 /// <summary>
 /// hu: In-memory, thread-safe FIFO mailbox implementáció. A .NET ConcurrentQueue-ra épül,

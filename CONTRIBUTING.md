@@ -1,8 +1,8 @@
-# Contributing to Neuron OS
+# Contributing to Symphact
 
 > Magyar verzió: [CONTRIBUTING-hu.md](CONTRIBUTING-hu.md)
 
-Thank you for your interest in contributing to Neuron OS!
+Thank you for your interest in contributing to Symphact!
 
 ## Prerequisites
 
@@ -14,7 +14,7 @@ Thank you for your interest in contributing to Neuron OS!
 
 ```bash
 # Full build
-dotnet build NeuronOS.sln -c Debug
+dotnet build Symphact.sln -c Debug
 
 # Run all tests
 dotnet test
@@ -23,7 +23,7 @@ dotnet test
 dotnet test --filter "FullyQualifiedName~TMailboxTests"
 
 # Build without restore (if previously restored)
-dotnet build NeuronOS.sln -c Debug --no-restore
+dotnet build Symphact.sln -c Debug --no-restore
 ```
 
 ## Test-driven development (TDD) is required
@@ -112,7 +112,7 @@ Prefer bilingual commit messages (Hungarian first, then English on a separate li
 
 ## Hardware / CFPU feedback
 
-If while working on Neuron OS you discover a requirement that the CFPU hardware should provide (mailbox depth, interrupt structure, capability width, etc.), please open an issue using the [`osreq-for-cfpu`](.github/ISSUE_TEMPLATE/osreq-for-cfpu.md) template. These issues feed directly into the [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) hardware design discussions.
+If while working on Symphact you discover a requirement that the CFPU hardware should provide (mailbox depth, interrupt structure, capability width, etc.), please open an issue using the [`osreq-for-cfpu`](.github/ISSUE_TEMPLATE/osreq-for-cfpu.md) template. These issues feed directly into the [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) hardware design discussions.
 
 ## Pull request checklist
 

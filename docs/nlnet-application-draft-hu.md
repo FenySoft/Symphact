@@ -1,4 +1,4 @@
-# NLnet NGI Zero Commons Fund — Pályázati vázlat (Neuron OS)
+# NLnet NGI Zero Commons Fund — Pályázati vázlat (Symphact)
 
 > **Deadline:** TBD — következő NGI Zero Commons Fund nyílt hívás (várhatóan 2026 Q3)
 > **Form:** https://nlnet.nl/propose/
@@ -18,23 +18,23 @@ NGI Zero Commons Fund
 
 ## Pályázat neve
 
-**Neuron OS: Capability-alapú aktor runtime biztonságos .NET számításhoz**
+**Symphact: Capability-alapú aktor runtime biztonságos .NET számításhoz**
 
 ## Weboldal / Wiki
 
-https://github.com/FenySoft/NeuronOS
+https://github.com/FenySoft/Symphact
 
 ---
 
 ## Kivonat
 
-A Neuron OS **capability-alapú aktor runtime .NET-re**, arra az elvre építve, hogy *minden állapottal rendelkező entitás egy aktor, és a kommunikáció kizárólag immutábilis üzeneteken keresztül történik*. A projekt befejezte az alapozási fázisát (v0.1 pre-alpha): **46 zöld xUnit teszt** fedi le a core primitíveket — `TMailbox` (FIFO mailbox), `TActorRef` (capability token), `TActor<TState>` (absztrakt aktor `Init()` + `Handle()` mintákkal), `TActorContext` (handler context `Send`-del), és `TActorSystem` (runtime `Spawn`, `Send`, `DrainAsync` műveletekkel). Mindezt szigorú TDD módszertannal, .NET 10-en, Apache-2.0 licensszel. **Ez a pályázat a core primitívekről egy használható, biztonságos aktor operációs rendszerre való átmenetet finanszírozza**: supervision, scheduling, persistencia, capability-alapú biztonság, és az első device aktorok.
+A Symphact **capability-alapú aktor runtime .NET-re**, arra az elvre építve, hogy *minden állapottal rendelkező entitás egy aktor, és a kommunikáció kizárólag immutábilis üzeneteken keresztül történik*. A projekt befejezte az alapozási fázisát (v0.1 pre-alpha): **46 zöld xUnit teszt** fedi le a core primitíveket — `TMailbox` (FIFO mailbox), `TActorRef` (capability token), `TActor<TState>` (absztrakt aktor `Init()` + `Handle()` mintákkal), `TActorContext` (handler context `Send`-del), és `TActorSystem` (runtime `Spawn`, `Send`, `DrainAsync` műveletekkel). Mindezt szigorú TDD módszertannal, .NET 10-en, Apache-2.0 licensszel. **Ez a pályázat a core primitívekről egy használható, biztonságos aktor operációs rendszerre való átmenetet finanszírozza**: supervision, scheduling, persistencia, capability-alapú biztonság, és az első device aktorok.
 
 **Miért aktor OS, és miért most?**
 
 A jelenlegi operációs rendszerek (Linux, Windows, macOS) az 1970-es években hozott architekturális döntéseket viselnek — shared memory, monolitikus kernel, POSIX jogosultságok, fork/exec. Ezek a megoldások egyre kevésbé illenek a modern valósághoz: 1000+ core chip-enként, AI-vezérelt fenyegetések, supply chain támadások (log4j, xz-utils), és hibatűrés iránti igény safety-critical rendszerekben. Joe Armstrong (az Erlang megalkotója) erről beszélt 2014-es "The Mess We're In" előadásában — aktor-orientált hardver kellett volna, de akkor nem létezett. **Mostanra létezik.** A nyílt szilícium (Tiny Tapeout, eFabless, IHP MPW), az érett aktor framework-ök (Akka.NET, Orleans, Akka JVM), és a Dennard skálázás végének összhatása életképessé teszi egy tiszta lapról indított aktor OS-t 2026-ban.
 
-A Neuron OS négy bizonyított ötletet kombinál egy runtime-ban, modern alapokon:
+A Symphact négy bizonyított ötletet kombinál egy runtime-ban, modern alapokon:
 
 - **Aktor modell** (Erlang/OTP, 40+ év telco/pénzügy) — let-it-crash + supervision
 - **Capability-alapú biztonság** (seL4, CHERI) — hamisíthatatlan referenciák, nincs globális namespace
@@ -53,9 +53,9 @@ A Neuron OS négy bizonyított ötletet kombinál egy runtime-ban, modern alapok
 
 - **Apache-2.0, teljesen libre:** Permisszív licensz, ami kompatibilis a szélesebb .NET ökoszisztémával — az enterprise adoption útvonala tiszta.
 - **8+ millió .NET fejlesztő célozhatja meg ezt a runtime-ot ismerős eszközökkel:** C#, F#, VB.NET mind CIL-re fordul. A runtime már ma fut bármely .NET host-on (Windows, Linux, macOS) — a szilícium-függetlenség azt jelenti, nincs hardveres blokkoló.
-- **Capability-alapú biztonság framework szinten:** Ellentétben a POSIX jogosultságokkal, a Neuron OS-nek nincs globális namespace-e. Egy aktor csak akkor küldhet üzenetet másiknak, ha birtokolja a capability-t — nincs ambient authority. Ez a seL4/CHERI biztonsági modell userland .NET-ben.
-- **Nyílt szilíciummal közösen tervezve:** Bár a Neuron OS már ma fut bármely CIL host-on, a Cognitive Fabric Processing Unit (CFPU) projekttel közösen van tervezve ([github.com/FenySoft/CLI-CPU](https://github.com/FenySoft/CLI-CPU)). Az OS követelmények visszahatnak a hardver tervezésre az `osreq-to-cfpu` issue template-en keresztül — az Apple M-sorozat OS/hardver integrációjához hasonló kétirányú hurok, de teljesen nyíltan.
-- **Formálisan verifikálható:** Az aktor modell matematikai alapjai (CSP, pi-calculus, Erlang bizonyított runtime-ja) természetes formális verifikációs célponttá teszik a Neuron OS-t — ellentétben a ~40M soros Linux kernel C kóddal.
+- **Capability-alapú biztonság framework szinten:** Ellentétben a POSIX jogosultságokkal, a Symphact-nek nincs globális namespace-e. Egy aktor csak akkor küldhet üzenetet másiknak, ha birtokolja a capability-t — nincs ambient authority. Ez a seL4/CHERI biztonsági modell userland .NET-ben.
+- **Nyílt szilíciummal közösen tervezve:** Bár a Symphact már ma fut bármely CIL host-on, a Cognitive Fabric Processing Unit (CFPU) projekttel közösen van tervezve ([github.com/FenySoft/CLI-CPU](https://github.com/FenySoft/CLI-CPU)). Az OS követelmények visszahatnak a hardver tervezésre az `osreq-to-cfpu` issue template-en keresztül — az Apple M-sorozat OS/hardver integrációjához hasonló kétirányú hurok, de teljesen nyíltan.
+- **Formálisan verifikálható:** Az aktor modell matematikai alapjai (CSP, pi-calculus, Erlang bizonyított runtime-ja) természetes formális verifikációs célponttá teszik a Symphact-t — ellentétben a ~40M soros Linux kernel C kóddal.
 - **Európai szuverenitás:** Nyílt, auditálható .NET runtime, US/ázsiai IP függőségektől mentes — az Apache-2.0 licensz bármely európai entitásnak engedi fork-olni, módosítani és tanúsítani.
 
 **Miért most?** Három konvergáló erő teszi kritikussá ezt a pillanatot:
@@ -72,10 +72,10 @@ A pályázó 35+ év professzionális szoftver- és hardvertapasztalattal rendel
 
 - **Országos szintű éles rendszerek (1990-es évek–2026):** 3 fős csapatban fejlesztett „Atlasz" — vasúti menetirányító rendszer a MÁV számára, amelyet az országos forgalomirányításban 2026-ig használtak. Szintén Visual Restaurant / Visual Hotel & Restaurant szoftvercsomag (Delphi, később .NET), széles körben használt a magyar vendéglátóiparban.
 - **.NET ökoszisztéma (20+ év):** Professzionális C#/.NET fejlesztés, beleértve kötelező hatósági adatszolgáltatási integrációkat (NAV adóhatóság, NTAK turizmus), Akka.NET aktor rendszereket (QCassa/JokerQ: 55+ éles aktor), Avalonia UI cross-platform alkalmazásokat, és Android/iOS telepítést.
-- **Magyar Adóügyi Ellenőrző Egység (AEE):** Az eredeti AEE projekt ([48/2013 NGM](https://njt.hu/jogszabaly/2013-48-20-2X)) szoftverének egyedüli fejlesztője. A jelenlegi utód **QCassa/JokerQ** PQC-biztosított modern helyettesítő (55+ Akka.NET aktor supervision hierarchiában), szintén egyedül fejlesztve a [8/2025 NGM rendelet](https://njt.hu/jogszabaly/2025-8-20-2X) szerint. Ez a projekt mélyreható, gyakorlati tapasztalatot ad éles aktor-modell architektúrában, ami közvetlenül befolyásolja a Neuron OS tervezési döntéseit.
+- **Magyar Adóügyi Ellenőrző Egység (AEE):** Az eredeti AEE projekt ([48/2013 NGM](https://njt.hu/jogszabaly/2013-48-20-2X)) szoftverének egyedüli fejlesztője. A jelenlegi utód **QCassa/JokerQ** PQC-biztosított modern helyettesítő (55+ Akka.NET aktor supervision hierarchiában), szintén egyedül fejlesztve a [8/2025 NGM rendelet](https://njt.hu/jogszabaly/2025-8-20-2X) szerint. Ez a projekt mélyreható, gyakorlati tapasztalatot ad éles aktor-modell architektúrában, ami közvetlenül befolyásolja a Symphact tervezési döntéseit.
 - **Hardver közös-tervezési tapasztalat:** Párhuzamos fejlesztés a **CLI-CPU / CFPU** nyílt szilícium projekten ([github.com/FenySoft/CLI-CPU](https://github.com/FenySoft/CLI-CPU)) — 250+ xUnit teszt a referencia szimulátoron, 48 CIL-T0 opkód, működő Roslyn-alapú linker, előzetes Verilog RTL (ALU modul: 41/41 cocotb teszt). Ez a hardveres projekt külön NLnet pályázatot folytat (beadva 2026-06-01), és biztosítja a kétirányú OS↔HW tervezési hurkot.
 
-A Neuron OS projekt 2026 áprilisában kezdődött, és ~14 óra fókuszált TDD munkában szállította a v0.1-et (M0.1 + M0.2): 46 xUnit teszt, ~580 sor runtime kód, működő `TActorSystem` aktor-közi üzenetküldéssel. **Ez a velocity dokumentálva van a roadmap-ben** ([`docs/roadmap.md`](roadmap.md)) és alapot ad a reális mérföldkő-becslésekhez ebben a pályázatban.
+A Symphact projekt 2026 áprilisában kezdődött, és ~14 óra fókuszált TDD munkában szállította a v0.1-et (M0.1 + M0.2): 46 xUnit teszt, ~580 sor runtime kód, működő `TActorSystem` aktor-közi üzenetküldéssel. **Ez a velocity dokumentálva van a roadmap-ben** ([`docs/roadmap.md`](roadmap.md)) és alapot ad a reális mérföldkő-becslésekhez ebben a pályázatban.
 
 ---
 
@@ -91,7 +91,7 @@ A Neuron OS projekt 2026 áprilisában kezdődött, és ~14 óra fókuszált TDD
 | **M2: Persistencia + Location Transparency** (M0.5-M0.7) | Event-sourcing persistencia, capability registry HMAC tokenekkel, router revocation + delegation támogatással. ~60+ új teszt. | ~85ó | €7,000 | 3-8. hónap |
 | **M3: Kernel aktorok + Device aktorok** (M2.1-M3.2) | `memory_manager`, `hot_code_loader` alap, első device aktorok (`uart_device`, `gpio_device`, `timer_device`) szimulált MMIO-n. ~50+ új teszt. | ~60ó | €5,500 | 6-11. hónap |
 | **M4: CFPU integrációs demó** | End-to-end demó: elosztott számláló aktor 4 szimulált CFPU core-on keresztül a `FenySoft.CilCpu.Sim` NuGet segítségével. 3-5 konkrét HW követelmény felfedezése, `osreq-to-cfpu` issue-ként iktatva. | ~35ó | €3,500 | 9-12. hónap |
-| **M5: Developer experience + dokumentáció** | NuGet csomag publikáció (NeuronOS.Core), CLI eszköz (`neuronos-cli`), angol architektúra dokumentáció, contribution guide, 3 blogposzt, lightning talk egy .NET konferencián. | ~70ó | €5,500 | Folyamatos |
+| **M5: Developer experience + dokumentáció** | NuGet csomag publikáció (Symphact.Core), CLI eszköz (`neuronos-cli`), angol architektúra dokumentáció, contribution guide, 3 blogposzt, lightning talk egy .NET konferencián. | ~70ó | €5,500 | Folyamatos |
 | **M6: Biztonsági audit + formális alapozás** | Külső biztonsági review a capability mechanizmusra (független reviewer, ~€2,000 alvállalkozói). Initial formális specifikáció a `send/receive` szemantikára TLA+ vagy Dafny-ben. | ~25ó | €2,500 | 10-12. hónap |
 | **Összesen** | | **~340ó** | **€30,000** | **12 hónap** |
 
@@ -99,24 +99,24 @@ A Neuron OS projekt 2026 áprilisában kezdődött, és ~14 óra fókuszált TDD
 - Személyi költség: ~340 óra részmunkaidő × €36/óra = €27,500 (konzisztens a párhuzamos CLI-CPU pályázat óradíjával)
 - Biztonsági audit alvállalkozói: €2,000 (külső reviewer a capability mechanizmusra)
 - Konferencia utazás (1 lightning talk, EU-n belül): €500
-- **Nincs hardver költség** — a Neuron OS teljesen szoftveres host-okon fut (Windows/Linux/macOS/CI)
+- **Nincs hardver költség** — a Symphact teljesen szoftveres host-okon fut (Windows/Linux/macOS/CI)
 
 ---
 
 ## Meglévő finanszírozási források
 
-A projekt jelenleg a pályázó saját finanszírozásából működik. Nem érkezett külső finanszírozás. Nincs más függőben lévő pályázat **erre a munkára (Neuron OS runtime)**.
+A projekt jelenleg a pályázó saját finanszírozásából működik. Nem érkezett külső finanszírozás. Nincs más függőben lévő pályázat **erre a munkára (Symphact runtime)**.
 
 **Kapcsolódó, de scope-ban elhatárolt:** Párhuzamos NLnet NGI Zero Commons Fund pályázat került beadásra (2026-04) a **CLI-CPU / CFPU hardveres projektre** ([github.com/FenySoft/CLI-CPU](https://github.com/FenySoft/CLI-CPU)). A két projekt **szándékosan nem átfedő scope-pal** rendelkezik:
 
-| Dimenzió | CLI-CPU / CFPU | Neuron OS |
+| Dimenzió | CLI-CPU / CFPU | Symphact |
 |----------|---------------|-----------|
 | **Deliverable** | Hardveres ISA, RTL, silicon tape-out, FPGA | Szoftveres runtime, OS szolgáltatások |
 | **Cél** | Verilog szintézis, Sky130 PDK | .NET 10 library (fut Windows/Linux/macOS-en) |
 | **Licensz** | CERN-OHL-S-2.0 (reciprocal hardver) | Apache-2.0 (permisszív szoftver) |
-| **Repository** | `FenySoft/CLI-CPU` | `FenySoft/NeuronOS` |
+| **Repository** | `FenySoft/CLI-CPU` | `FenySoft/Symphact` |
 | **Finanszírozott mérföldkövek** | F2 RTL, F3 Tiny Tapeout, F4 FPGA multi-core | M0.3-M3.2 aktor runtime + kernel aktorok |
-| **Függőségek** | Nincs Neuron OS-en | Nincs a CLI-CPU szilíciumon (szimulátor elég) |
+| **Függőségek** | Nincs Symphact-en | Nincs a CLI-CPU szilíciumon (szimulátor elég) |
 
 **Fenntarthatósági terv:**
 
@@ -132,7 +132,7 @@ A projektnek **útvonala van az önfenntartáshoz a 3. évre**, folyamatos grant
 
 ## Összehasonlítás meglévő megoldásokkal
 
-| Projekt | Megközelítés | Korlát | Neuron OS különbség |
+| Projekt | Megközelítés | Korlát | Symphact különbség |
 |---------|-------------|--------|--------------------|
 | **Akka.NET** | Aktor framework .NET-en | Linux/Windows-on fut globális GC-vel, POSIX jogosultságok, nincs capability biztonság | Capability-alapú biztonság, per-core GC modell, aktor-natív HW-rel közös-tervezve |
 | **Microsoft Orleans** | Virtuális aktor framework | Felhő-skála, stateless aktor fókusz, nem OS szintű | OS szintű aktorok device driverek és kernel szolgáltatások szintjén |
@@ -143,7 +143,7 @@ A projektnek **útvonala van az önfenntartáshoz a 3. évre**, folyamatos grant
 | **Redox OS** | Microkernel Rust-ban | Csak Rust, nincs .NET, nem aktor-alapú | Aktor-alapú, .NET ökoszisztéma |
 | **Tock** | Beágyazott OS Rust-ban | Beágyazott fókusz, nem aktor-alapú | Aktor modell, általános célú |
 
-**Egyetlen létező projekt sem kombinálja:** capability-alapú biztonság + aktor runtime + .NET ökoszisztéma + nyílt forráskód + nyílt szilíciummal közös-tervezve. A Neuron OS egy új pozíció ebben a térben.
+**Egyetlen létező projekt sem kombinálja:** capability-alapú biztonság + aktor runtime + .NET ökoszisztéma + nyílt forráskód + nyílt szilíciummal közös-tervezve. A Symphact egy új pozíció ebben a térben.
 
 ---
 
@@ -170,16 +170,16 @@ A projektnek **útvonala van az önfenntartáshoz a 3. évre**, folyamatos grant
 - **Visual Studio Code / Code - OSS** (MIT) — elsődleges fejlesztői környezet
 
 **Downstream felhasználók és stakeholderek:**
-- **.NET fejlesztői közösség (~8M+ fejlesztő):** Bármely C#/F# kódbázis adoptálhatja a Neuron OS-t aktor runtime-ként. Az Akka.NET felhasználók természetes korai adoptálók (az API hasonlóság szándékos).
+- **.NET fejlesztői közösség (~8M+ fejlesztő):** Bármely C#/F# kódbázis adoptálhatja a Symphact-t aktor runtime-ként. Az Akka.NET felhasználók természetes korai adoptálók (az API hasonlóság szándékos).
 - **Beágyazott / IoT fejlesztők:** A device actor modell + capability biztonság biztonságosabb alternatíva az RTOS-ekkel (FreeRTOS, Zephyr) szemben szabályozott domain-ekben.
 - **Biztonság-tudatos szektorok:** Egészségügy, kritikus infrastruktúra, autóipar (ISO 26262), orvosi eszközök (IEC 62304), ipari vezérlés (IEC 61508) — ahol a Linux tanúsítása 10+ évet vesz igénybe.
-- **CLI-CPU / CFPU hardveres projekt:** A Neuron OS az elsődleges szoftveres célpont a nyílt szilícium munkához, konkrét HW követelményeket produkálva az `osreq-to-cfpu`-n keresztül.
-- **Formális módszerek kutatói közösség:** TLA+ / Dafny specifikációk a Neuron OS-t oktatási és kutatási célponttá teszik.
+- **CLI-CPU / CFPU hardveres projekt:** A Symphact az elsődleges szoftveres célpont a nyílt szilícium munkához, konkrét HW követelményeket produkálva az `osreq-to-cfpu`-n keresztül.
+- **Formális módszerek kutatói közösség:** TLA+ / Dafny specifikációk a Symphact-t oktatási és kutatási célponttá teszik.
 - **Európai digitális szuverenitás iniciatíva:** Apache-2.0 licensszel, teljesen auditálható, US/ázsiai IP függőségektől mentes.
 
 **Közösségépítési terv:**
 - **GitHub repository CI/CD-vel:** Minden commit lefuttatja az összes tesztet; zöld badge látható a README-n.
-- **NuGet csomag publikáció:** `NeuronOS.Core` publikálva a nuget.org-on a 4. hónapra.
+- **NuGet csomag publikáció:** `Symphact.Core` publikálva a nuget.org-on a 4. hónapra.
 - **Dokumentációs weboldal:** GitHub Pages site tutoriállal, API referenciával, tervezési indoklással.
 - **Blogposztok:** 3 technikai mérföldkő poszt + 1 év végi retrospektív.
 - **Konferencia outreach:** Lightning talk a .NET Conf-on, Norbit-en / Update Conf-on, vagy más EU-alapú .NET eseményen.
@@ -195,7 +195,7 @@ A projektnek **útvonala van az önfenntartáshoz a 3. évre**, folyamatos grant
 
 ## .NET függetlenség és szabvány illesztés
 
-A CIL specifikáció (ECMA-335) egy ISO/IEC 23271 által ratifikált nemzetközi szabvány. A Neuron OS a bytecode formátumot célozza, nem valamely saját Microsoft runtime-ot. Alternatív CIL implementációk léteznek (Mono, örökölt .NET Framework compilerek, különböző Roslyn-független front-endek). A runtime design CIL szinten működik, és független bármely upstream runtime változástól.
+A CIL specifikáció (ECMA-335) egy ISO/IEC 23271 által ratifikált nemzetközi szabvány. A Symphact a bytecode formátumot célozza, nem valamely saját Microsoft runtime-ot. Alternatív CIL implementációk léteznek (Mono, örökölt .NET Framework compilerek, különböző Roslyn-független front-endek). A runtime design CIL szinten működik, és független bármely upstream runtime változástól.
 
 **Apache-2.0 licensz** permisszív felhasználást biztosít bármely downstream projektben, beleértve a kereskedelmi felhasználást — konzisztens a .NET ökoszisztéma normáival és a .NET Foundation projekt elvárásokkal.
 
@@ -207,7 +207,7 @@ PDF mellékletek (~15-20 oldal összesen):
 1. **Architektúra áttekintés** — kivonat a `docs/vision-en.md`-ből (capability modell, aktor hierarchia, üzenet routing)
 2. **Roadmap** — `docs/roadmap.md` Fázis 1-7 óra becslésekkel
 3. **Jelenlegi állapot snapshot** — 46 xUnit teszt output, kód metrikák, repo screenshot
-4. **CLI-CPU ↔ Neuron OS interakciós diagram** — OS követelmények visszacsatolási hurok
+4. **CLI-CPU ↔ Symphact interakciós diagram** — OS követelmények visszacsatolási hurok
 5. **Threat model összefoglaló** — capability hamisítás, supervisor escape, hot-load tampering
 6. **1-oldalas executive summary** — probléma, megközelítés, deliverable-ök, költségvetés, fenntarthatóság
 
@@ -233,13 +233,13 @@ PDF mellékletek (~15-20 oldal összesen):
 | Külső biztonsági reviewer nem található €2K-ért | Közepes | NLnet belső kapcsolatokon keresztül (korábbi seL4 / CHERI grantee-k) |
 | Hot code loading túl komplex 12 hónap alatt | Alacsony | M3.2-ben csak foundation, teljes implementáció a követő pályázatban |
 | .NET Foundation elutasítja 9. hónapban | Alacsony | Fallback: Eclipse Foundation, Linux Foundation sandbox |
-| CFPU referencia szimulátor NuGet csúszik | Közepes | A Neuron OS közvetlenül is tud a CLI-CPU forráskódra hivatkozni — nem kritikus függőség |
+| CFPU referencia szimulátor NuGet csúszik | Közepes | A Symphact közvetlenül is tud a CLI-CPU forráskódra hivatkozni — nem kritikus függőség |
 
 ### Következő lépések
-1. **Várd meg a CLI-CPU NLnet döntést** (jellemzően 3-4 hónap review) — ha pozitív, ez a Neuron OS pályázat is megerősíti
+1. **Várd meg a CLI-CPU NLnet döntést** (jellemzően 3-4 hónap review) — ha pozitív, ez a Symphact pályázat is megerősíti
 2. **M0.3 implementáció elindítása** — a supervisionra, hogy a tesztszám 100+ legyen beadáskor
 3. **.NET Foundation mentor kapcsolat** — supporting letter-hez a pályázathoz
-4. **NeuronOS README frissítése** — M0.3 in-progress, roadmap update
+4. **Symphact README frissítése** — M0.3 in-progress, roadmap update
 5. **PDF mellékletek elkészítése** előre (nem utólag, mint a CLI-CPU-nál)
 6. **Beadás** — https://nlnet.nl/propose/ — a következő nyílt hívásra (várhatóan 2026 Q3)
 

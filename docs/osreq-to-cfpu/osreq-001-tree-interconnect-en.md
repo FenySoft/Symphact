@@ -8,13 +8,13 @@
 
 ## Summary
 
-The Neuron OS supervisor tree, capability delegation model, and memory management assume a **tree-structured hierarchy**. The interconnect topology must mirror this tree — not a flat bus, not a uniform mesh, but a **hierarchical tree (fat tree)**.
+The Symphact supervisor tree, capability delegation model, and memory management assume a **tree-structured hierarchy**. The interconnect topology must mirror this tree — not a flat bus, not a uniform mesh, but a **hierarchical tree (fat tree)**.
 
 ## Context — why a tree?
 
 ### 1. The software is naturally a tree
 
-The Neuron OS supervisor tree is a tree:
+The Symphact supervisor tree is a tree:
 
 ```
 TRootSupervisor [Admin]              ← Rich Core
@@ -151,6 +151,6 @@ This is O(1) routing, not O(N) lookup.
 ## Cross-references
 
 - CLI-CPU issue: #TODO (osreq-from-os label)
-- Neuron OS roadmap: M2.3 (Router), M2.4 (Memory Manager)
+- Symphact roadmap: M2.3 (Router), M2.4 (Memory Manager)
 - Boot sequence: `docs/boot-sequence-hu.md` — step 8 (Nano Core Wake)
 - CLI-CPU architecture: `docs/architecture-hu.md` — "Scaling to F6" section

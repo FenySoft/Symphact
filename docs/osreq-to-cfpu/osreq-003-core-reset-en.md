@@ -8,11 +8,11 @@
 
 ## Summary
 
-The Neuron OS **"let it crash"** model requires that a supervisor actor can restart a faulty child actor's core. This requires **hardware core reset** that atomically clears the core's SRAM and mailbox FIFO, then brings the core into a restartable state.
+The Symphact **"let it crash"** model requires that a supervisor actor can restart a faulty child actor's core. This requires **hardware core reset** that atomically clears the core's SRAM and mailbox FIFO, then brings the core into a restartable state.
 
 ## Context
 
-The Erlang/OTP supervision model is the foundation of Neuron OS (M0.3 milestone). When an actor throws an error:
+The Erlang/OTP supervision model is the foundation of Symphact (M0.3 milestone). When an actor throws an error:
 
 ```
 1. Actor crash (e.g. invalid message, assertion failure)
@@ -86,6 +86,6 @@ In the **let-it-crash** model, restart is a **frequent, normal operation** — n
 
 ## Cross-references
 
-- Neuron OS roadmap: M0.3 (Supervision / Let-it-crash)
+- Symphact roadmap: M0.3 (Supervision / Let-it-crash)
 - Boot sequence: `docs/boot-sequence-hu.md` — step 1 (POR)
 - CLI-CPU architecture: Seal Core self-test analogy

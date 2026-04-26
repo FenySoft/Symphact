@@ -1,4 +1,4 @@
-namespace NeuronOS.Core;
+namespace Symphact.Core;
 
 /// <summary>
 /// hu: Az IActorContext referencia-implementációja. Egyetlen Handle hívásra jön létre:

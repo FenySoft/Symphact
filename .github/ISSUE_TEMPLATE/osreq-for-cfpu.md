@@ -8,17 +8,17 @@ assignees: []
 
 ## Summary
 
-<!-- One sentence: what does Neuron OS need from the CFPU hardware? -->
+<!-- One sentence: what does Symphact need from the CFPU hardware? -->
 
 ## Context
 
-<!-- Where in Neuron OS did this requirement surface?
+<!-- Where in Symphact did this requirement surface?
   - Which module/actor/test revealed it?
   - Was it a performance bottleneck, a correctness issue, or a design limitation? -->
 
 ## Current software workaround
 
-<!-- How is Neuron OS handling this today without hardware support?
+<!-- How is Symphact handling this today without hardware support?
      Is the workaround acceptable for v0.x, or is it blocking something? -->
 
 ## Proposed hardware behaviour
@@ -53,5 +53,5 @@ assignees: []
 <!-- Link the corresponding issue in FenySoft/CLI-CPU once opened. -->
 
 - CLI-CPU issue: #TODO
-- Related Neuron OS code: `src/...`
+- Related Symphact code: `src/...`
 - Related test: `tests/...`

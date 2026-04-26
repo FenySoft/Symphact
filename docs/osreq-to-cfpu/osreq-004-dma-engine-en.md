@@ -8,7 +8,7 @@
 
 ## Summary
 
-The Neuron OS persistence model (M0.5 — Event Sourcing) requires that an actor's state can be written to external storage (DRAM/Flash/FRAM) in an **asynchronous, non-blocking manner**. Since core SRAM is volatile (lost on power failure), a **DMA engine** is needed for journal/snapshot writes so that core execution is not blocked.
+The Symphact persistence model (M0.5 — Event Sourcing) requires that an actor's state can be written to external storage (DRAM/Flash/FRAM) in an **asynchronous, non-blocking manner**. Since core SRAM is volatile (lost on power failure), a **DMA engine** is needed for journal/snapshot writes so that core execution is not blocked.
 
 ## Context
 
@@ -80,7 +80,7 @@ The primary target device for persistence is **FRAM** — non-volatile, fast wri
 
 ## Cross-references
 
-- Neuron OS roadmap: M0.5 (Persistence / Event Sourcing)
+- Symphact roadmap: M0.5 (Persistence / Event Sourcing)
 - CLI-CPU architecture: OPI bus, FRAM section
 - OSREQ-001: cluster topology (per-cluster DMA alignment)
 - OSREQ-002: MMIO map (DMA register addresses)

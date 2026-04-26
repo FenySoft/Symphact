@@ -1,6 +1,6 @@
 using System.Collections.Concurrent;
 
-namespace NeuronOS.Core;
+namespace Symphact.Core;
 
 /// <summary>
 /// hu: Az aktor runtime fő belépési pontja. Ez egy referencia, single-host implementáció —

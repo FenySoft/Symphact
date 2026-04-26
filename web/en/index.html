@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neuron OS — Capability-based actor runtime for .NET, co-designed with the CFPU</title>
-  <meta name="description" content="Neuron OS: a capability-based actor runtime for secure .NET computing, co-designed with the Cognitive Fabric Processing Unit (CFPU). Apache-2.0 license. Every entity is an actor, hardware-enforced isolation, formal verifiability.">
+  <title>Symphact — Capability-based actor runtime for .NET, co-designed with the CFPU</title>
+  <meta name="description" content="Symphact: a capability-based actor runtime for secure .NET computing, co-designed with the Cognitive Fabric Processing Unit (CFPU). Apache-2.0 license. Every entity is an actor, hardware-enforced isolation, formal verifiability.">
   <style>
     :root {
       --bg: #0d1117;
@@ -232,7 +232,7 @@
 </header>
 
 <div class="container" style="padding-top:48px;">
-  <img src="../img/neuron-os.jpg" alt="Neuron OS — Cognitive Fabric Processing Unit" style="width:100%;border-radius:8px;">
+  <img src="../img/symphact.jpg" alt="Symphact — Cognitive Fabric Processing Unit" style="width:100%;border-radius:8px;">
 </div>
 
 <main>
@@ -240,12 +240,12 @@
 
     <div class="abstract">
       <p>
-        Neuron OS is a <strong>capability-based actor runtime</strong> for .NET, built on a single simple idea:
+        Symphact is a <strong>capability-based actor runtime</strong> for .NET, built on a single simple idea:
         every stateful entity is an actor; actors communicate exclusively through immutable messages over mailboxes;
         isolation is a hardware property, not a software convention.
       </p>
       <p style="margin-top: 16px;">
-        Today, Neuron OS runs on <strong>any .NET host</strong> (Windows, Linux, macOS) as a reference runtime. Tomorrow,
+        Today, Symphact runs on <strong>any .NET host</strong> (Windows, Linux, macOS) as a reference runtime. Tomorrow,
         it will run natively on the <a href="https://clicpu.org">Cognitive Fabric Processing Unit (CFPU)</a> &mdash; a new
         category of processor where each core is physically an actor, with private SRAM and hardware mailbox FIFOs.
       </p>
@@ -255,10 +255,10 @@
       <h2>// hw/os co-design</h2>
       <p>
         Apple&rsquo;s M-series achieves tight OS/silicon integration because macOS existed before the chip was
-        designed &mdash; the OS&rsquo;s needs shaped the hardware. Neuron OS applies the same philosophy to open-source
+        designed &mdash; the OS&rsquo;s needs shaped the hardware. Symphact applies the same philosophy to open-source
         silicon: by running on a simulator from day one, it discovers CFPU requirements (mailbox depth, capability
         token width, context size, interrupt model) <em>before</em> the hardware is fixed. The feedback flows
-        through the <a href="https://github.com/FenySoft/NeuronOS/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
+        through the <a href="https://github.com/FenySoft/Symphact/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
         workflow.
       </p>
     </div>
@@ -267,32 +267,32 @@
       <div class="card">
         <h3>Design Principles</h3>
         <p>Everything is an actor. No shared memory. Let it crash. Supervision. Location transparency. Capability security. Hot code loading. Determinism.</p>
-        <a href="https://github.com/FenySoft/NeuronOS#design-principles">Read &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact#design-principles">Read &rarr;</a>
       </div>
       <div class="card">
         <h3>Source Code</h3>
         <p>TMailbox, TActorRef, TActor&lt;T&gt;, TActorSystem. TDD from day one. Apache-2.0 licensed.</p>
-        <a href="https://github.com/FenySoft/NeuronOS/tree/main/src/NeuronOS.Core">Browse &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact/tree/main/src/Symphact.Core">Browse &rarr;</a>
       </div>
       <div class="card">
         <h3>CFPU Hardware</h3>
-        <p>The processor Neuron OS co-designs with. Cognitive Fabric Processing Unit &mdash; the first MIMD actor-native PU.</p>
+        <p>The processor Symphact co-designs with. Cognitive Fabric Processing Unit &mdash; the first MIMD actor-native PU.</p>
         <a href="https://clicpu.org">Visit &rarr;</a>
       </div>
       <div class="card">
         <h3>OS Requirements for CFPU</h3>
         <p>Issues opened by the OS team that should shape the hardware. Mailbox depth, capability width, interrupt structure.</p>
-        <a href="https://github.com/FenySoft/NeuronOS/issues?q=is%3Aissue+label%3Aosreq-to-cfpu">View issues &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact/issues?q=is%3Aissue+label%3Aosreq-to-cfpu">View issues &rarr;</a>
       </div>
       <div class="card">
         <h3>Contributing</h3>
         <p>TDD is required. Bilingual XML docs. T/I/A/F naming conventions. Apache-2.0 license with patent grant.</p>
-        <a href="https://github.com/FenySoft/NeuronOS/blob/main/CONTRIBUTING.md">Read &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact/blob/main/CONTRIBUTING.md">Read &rarr;</a>
       </div>
       <div class="card">
         <h3>GitHub</h3>
         <p>Source code, tests, CI for Linux + Windows + macOS. Star us and follow the OS-side of the journey.</p>
-        <a href="https://github.com/FenySoft/NeuronOS">View repo &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact">View repo &rarr;</a>
       </div>
     </div>
 
@@ -317,7 +317,7 @@
   <div class="container">
     <div class="footer-links">
       <span>Apache-2.0</span>
-      <a href="https://github.com/FenySoft/NeuronOS">GitHub</a>
+      <a href="https://github.com/FenySoft/Symphact">GitHub</a>
       <a href="https://clicpu.org">CLI-CPU / CFPU</a>
     </div>
   </div>

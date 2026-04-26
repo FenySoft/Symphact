@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>NeuronOS.Core.Tests</RootNamespace>
-    <AssemblyName>NeuronOS.Core.Tests</AssemblyName>
+    <RootNamespace>Symphact.Core.Tests</RootNamespace>
+    <AssemblyName>Symphact.Core.Tests</AssemblyName>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\NeuronOS.Core\NeuronOS.Core.csproj" />
+    <ProjectReference Include="..\..\src\Symphact.Core\Symphact.Core.csproj" />
   </ItemGroup>
 
 </Project>

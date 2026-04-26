@@ -1,4 +1,4 @@
-Neuron OS
+Symphact
 Copyright 2026 FenySoft
 
 This product includes software developed by FenySoft and contributors.
@@ -11,7 +11,7 @@ You may obtain a copy of the License at
 
 ---
 
-Neuron OS is a capability-based actor runtime for secure .NET computing,
+Symphact is a capability-based actor runtime for secure .NET computing,
 designed for co-development with the Cognitive Fabric Processing Unit (CFPU).
 The CFPU's open-source reference implementation is the CLI-CPU project
 (https://github.com/FenySoft/CLI-CPU).

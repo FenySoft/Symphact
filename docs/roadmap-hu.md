@@ -13,7 +13,7 @@
 | **Phase 5** Security | M5.1-M5.4 | ~100-140 | Capability security, audit, formal verification |
 | **Phase 6** Developer Experience | M6.1-M6.5 | ~100-140 | CLI, IDE, profiler, NuGet, docs |
 | **Phase 7** Első Eladható Termék | M7.1-M7.5 | ~80-120 | Reference apps, enterprise, launch |
-| **Összesen** | | **~728-1024** | **Production-ready Neuron OS** |
+| **Összesen** | | **~728-1024** | **Production-ready Symphact** |
 
 > ~728-1024 óra ≈ **4-6 hónap full-time** (1 ember) vagy **2-3 hónap** (ügynök csapattal).
 
@@ -124,7 +124,7 @@
 **Lehetséges HW kérés:** DMA engine hozzáférés core-onként: saját DMA vagy központi controller?
 
 **Becsült óra:** ~16-24
-> Új projekt lehetséges (NeuronOS.Persistence). Külső függőség (SQLite). Snapshot + replay logika. Integráció M0.3 supervision-nel (recovery restart után). ~4-5 új fájl, ~300-400 sor runtime, ~400-500 sor teszt.
+> Új projekt lehetséges (Symphact.Persistence). Külső függőség (SQLite). Snapshot + replay logika. Integráció M0.3 supervision-nel (recovery restart után). ~4-5 új fájl, ~300-400 sor runtime, ~400-500 sor teszt.
 
 ---
 
@@ -143,7 +143,7 @@
 **Lehetséges HW kérés:** Inter-chip protokoll: milyen link? Max message méret? HW routing (mesh NoC)?
 
 **Becsült óra:** ~28-36
-> TActorRef formátum változás (location info). Serialization layer (message → byte → message). Hálózati kód: connection management, reconnection, hibakezelés. Location-transparent Send routing. Új projekt (NeuronOS.Remoting). ~5-7 új fájl, ~500-700 sor runtime, ~500-700 sor teszt.
+> TActorRef formátum változás (location info). Serialization layer (message → byte → message). Hálózati kód: connection management, reconnection, hibakezelés. Location-transparent Send routing. Új projekt (Symphact.Remoting). ~5-7 új fájl, ~500-700 sor runtime, ~500-700 sor teszt.
 
 ---
 
@@ -537,12 +537,12 @@
 
 | Csomag | Tartalom |
 |--------|----------|
-| `NeuronOS.Core` | Runtime primitívek. |
-| `NeuronOS.Supervision` | Supervisor stratégiák. |
-| `NeuronOS.Persistence` | Event sourcing. |
-| `NeuronOS.Remoting` | Distribution. |
-| `NeuronOS.Security` | Capability modell. |
-| `NeuronOS.Devices` | Device actor framework. |
+| `Symphact.Core` | Runtime primitívek. |
+| `Symphact.Supervision` | Supervisor stratégiák. |
+| `Symphact.Persistence` | Event sourcing. |
+| `Symphact.Remoting` | Distribution. |
+| `Symphact.Security` | Capability modell. |
+| `Symphact.Devices` | Device actor framework. |
 
 API reference site (DocFX vagy hasonló).
 

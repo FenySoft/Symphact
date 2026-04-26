@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Neuron OS — Capability-alapú aktor runtime .NET-re, a CFPU-val együtt tervezve</title>
-  <meta name="description" content="Neuron OS: capability-alapú aktor runtime biztonságos .NET számításhoz, a Cognitive Fabric Processing Unit (CFPU) hardverrel együtt fejlesztve. Apache-2.0 licenc. Minden entitás aktor, hardveres izoláció, formális verifikálhatóság.">
+  <title>Symphact — Capability-alapú aktor runtime .NET-re, a CFPU-val együtt tervezve</title>
+  <meta name="description" content="Symphact: capability-alapú aktor runtime biztonságos .NET számításhoz, a Cognitive Fabric Processing Unit (CFPU) hardverrel együtt fejlesztve. Apache-2.0 licenc. Minden entitás aktor, hardveres izoláció, formális verifikálhatóság.">
   <style>
     :root {
       --bg: #0d1117;
@@ -232,7 +232,7 @@
 </header>
 
 <div class="container" style="padding-top:48px;">
-  <img src="../img/neuron-os.jpg" alt="Neuron OS — Cognitive Fabric Processing Unit" style="width:100%;border-radius:8px;">
+  <img src="../img/symphact.jpg" alt="Symphact — Cognitive Fabric Processing Unit" style="width:100%;border-radius:8px;">
 </div>
 
 <main>
@@ -240,12 +240,12 @@
 
     <div class="abstract">
       <p>
-        A Neuron OS egy <strong>capability-alapú aktor runtime</strong> .NET-re, egyetlen egyszerű elvre építve:
+        A Symphact egy <strong>capability-alapú aktor runtime</strong> .NET-re, egyetlen egyszerű elvre építve:
         minden állapot-tartó entitás egy aktor; az aktorok kizárólag immutable üzenetekkel kommunikálnak mailbox-okon
         keresztül; az izoláció <strong>hardveres tulajdonság</strong>, nem szoftveres konvenció.
       </p>
       <p style="margin-top: 16px;">
-        Ma a Neuron OS <strong>bármely .NET hoszton</strong> (Windows, Linux, macOS) fut referencia runtime-ként. Holnap
+        Ma a Symphact <strong>bármely .NET hoszton</strong> (Windows, Linux, macOS) fut referencia runtime-ként. Holnap
         natívan fut majd a <a href="https://clicpu.org/hu/">Cognitive Fabric Processing Unit (CFPU)</a> hardveren &mdash; egy új
         kategóriájú processzoron, ahol minden core fizikailag egy aktor, saját privát SRAM-mal és hardveres mailbox
         FIFO-kkal.
@@ -256,11 +256,11 @@
       <h2>// hw/os co-design</h2>
       <p>
         Az Apple M-sorozata azért éri el ennyire szoros OS/szilícium integrációt, mert a macOS létezett a chip
-        tervezése előtt &mdash; az OS igényei alakították a hardvert. A Neuron OS ugyanezt a filozófiát alkalmazza
+        tervezése előtt &mdash; az OS igényei alakították a hardvert. A Symphact ugyanezt a filozófiát alkalmazza
         nyílt forráskódú szilíciumra: már a nulladik naptól szimulátoron fut, így felfedezi a CFPU követelményeit
         (mailbox mélység, capability token szélesség, kontextus méret, interrupt modell) <em>még azelőtt</em>, hogy a
         hardver véglegesülne. A visszacsatolás az
-        <a href="https://github.com/FenySoft/NeuronOS/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
+        <a href="https://github.com/FenySoft/Symphact/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
         workflow-n át történik.
       </p>
     </div>
@@ -269,32 +269,32 @@
       <div class="card">
         <h3>Tervezési alapelvek</h3>
         <p>Minden aktor. Nincs shared memory. Let it crash. Supervision. Location transparency. Capability security. Hot code loading. Determinizmus.</p>
-        <a href="https://github.com/FenySoft/NeuronOS/blob/main/README-hu.md#tervez%C3%A9si-alapelvek">Olvasás &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact/blob/main/README-hu.md#tervez%C3%A9si-alapelvek">Olvasás &rarr;</a>
       </div>
       <div class="card">
         <h3>Forráskód</h3>
         <p>TMailbox, TActorRef, TActor&lt;T&gt;, TActorSystem. TDD a nulladik naptól. Apache-2.0 licenszelve.</p>
-        <a href="https://github.com/FenySoft/NeuronOS/tree/main/src/NeuronOS.Core">Böngészés &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact/tree/main/src/Symphact.Core">Böngészés &rarr;</a>
       </div>
       <div class="card">
         <h3>CFPU hardver</h3>
-        <p>A processzor, amivel a Neuron OS együtt fejlődik. Cognitive Fabric Processing Unit &mdash; az első MIMD aktor-natív PU.</p>
+        <p>A processzor, amivel a Symphact együtt fejlődik. Cognitive Fabric Processing Unit &mdash; az első MIMD aktor-natív PU.</p>
         <a href="https://clicpu.org/hu/">Látogatás &rarr;</a>
       </div>
       <div class="card">
         <h3>OS-követelmények a CFPU-hoz</h3>
         <p>Az OS csapat által nyitott issue-k, amelyek alakítják a hardvert. Mailbox mélység, capability szélesség, interrupt struktúra.</p>
-        <a href="https://github.com/FenySoft/NeuronOS/issues?q=is%3Aissue+label%3Aosreq-to-cfpu">Issue-k megtekintése &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact/issues?q=is%3Aissue+label%3Aosreq-to-cfpu">Issue-k megtekintése &rarr;</a>
       </div>
       <div class="card">
         <h3>Közreműködés</h3>
         <p>TDD kötelező. Kétnyelvű XML docs. T/I/A/F elnevezési konvenciók. Apache-2.0 licenc patent grant-tel.</p>
-        <a href="https://github.com/FenySoft/NeuronOS/blob/main/CONTRIBUTING-hu.md">Olvasás &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact/blob/main/CONTRIBUTING-hu.md">Olvasás &rarr;</a>
       </div>
       <div class="card">
         <h3>GitHub</h3>
         <p>Forráskód, tesztek, CI Linux + Windows + macOS-ra. Csillagozz minket és kövesd az út OS-oldali szálát.</p>
-        <a href="https://github.com/FenySoft/NeuronOS/blob/main/README-hu.md">Repó megtekintése &rarr;</a>
+        <a href="https://github.com/FenySoft/Symphact/blob/main/README-hu.md">Repó megtekintése &rarr;</a>
       </div>
     </div>
 
@@ -319,7 +319,7 @@
   <div class="container">
     <div class="footer-links">
       <span>Apache-2.0</span>
-      <a href="https://github.com/FenySoft/NeuronOS/blob/main/README-hu.md">GitHub</a>
+      <a href="https://github.com/FenySoft/Symphact/blob/main/README-hu.md">GitHub</a>
       <a href="https://clicpu.org/hu/">CLI-CPU / CFPU</a>
     </div>
   </div>

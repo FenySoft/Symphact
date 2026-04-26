@@ -1,6 +1,6 @@
-using NeuronOS.Core;
+using Symphact.Core;
 
-namespace NeuronOS.Core.Tests;
+namespace Symphact.Core.Tests;
 
 /// <summary>
 /// hu: Az IActorContext integráció tesztjei. Lefedi: context.Self helyes értékét, context.Send

@@ -1,4 +1,4 @@
-namespace NeuronOS.Core;
+namespace Symphact.Core;
 
 /// <summary>
 /// hu: Egy aktor futtatási kontextusa, amelyet a Handle metódus kap meg üzenet-feldolgozáskor.

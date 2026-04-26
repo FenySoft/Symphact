@@ -8,7 +8,7 @@
 
 ## Summary
 
-The Neuron OS scheduler (M0.4) needs to know how a core is **notified when a new message arrives in its mailbox FIFO**. This is a fundamental question: **hardware interrupt** or **software polling**? The answer affects power consumption, latency, and the scheduler algorithm.
+The Symphact scheduler (M0.4) needs to know how a core is **notified when a new message arrives in its mailbox FIFO**. This is a fundamental question: **hardware interrupt** or **software polling**? The answer affects power consumption, latency, and the scheduler algorithm.
 
 ## Context
 
@@ -108,6 +108,6 @@ The `???` is the question.
 
 ## Cross-references
 
-- Neuron OS roadmap: M0.4 (Scheduler / Per-Actor Parallelism)
+- Symphact roadmap: M0.4 (Scheduler / Per-Actor Parallelism)
 - CLI-CPU architecture: "Event-driven, not clock-driven" section, Sleep/Wake logic
 - OSREQ-002: MMIO map (IRQ registers)

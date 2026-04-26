@@ -1,6 +1,6 @@
-# Neuron OS Boot Sequence
+# Symphact Boot Sequence
 
-> A Neuron OS indulási folyamata — a hardveres boot **után**, az első alkalmazás actor-ig.
+> A Symphact indulási folyamata — a hardveres boot **után**, az első alkalmazás actor-ig.
 
 ---
 
@@ -11,15 +11,15 @@ A boot folyamat **két repo** kódját érinti:
 | Repo | Mit tartalmaz? |
 |------|---------------|
 | **[FenySoft/CLI-CPU](https://github.com/FenySoft/CLI-CPU)** | A chip RTL-je, Seal Core, MMIO regiszterek, HW mailbox FIFO, eFuse root hash. **A hardveres boot szekvenciát** (POR → Seal Core verify → Rich core start) lásd: [hw-boot-hu.md](https://github.com/FenySoft/CLI-CPU/blob/main/docs/hw-boot-hu.md) |
-| **[FenySoft/NeuronOS](https://github.com/FenySoft/NeuronOS)** | Az OS kódja: `Boot.Main()`, actor runtime, kernel actor-ok, device actor-ok, alkalmazások |
+| **[FenySoft/Symphact](https://github.com/FenySoft/Symphact)** | Az OS kódja: `Boot.Main()`, actor runtime, kernel actor-ok, device actor-ok, alkalmazások |
 
-**Szabály:** A Seal Core firmware a **hardver része** (mask ROM-ba égetve, a chip-pel szállítják). A NeuronOS a **szoftver** (flash-en, frissíthető, aláírással védve). Két repo, két életciklus, két licenc (CERN-OHL-S vs Apache-2.0).
+**Szabály:** A Seal Core firmware a **hardver része** (mask ROM-ba égetve, a chip-pel szállítják). A Symphact a **szoftver** (flash-en, frissíthető, aláírással védve). Két repo, két életciklus, két licenc (CERN-OHL-S vs Apache-2.0).
 
 ---
 
 ## Előfeltétel: hardveres boot (1-3. lépés)
 
-A Neuron OS indulása előtt a chip hardveresen elvégzi:
+A Symphact indulása előtt a chip hardveresen elvégzi:
 
 1. **Power-On Reset** — minden core reset
 2. **Seal Core boot** — self-test, eFuse root hash olvasás, QSPI flash → SRAM másolás, SHA-256 + WOTS+/LMS HW verifikáció
@@ -38,7 +38,7 @@ A kriptográfiai modellt (PQC, WOTS+/LMS, trust chain, tanúsítvány formátum,
      │
      ▼
 [4. Boot.Main()] ──────── MMIO discovery, core count, mailbox mapping
-     │                     Kód: NeuronOS repo (src/NeuronOS.Boot/)
+     │                     Kód: Symphact repo (src/Symphact.Boot/)
      ▼
 [5. Root Supervisor] ──── Első actor, Admin capability
      │                     Mailbox FIFO enable
@@ -59,12 +59,12 @@ A kriptográfiai modellt (PQC, WOTS+/LMS, trust chain, tanúsítvány formátum,
 
 ---
 
-## 4. NeuronOS.Boot.Main() — rendszer inicializálás
+## 4. Symphact.Boot.Main() — rendszer inicializálás
 
 | Szoftver | Hardver (MMIO) |
 |----------|----------------|
-| A Rich core futtatja `NeuronOS.Boot.Main()`-t. | A Rich core folyamatosan CIL-t hajt végre. |
-| **Innentől a NeuronOS repo kódja fut.** | A Seal Core verifikálta — a kód hiteles. |
+| A Rich core futtatja `Symphact.Boot.Main()`-t. | A Rich core folyamatosan CIL-t hajt végre. |
+| **Innentől a Symphact repo kódja fut.** | A Seal Core verifikálta — a kód hiteles. |
 | | |
 | **4a. GC inicializálás** | A Rich core SRAM heap régiójában **bump allocator** indul. |
 | `THeapManager.Init(heapStart, heapEnd)` | Mark-sweep GC később, amikor a heap megtelik. |
@@ -81,7 +81,7 @@ A kriptográfiai modellt (PQC, WOTS+/LMS, trust chain, tanúsítvány formátum,
 | Beállítja melyik interrupt → melyik handler: | Interrupt sources: mailbox not-empty, watchdog, trap from Nano core. |
 | `Mmio.Write(0xF0000600, MAILBOX_IRQ_HANDLER_ADDR)` | |
 
-**Forráskód helye:** `FenySoft/NeuronOS` repo — `src/NeuronOS.Boot/TBoot.cs`
+**Forráskód helye:** `FenySoft/Symphact` repo — `src/Symphact.Boot/TBoot.cs`
 
 MMIO regiszterek részletes leírása: [CLI-CPU/docs/hw-boot-hu.md §MMIO](https://github.com/FenySoft/CLI-CPU/blob/main/docs/hw-boot-hu.md#mmio)
 
@@ -107,7 +107,7 @@ MMIO regiszterek részletes leírása: [CLI-CPU/docs/hw-boot-hu.md §MMIO](https
 | Ez az **egyetlen** actor akinek Admin capability-je van. | |
 | Minden más actor **ettől kap jogot** (capability delegation). | |
 
-**Forráskód helye:** `FenySoft/NeuronOS` repo — `src/NeuronOS.Core/TRootSupervisor.cs` (M2.1 milestone)
+**Forráskód helye:** `FenySoft/Symphact` repo — `src/Symphact.Core/TRootSupervisor.cs` (M2.1 milestone)
 
 **Mi az Admin capability?** A root supervisor korlátlan jogokkal rendelkezik:
 - Spawn bármilyen actor-t
@@ -151,7 +151,7 @@ MMIO regiszterek részletes leírása: [CLI-CPU/docs/hw-boot-hu.md §MMIO](https
 3. A `TCapabilityRegistry` kell a device actor-ok előtt — azoknak capability kell
 4. A `TKernelIoSupervisor` utolsó — ő spawn-olja a device actor-okat a 7. lépésben
 
-**Forráskód helye:** `FenySoft/NeuronOS` repo — `src/NeuronOS.Core/` (M0.3 supervision + M2.1-M2.5 kernel actors)
+**Forráskód helye:** `FenySoft/Symphact` repo — `src/Symphact.Core/` (M0.3 supervision + M2.1-M2.5 kernel actors)
 
 **Állapot a 6. lépés után:**
 - Rich core-on fut **7 kernel actor**: root + 2 supervisor + scheduler + router + registry + io_sup
@@ -201,7 +201,7 @@ Az aláírási modell, tanúsítvány formátum és HSM Card részletei: [CLI-CP
 
 ## .NET Reference Implementáció
 
-A boot sequence fenti leírása a **CFPU hardverre** vonatkozik. A .NET reference runtime (`src/NeuronOS.Core/`) **szimulálva** futtatja ugyanezt:
+A boot sequence fenti leírása a **CFPU hardverre** vonatkozik. A .NET reference runtime (`src/Symphact.Core/`) **szimulálva** futtatja ugyanezt:
 
 | Boot lépés | CFPU HW-en | .NET Reference Impl-ben |
 |-----------|------------|------------------------|

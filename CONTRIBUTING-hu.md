@@ -1,8 +1,8 @@
-# Közreműködés a Neuron OS-ben
+# Közreműködés a Symphact-ben
 
 > English version: [CONTRIBUTING.md](CONTRIBUTING.md)
 
-Köszönjük az érdeklődést a Neuron OS iránt!
+Köszönjük az érdeklődést a Symphact iránt!
 
 ## Előfeltételek
 
@@ -14,7 +14,7 @@ Köszönjük az érdeklődést a Neuron OS iránt!
 
 ```bash
 # Teljes build
-dotnet build NeuronOS.sln -c Debug
+dotnet build Symphact.sln -c Debug
 
 # Összes teszt futtatása
 dotnet test
@@ -23,7 +23,7 @@ dotnet test
 dotnet test --filter "FullyQualifiedName~TMailboxTests"
 
 # Build restore nélkül (ha már korábban le volt fordítva)
-dotnet build NeuronOS.sln -c Debug --no-restore
+dotnet build Symphact.sln -c Debug --no-restore
 ```
 
 ## Teszt-vezérelt fejlesztés (TDD) — kötelező
@@ -112,7 +112,7 @@ Kétnyelvű commit üzenet ajánlott (magyar először, utána angol külön sor
 
 ## Hardver / CFPU visszajelzés
 
-Ha a Neuron OS-en dolgozva felfedezel egy követelményt, amit a CFPU hardvernek biztosítania kellene (mailbox mélység, interrupt struktúra, capability szélesség, stb.), nyiss issue-t az [`osreq-for-cfpu`](.github/ISSUE_TEMPLATE/osreq-for-cfpu.md) sablonnal. Ezek az issue-k közvetlenül a [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU/blob/main/README-hu.md) hardveres tervezési viták bemenetét képezik.
+Ha a Symphact-en dolgozva felfedezel egy követelményt, amit a CFPU hardvernek biztosítania kellene (mailbox mélység, interrupt struktúra, capability szélesség, stb.), nyiss issue-t az [`osreq-for-cfpu`](.github/ISSUE_TEMPLATE/osreq-for-cfpu.md) sablonnal. Ezek az issue-k közvetlenül a [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU/blob/main/README-hu.md) hardveres tervezési viták bemenetét képezik.
 
 ## Pull request ellenőrzőlista
 

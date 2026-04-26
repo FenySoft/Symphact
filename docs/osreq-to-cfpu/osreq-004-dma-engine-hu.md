@@ -8,7 +8,7 @@
 
 ## Összefoglaló
 
-A Neuron OS persistence modellje (M0.5 — Event Sourcing) megköveteli, hogy egy actor állapotát **aszinkron, nem-blokkoló módon** lehessen kiírni külső tárolóra (DRAM/Flash/FRAM). Mivel a core SRAM volatile (tápelvesztésnél elveszik), a journal/snapshot kiíráshoz **DMA engine** szükséges, ami a core futását nem blokkolja.
+A Symphact persistence modellje (M0.5 — Event Sourcing) megköveteli, hogy egy actor állapotát **aszinkron, nem-blokkoló módon** lehessen kiírni külső tárolóra (DRAM/Flash/FRAM). Mivel a core SRAM volatile (tápelvesztésnél elveszik), a journal/snapshot kiíráshoz **DMA engine** szükséges, ami a core futását nem blokkolja.
 
 ## Kontextus
 
@@ -80,7 +80,7 @@ A persistence elsődleges céleszköze a **FRAM** — nem-volatile, gyors írás
 
 ## Kereszthivatkozások
 
-- Neuron OS roadmap: M0.5 (Persistence / Event Sourcing)
+- Symphact roadmap: M0.5 (Persistence / Event Sourcing)
 - CLI-CPU architecture: OPI busz, FRAM szekció
 - OSREQ-001: cluster topológia (per-cluster DMA illeszkedés)
 - OSREQ-002: MMIO térkép (DMA regiszter címek)

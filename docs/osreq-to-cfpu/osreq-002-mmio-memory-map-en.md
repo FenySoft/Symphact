@@ -8,7 +8,7 @@
 
 ## Summary
 
-The Neuron OS boot process assumes specific MMIO registers for communication between the Rich Core and the Seal Core, core discovery, mailbox management, and interrupt control. These are the OS↔HW interface contracts — the CLI-CPU HW design must implement these addresses and semantics (or propose alternatives).
+The Symphact boot process assumes specific MMIO registers for communication between the Rich Core and the Seal Core, core discovery, mailbox management, and interrupt control. These are the OS↔HW interface contracts — the CLI-CPU HW design must implement these addresses and semantics (or propose alternatives).
 
 ## Context
 
@@ -102,7 +102,7 @@ The Neuron OS boot process assumes specific MMIO registers for communication bet
 
 ## Current Software Implementation
 
-In the .NET reference implementation there is no MMIO — `TActorSystem` manages internal state directly. The boot sequence code (`src/NeuronOS.Boot/`) does not exist yet.
+In the .NET reference implementation there is no MMIO — `TActorSystem` manages internal state directly. The boot sequence code (`src/Symphact.Boot/`) does not exist yet.
 
 ## Open Questions (HW feedback needed)
 
@@ -114,6 +114,6 @@ In the .NET reference implementation there is no MMIO — `TActorSystem` manages
 
 ## Cross-references
 
-- Neuron OS boot sequence: `docs/boot-sequence-hu.md` — steps 1–8
+- Symphact boot sequence: `docs/boot-sequence-hu.md` — steps 1–8
 - CLI-CPU architecture: `docs/architecture-hu.md` — memory map section
 - OSREQ-001: tree topology (cluster registers: `0xF0000108–0xF0000114`)

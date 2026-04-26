@@ -1,4 +1,4 @@
-# Neuron OS
+# Symphact
 
 > **Capability-based actor runtime for secure .NET computing — co-designed with the Cognitive Fabric Processing Unit (CFPU).**
 > Every entity is an actor. Communication happens exclusively through messages. Hardware-enforced isolation, formal verifiability, and co-evolution with open silicon.
@@ -7,22 +7,22 @@
 
 > Version: 0.1 (pre-alpha — active development)
 
-## What is Neuron OS?
+## What is Symphact?
 
-Neuron OS is a **capability-based actor runtime** for .NET, built on a simple idea:
+Symphact is a **capability-based actor runtime** for .NET, built on a simple idea:
 
 > Every stateful entity is an actor. Actors communicate exclusively through immutable messages over mailboxes. Isolation is a hardware property, not a software convention.
 
-Today, Neuron OS runs on **any .NET host** (Windows, Linux, macOS) as a reference runtime. Tomorrow, it will run natively on the **Cognitive Fabric Processing Unit (CFPU)** — a new category of processing unit where each core is physically an actor, with private SRAM and hardware mailbox FIFOs.
+Today, Symphact runs on **any .NET host** (Windows, Linux, macOS) as a reference runtime. Tomorrow, it will run natively on the **Cognitive Fabric Processing Unit (CFPU)** — a new category of processing unit where each core is physically an actor, with private SRAM and hardware mailbox FIFOs.
 
 **The two projects are co-developed on purpose:** the OS shapes the hardware requirements, and the hardware grounds the OS design. This bidirectional loop is how Apple's M-series chips achieve such tight OS/hardware integration — we apply the same philosophy to an open-source stack.
 
 ## Why a separate repository?
 
-Neuron OS has its own repo for three reasons:
+Symphact has its own repo for three reasons:
 
 1. **Distinct contributor audience** — .NET developers should not need to read Verilog, cocotb, or Yosys scripts to contribute to an actor runtime
-2. **Independent lifecycle** — Neuron OS runs on any CIL host today; it does not block on silicon availability
+2. **Independent lifecycle** — Symphact runs on any CIL host today; it does not block on silicon availability
 3. **Clean licensing** — Apache-2.0 (permissive) aligns with the broader .NET ecosystem; the CFPU hardware repo uses CERN-OHL-S (strong reciprocal), appropriate for silicon designs
 
 The hardware co-development story is in [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) — the open-source reference implementation of the CFPU.
@@ -30,9 +30,9 @@ The hardware co-development story is in [`FenySoft/CLI-CPU`](https://github.com/
 ## Quick Start
 
 ```bash
-git clone https://github.com/FenySoft/NeuronOS.git
-cd NeuronOS
-dotnet build NeuronOS.sln -c Debug
+git clone https://github.com/FenySoft/Symphact.git
+cd Symphact
+dotnet build Symphact.sln -c Debug
 dotnet test
 ```
 
@@ -60,7 +60,7 @@ Full roadmap: [`docs/roadmap.md`](docs/roadmap.md).
 
 ## Relationship with CLI-CPU / CFPU
 
-Neuron OS runs on **any** CIL host. For hardware co-design purposes, we additionally run Neuron OS workloads against the CLI-CPU reference simulator (via the upcoming `FenySoft.CilCpu.Sim` NuGet package) to discover hardware requirements:
+Symphact runs on **any** CIL host. For hardware co-design purposes, we additionally run Symphact workloads against the CLI-CPU reference simulator (via the upcoming `FenySoft.CilCpu.Sim` NuGet package) to discover hardware requirements:
 
 - Mailbox depth profiling → informs CFPU FIFO sizing
 - Context size measurement → informs per-core SRAM budget

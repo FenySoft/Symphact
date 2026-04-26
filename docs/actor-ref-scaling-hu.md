@@ -1,4 +1,4 @@
-# Aktor referencia skálázódás és védelmi modell — Neuron OS
+# Aktor referencia skálázódás és védelmi modell — Symphact
 
 > English version: [actor-ref-scaling-en.md](actor-ref-scaling-en.md)
 
@@ -6,15 +6,15 @@
 
 > Státusz: véglegesített specifikáció, M0.6 / M0.7 / M2.5 alapja
 
-Ez a dokumentum a `TActorRef` **véglegesített bit-elrendezését**, **wire-formátumát**, és a **védelmi piramist** rögzíti. Az érvelés végigmegy a tervezési döntéseken: miért 64 bit, miért ez az allokáció, miért 24 bit HMAC, és miért elegendő a védelem a Neuron OS célközönségére (consumer + enterprise + ipari kritikus).
+Ez a dokumentum a `TActorRef` **véglegesített bit-elrendezését**, **wire-formátumát**, és a **védelmi piramist** rögzíti. Az érvelés végigmegy a tervezési döntéseken: miért 64 bit, miért ez az allokáció, miért 24 bit HMAC, és miért elegendő a védelem a Symphact célközönségére (consumer + enterprise + ipari kritikus).
 
-> **Célközönség:** Neuron OS runtime fejlesztők, CFPU HW tervezők (sister repo: `FenySoft/CLI-CPU`), API kontraktus felülvizsgálatakor, biztonsági auditok.
+> **Célközönség:** Symphact runtime fejlesztők, CFPU HW tervezők (sister repo: `FenySoft/CLI-CPU`), API kontraktus felülvizsgálatakor, biztonsági auditok.
 
 ---
 
 ## Kontextus
 
-A `TActorRef` a Neuron OS publikus API-jának **alapköve**: minden aktor-aktor kommunikáció ezen keresztül történik. A `CLAUDE.md` rögzíti az API kontraktust:
+A `TActorRef` a Symphact publikus API-jának **alapköve**: minden aktor-aktor kommunikáció ezen keresztül történik. A `CLAUDE.md` rögzíti az API kontraktust:
 
 ```csharp
 public readonly record struct TActorRef(long ActorId);   // 64 bit, opaque, public
@@ -28,7 +28,7 @@ A korábbi spec-eltérések (vision-hu.md 160 bites struct, roadmap M0.7 `[16][1
 
 ## Threat model
 
-A Neuron OS védelmi modellje **szoftveres + supply-chain** támadásokra fókuszál. A fizikai szintű támadás **out-of-scope** ezen a védelmi rétegen.
+A Symphact védelmi modellje **szoftveres + supply-chain** támadásokra fókuszál. A fizikai szintű támadás **out-of-scope** ezen a védelmi rétegen.
 
 | Támadási vektor | Védelem | Hatókör |
 |---|---|---|
@@ -277,7 +277,7 @@ Hot-spot backpressure:         88k core 1 célre = mailbox FIFO 8–64 mély tel
                                87 936 core blokkolódik
 ```
 
-A támadónak **válaszra kell várnia** ahhoz, hogy tudja, melyik HMAC volt sikeres (a Neuron OS shared-nothing modellben nincs side-channel az aktorok között). Tempó: **~10⁶ próba/sec** aggregate.
+A támadónak **válaszra kell várnia** ahhoz, hogy tudja, melyik HMAC volt sikeres (a Symphact shared-nothing modellben nincs side-channel az aktorok között). Tempó: **~10⁶ próba/sec** aggregate.
 
 ### Bytecode-szintű gating (Open mode)
 
@@ -311,7 +311,7 @@ A **24 bit HMAC + védelmi piramis** kombinációja:
 - **Strict mode**: ~70 ezer év brute-force védelem (FenySoft Strict whitelist)
 - **Open mode**: ~6 hónap–5 év brute-force védelem (csak fejlesztői chipeken volna releváns, **NEM létezik a FenySoft termékben** — lásd `trust-model-hu.md`)
 
-Mindkét szint **post-quantum-szintű biztonság a Neuron OS célközönségére** (consumer, IoT, enterprise, ipari kritikus). Nemzetállami szintű támadásra a Secure Edition (F6.5) ad külön védelmet (`CLI-CPU/docs/secure-element-hu.md`).
+Mindkét szint **post-quantum-szintű biztonság a Symphact célközönségére** (consumer, IoT, enterprise, ipari kritikus). Nemzetállami szintű támadásra a Secure Edition (F6.5) ad külön védelmet (`CLI-CPU/docs/secure-element-hu.md`).
 
 ---
 

@@ -1,4 +1,4 @@
-# Actor Reference Scaling and Defense Model — Neuron OS
+# Actor Reference Scaling and Defense Model — Symphact
 
 > Magyar verzió: [actor-ref-scaling-hu.md](actor-ref-scaling-hu.md)
 
@@ -6,15 +6,15 @@
 
 > Status: finalized specification, basis for M0.6 / M0.7 / M2.5
 
-This document records the **finalized bit layout**, **wire format**, and **defense-in-depth pyramid** of `TActorRef`. The reasoning walks through the design decisions: why 64 bits, why this allocation, why a 24-bit HMAC, and why this defense suffices for the Neuron OS target audience (consumer + enterprise + industrial critical).
+This document records the **finalized bit layout**, **wire format**, and **defense-in-depth pyramid** of `TActorRef`. The reasoning walks through the design decisions: why 64 bits, why this allocation, why a 24-bit HMAC, and why this defense suffices for the Symphact target audience (consumer + enterprise + industrial critical).
 
-> **Audience:** Neuron OS runtime developers, CFPU HW designers (sister repo: `FenySoft/CLI-CPU`), reviewers of the API contract, security auditors.
+> **Audience:** Symphact runtime developers, CFPU HW designers (sister repo: `FenySoft/CLI-CPU`), reviewers of the API contract, security auditors.
 
 ---
 
 ## Context
 
-`TActorRef` is the **cornerstone** of the Neuron OS public API: every actor-to-actor communication flows through it. `CLAUDE.md` records the API contract:
+`TActorRef` is the **cornerstone** of the Symphact public API: every actor-to-actor communication flows through it. `CLAUDE.md` records the API contract:
 
 ```csharp
 public readonly record struct TActorRef(long ActorId);   // 64 bit, opaque, public
@@ -28,7 +28,7 @@ Earlier spec inconsistencies (160-bit struct in vision-en.md, roadmap M0.7 `[16]
 
 ## Threat model
 
-The Neuron OS defense model focuses on **software + supply-chain** attacks. Physical-layer attacks are **out-of-scope** for this defense layer.
+The Symphact defense model focuses on **software + supply-chain** attacks. Physical-layer attacks are **out-of-scope** for this defense layer.
 
 | Attack vector | Defense | Scope |
 |---|---|---|
@@ -277,7 +277,7 @@ Hot-spot backpressure:         88k cores → 1 target = mailbox FIFO 8–64 deep
                                87,936 cores blocked
 ```
 
-The attacker **must wait for a response** to know which HMAC was successful (in the Neuron OS shared-nothing model there is no inter-actor side-channel). Throughput: **~10⁶ tries/sec** aggregate.
+The attacker **must wait for a response** to know which HMAC was successful (in the Symphact shared-nothing model there is no inter-actor side-channel). Throughput: **~10⁶ tries/sec** aggregate.
 
 ### Bytecode-level gating (Open mode)
 
@@ -311,7 +311,7 @@ The **24-bit HMAC + defense pyramid** combination:
 - **Strict mode**: ~70,000 years brute-force defense (FenySoft Strict whitelist)
 - **Open mode**: ~6 months–5 years brute-force defense (only relevant on developer chips, **NOT EXISTENT in the FenySoft product** — see `trust-model-en.md`)
 
-Both levels are **post-quantum-grade for the Neuron OS target audience** (consumer, IoT, enterprise, industrial critical). For nation-state-level attacks the Secure Edition (F6.5) provides separate defense (`CLI-CPU/docs/secure-element-en.md`).
+Both levels are **post-quantum-grade for the Symphact target audience** (consumer, IoT, enterprise, industrial critical). For nation-state-level attacks the Secure Edition (F6.5) provides separate defense (`CLI-CPU/docs/secure-element-en.md`).
 
 ---
 

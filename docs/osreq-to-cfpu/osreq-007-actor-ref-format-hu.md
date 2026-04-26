@@ -8,17 +8,17 @@
 
 ## Összefoglaló
 
-A Neuron OS véglegesítette a `TActorRef` 64 bites bit-elrendezését (`docs/actor-ref-scaling-hu.md` v2.0). A specifikáció **három HW követelményt** támaszt a CLI-CPU csapatnak:
+A Symphact véglegesítette a `TActorRef` 64 bites bit-elrendezését (`docs/actor-ref-scaling-hu.md` v2.0). A specifikáció **három HW követelményt** támaszt a CLI-CPU csapatnak:
 
 1. **Interconnect cella header v2.5**: a `src_actor`/`dst_actor` mezők 16 → 8 bit, plusz új `perms[8]` és `HMAC[24]` mezők (a header **összmérete 128 bit változatlan** marad)
 2. **Új HW komponens**: célcore mailbox-edge HMAC verify unit (per-core kulcs, fail-stop trigger, hibás-HMAC counter)
 3. **Trust anchor szigorítás**: az `eFuse` egyetlen `CaRootHash` slotot tartalmaz (NEM array, NINCS Open-mode bit, NINCS deployment-mode toggle)
 
-Ezek **nem opcionálisak** — a Neuron OS védelmi piramisa a HW oldali implementációra támaszkodik.
+Ezek **nem opcionálisak** — a Symphact védelmi piramisa a HW oldali implementációra támaszkodik.
 
 ## Háttér — miért most
 
-A `TActorRef` a Neuron OS publikus API alapköve. A v1.0 spec a `roadmap.md` M0.7-ben rögzített `[core-id:16][offset:16][HMAC:24][perms:8]` layout **inkompatibilis** volt a CLI-CPU `interconnect-hu.md` v2.4 header-rel és `architecture-hu.md` 24-bites HW címével. A `actor-ref-scaling-hu.md` v2.0 doksi feloldja az inkonzisztenciákat, és a CLI-CPU oldali kanonikus szélességekkel **bit-azonos** layout-ot rögzít:
+A `TActorRef` a Symphact publikus API alapköve. A v1.0 spec a `roadmap.md` M0.7-ben rögzített `[core-id:16][offset:16][HMAC:24][perms:8]` layout **inkompatibilis** volt a CLI-CPU `interconnect-hu.md` v2.4 header-rel és `architecture-hu.md` 24-bites HW címével. A `actor-ref-scaling-hu.md` v2.0 doksi feloldja az inkonzisztenciákat, és a CLI-CPU oldali kanonikus szélességekkel **bit-azonos** layout-ot rögzít:
 
 ```
 TActorRef (64 bit, opaque, public):
@@ -139,7 +139,7 @@ Ellenőrzés:
 | **SipHash-128** | **~5k gate** | **~10 cycle** | Kifejezetten rövid üzenet MAC-ra tervezett (Aumasson & Bernstein) |
 | HMAC-MD5 trunc | ~10k gate | ~40 cycle | Cryptographically broken |
 
-**SipHash-128** a választás: 6× kisebb és 8× gyorsabb, mint az HMAC-SHA256, és kriptografikailag erős rövid üzenet MAC-ra. NIST SP 800-107 szerint a 24 bit MSB-truncate elfogadható (1:16,8M forgery resistance), és a Neuron OS védelmi piramissal együtt (lásd `actor-ref-scaling-hu.md` "Védelmi piramis") post-quantum-szintű biztonságot ad.
+**SipHash-128** a választás: 6× kisebb és 8× gyorsabb, mint az HMAC-SHA256, és kriptografikailag erős rövid üzenet MAC-ra. NIST SP 800-107 szerint a 24 bit MSB-truncate elfogadható (1:16,8M forgery resistance), és a Symphact védelmi piramissal együtt (lásd `actor-ref-scaling-hu.md` "Védelmi piramis") post-quantum-szintű biztonságot ad.
 
 ## Követelmény 3 — HW fail-stop és hibás-HMAC counter
 
@@ -218,7 +218,7 @@ Tilos:
 
 **Deployment-mode toggle** — runtime trust decision-t adna, ami szembemegy a `authcode-hu.md` SHA-256 binding kötelező invariánsával. Eltávolítandó minden ilyen mechanizmus.
 
-A FenySoft termékvonal **kötelezően** ezt a szigorú konfigurációt használja (lásd `docs/trust-model-hu.md`). Ez a Neuron OS védelmi piramisának alapfeltétele.
+A FenySoft termékvonal **kötelezően** ezt a szigorú konfigurációt használja (lásd `docs/trust-model-hu.md`). Ez a Symphact védelmi piramisának alapfeltétele.
 
 ## Hatás-becslés
 
@@ -242,10 +242,10 @@ A FenySoft termékvonal **kötelezően** ezt a szigorú konfigurációt használ
 
 ## Kapcsolódó tervek és milestone-ok
 
-- **`NeuronOS/docs/actor-ref-scaling-hu.md`** — TActorRef bit-elrendezés és védelmi piramis
-- **`NeuronOS/docs/trust-model-hu.md`** — FenySoft Strict whitelist üzleti modell
-- **`NeuronOS/docs/roadmap-hu.md`** M0.6, M0.7, M2.5 — implementációs milestone-ok
-- **`NeuronOS/docs/vision-hu.md`** — capability-based security és location transparency
+- **`Symphact/docs/actor-ref-scaling-hu.md`** — TActorRef bit-elrendezés és védelmi piramis
+- **`Symphact/docs/trust-model-hu.md`** — FenySoft Strict whitelist üzleti modell
+- **`Symphact/docs/roadmap-hu.md`** M0.6, M0.7, M2.5 — implementációs milestone-ok
+- **`Symphact/docs/vision-hu.md`** — capability-based security és location transparency
 - **`CLI-CPU/docs/architecture-hu.md`** — 24-bites HW cím, Actor Scheduling Pipeline
 - **`CLI-CPU/docs/interconnect-hu.md`** — cella header v2.4 (változtatandó v2.5-re)
 - **`CLI-CPU/docs/ddr5-architecture-hu.md`** — CAM tábla v2.4 (`src_actor` 16→8)
