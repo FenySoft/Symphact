@@ -91,7 +91,7 @@ A Symphact projekt 2026 áprilisában kezdődött, és ~14 óra fókuszált TDD 
 | **M2: Persistencia + Location Transparency** (M0.5-M0.7) | Event-sourcing persistencia, capability registry HMAC tokenekkel, router revocation + delegation támogatással. ~60+ új teszt. | ~85ó | €7,000 | 3-8. hónap |
 | **M3: Kernel aktorok + Device aktorok** (M2.1-M3.2) | `memory_manager`, `hot_code_loader` alap, első device aktorok (`uart_device`, `gpio_device`, `timer_device`) szimulált MMIO-n. ~50+ új teszt. | ~60ó | €5,500 | 6-11. hónap |
 | **M4: CFPU integrációs demó** | End-to-end demó: elosztott számláló aktor 4 szimulált CFPU core-on keresztül a `FenySoft.CilCpu.Sim` NuGet segítségével. 3-5 konkrét HW követelmény felfedezése, `osreq-to-cfpu` issue-ként iktatva. | ~35ó | €3,500 | 9-12. hónap |
-| **M5: Developer experience + dokumentáció** | NuGet csomag publikáció (Symphact.Core), CLI eszköz (`neuronos-cli`), angol architektúra dokumentáció, contribution guide, 3 blogposzt, lightning talk egy .NET konferencián. | ~70ó | €5,500 | Folyamatos |
+| **M5: Developer experience + dokumentáció** | NuGet csomag publikáció (Symphact.Core), CLI eszköz (`symphactos-cli`), angol architektúra dokumentáció, contribution guide, 3 blogposzt, lightning talk egy .NET konferencián. | ~70ó | €5,500 | Folyamatos |
 | **M6: Biztonsági audit + formális alapozás** | Külső biztonsági review a capability mechanizmusra (független reviewer, ~€2,000 alvállalkozói). Initial formális specifikáció a `send/receive` szemantikára TLA+ vagy Dafny-ben. | ~25ó | €2,500 | 10-12. hónap |
 | **Összesen** | | **~340ó** | **€30,000** | **12 hónap** |
 

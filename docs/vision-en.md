@@ -580,7 +580,7 @@ public class SnnCoordinatorActor : Actor<CoordinatorState> {
 
 ```csharp
 // If Symphact runs distributed across multiple chips:
-var remoteActor = ActorRef.FromUri("neuron://chip2.local/neural_workers/neuron_0042");
+var remoteActor = ActorRef.FromUri("symphact://chip2.local/neural_workers/neuron_0042");
 remoteActor.Send(new SpikeMsg(weight: 100));
 // the local router detects it is remote and routes through the network_device actor
 ```

@@ -84,7 +84,7 @@ The Symphact project itself began in April 2026, and in ~14 hours of focused TDD
 | **M2: Persistence + Location Transparency** (M0.5-M0.7) | Event-sourcing persistence, capability registry with HMAC tokens, router with revocation + delegation. ~60+ new tests. | ~85h | €7,000 | Month 3-8 |
 | **M3: Kernel actors + Device actors** (M2.1-M3.2) | `memory_manager`, `hot_code_loader` foundation, first device actors (`uart_device`, `gpio_device`, `timer_device`) on simulated MMIO. ~50+ new tests. | ~60h | €5,500 | Month 6-11 |
 | **M4: CFPU integration demo** | End-to-end demo: distributed counter actor across 4 simulated CFPU cores via `FenySoft.CilCpu.Sim` NuGet. Discover 3-5 concrete HW requirements, file as `osreq-to-cfpu` issues. | ~35h | €3,500 | Month 9-12 |
-| **M5: Developer experience + docs** | NuGet package publication (Symphact.Core), CLI tool (`neuronos-cli`), English architecture docs, contribution guide, 3 blog posts, lightning talk at a .NET conference. | ~70h | €5,500 | Ongoing |
+| **M5: Developer experience + docs** | NuGet package publication (Symphact.Core), CLI tool (`symphactos-cli`), English architecture docs, contribution guide, 3 blog posts, lightning talk at a .NET conference. | ~70h | €5,500 | Ongoing |
 | **M6: Security audit + formal groundwork** | External security review of the capability mechanism (independent reviewer, ~€2,000 subcontract). Initial formal specification of `send/receive` semantics in TLA+ or Dafny. | ~25h | €2,500 | Month 10-12 |
 | **Total** | | **~340h** | **€30,000** | **12 months** |
 

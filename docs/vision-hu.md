@@ -580,7 +580,7 @@ public class SnnCoordinatorActor : Actor<CoordinatorState> {
 
 ```csharp
 // Ha a Symphact több chipen fut elosztva:
-var remoteActor = ActorRef.FromUri("neuron://chip2.local/neural_workers/neuron_0042");
+var remoteActor = ActorRef.FromUri("symphact://chip2.local/neural_workers/neuron_0042");
 remoteActor.Send(new SpikeMsg(weight: 100));
 // a lokális router észleli, hogy remote, és a network_device aktornak küldi át
 ```

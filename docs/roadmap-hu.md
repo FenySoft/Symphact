@@ -498,10 +498,10 @@
 
 | Elem | Leírás |
 |---|---|
-| `neuron` CLI | `new`, `build`, `run`, `deploy`, `monitor` parancsok. |
-| `dotnet new neuron-app` | Console actor app sablon. |
-| `dotnet new neuron-service` | Supervised service sablon. |
-| `dotnet new neuron-device` | Device actor sablon. |
+| `symphact` CLI | `new`, `build`, `run`, `deploy`, `monitor` parancsok. |
+| `dotnet new symphact-app` | Console actor app sablon. |
+| `dotnet new symphact-service` | Supervised service sablon. |
+| `dotnet new symphact-device` | Device actor sablon. |
 
 **Becsült óra:** ~20-28
 
@@ -614,9 +614,9 @@ API reference site (DocFX vagy hasonló).
 | Elem | Leírás |
 |---|---|
 | Dual license | Apache-2.0 (community) + Commercial (enterprise support). |
-| Docker image | `neuronos-runtime`. |
+| Docker image | `symphactos-runtime`. |
 | Helm chart | K8s deploy. |
-| neuron.io landing page | Termék bemutató oldal. |
+| symphact.org landing page | Termék bemutató oldal. |
 
 **Becsült óra:** ~8-12
 

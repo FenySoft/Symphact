@@ -773,16 +773,16 @@
 
 ## M6.1 — CLI Tooling
 
-> hu: `neuron` parancssori eszköz — project template-ek, build, run, deploy, monitor.
+> hu: `symphact` parancssori eszköz — project template-ek, build, run, deploy, monitor.
 >
-> en: `neuron` command-line tool — project templates, build, run, deploy, monitor.
+> en: `symphact` command-line tool — project templates, build, run, deploy, monitor.
 
 | Elem / Item | Leírás / Description |
 |---|---|
-| `neuron` CLI | hu: `new`, `build`, `run`, `deploy`, `monitor` parancsok. / en: `new`, `build`, `run`, `deploy`, `monitor` commands. |
-| `dotnet new neuron-app` | hu: Console actor app template. / en: Console actor app template. |
-| `dotnet new neuron-service` | hu: Supervised service template. / en: Supervised service template. |
-| `dotnet new neuron-device` | hu: Device actor template. / en: Device actor template. |
+| `symphact` CLI | hu: `new`, `build`, `run`, `deploy`, `monitor` parancsok. / en: `new`, `build`, `run`, `deploy`, `monitor` commands. |
+| `dotnet new symphact-app` | hu: Console actor app template. / en: Console actor app template. |
+| `dotnet new symphact-service` | hu: Supervised service template. / en: Supervised service template. |
+| `dotnet new symphact-device` | hu: Device actor template. / en: Device actor template. |
 
 **Becsült óra / Est. hours:** ~20-28
 > hu: Új repo vagy tool projekt. dotnet template engine integrálás.
@@ -956,9 +956,9 @@
 | Elem / Item | Leírás / Description |
 |---|---|
 | Dual license | hu: Apache-2.0 (community) + Commercial (enterprise support). / en: Apache-2.0 (community) + Commercial (enterprise support). |
-| Docker image | hu: `neuronos-runtime` — production-ready container. / en: `neuronos-runtime` — production-ready container. |
+| Docker image | hu: `symphactos-runtime` — production-ready container. / en: `symphactos-runtime` — production-ready container. |
 | Helm chart | hu: K8s deployment template. / en: K8s deployment template. |
-| Landing page | hu: neuron.io — termék bemutató oldal. / en: neuron.io — product presentation page. |
+| Landing page | hu: symphact.org — termék bemutató oldal. / en: symphact.org — product presentation page. |
 
 **Becsült óra / Est. hours:** ~8-12
 > hu: A legrövidebb milestone — főleg koordináció és marketing feladatok. A dual license jogi szöveg a kritikus elem.
