@@ -16,7 +16,7 @@ This directory collects **OS-driven requirements** surfaced during Symphact deve
 
 This is the **OS → HW feedback loop**. Without it, hardware and OS development drift apart, and every CPU/OS mismatch in history (x86 segmentation, Itanium VLIW, ARM big.LITTLE rollout, Spectre/Meltdown) becomes our story too.
 
-The Apple M-series success is rooted in exactly this loop: macOS QoS classes informed P-core/E-core asymmetry, Core ML informed the Neural Engine, Keychain informed the Secure Enclave, and so on. We want open-source Symphact to do the same for the open-source CFPU.
+The Apple M-series success is rooted in exactly this loop: macOS QoS classes informed P-core/E-core asymmetry, Core ML informed the Neural Engine, Keychain informed the Secure Enclave, and x86 emulation (Rosetta 2) informed the TSO memory-ordering mode. We want open-source Symphact to do the same for the open-source CFPU.
 
 ## Current open requirements
 

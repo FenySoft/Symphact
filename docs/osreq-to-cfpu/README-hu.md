@@ -16,7 +16,7 @@ Ez a könyvtár a Symphact fejlesztése során felszínre kerülő **OS-oldali k
 
 Ez az **OS → HW visszacsatolási hurok**. Enélkül a hardver- és OS-fejlesztés szétcsúszik, és minden CPU/OS eltérés a történelemben (x86 szegmentálás, Itanium VLIW, ARM big.LITTLE bevezetés, Spectre/Meltdown) a mi történetünk is lesz.
 
-Az Apple M-sorozat sikere pontosan erre a hurokra épül: a macOS QoS osztályok informálták a P-core/E-core aszimmetriát, a Core ML a Neural Engine-t, a Keychain a Secure Enclave-et, és így tovább. Azt akarjuk, hogy a nyílt forráskódú Symphact ugyanezt tegye a nyílt forráskódú CFPU-ért.
+Az Apple M-sorozat sikere pontosan erre a hurokra épül: a macOS QoS osztályok informálták a P-core/E-core aszimmetriát, a Core ML a Neural Engine-t, a Keychain a Secure Enclave-et, az x86 emuláció (Rosetta 2) pedig a TSO memory-ordering módot. Azt akarjuk, hogy a nyílt forráskódú Symphact ugyanezt tegye a nyílt forráskódú CFPU-ért.
 
 ## Aktuális nyitott követelmények
 

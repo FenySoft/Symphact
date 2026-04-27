@@ -254,11 +254,14 @@
     <div class="codesign">
       <h2>// hw/os co-design</h2>
       <p>
-        Apple&rsquo;s M-series achieves tight OS/silicon integration because macOS existed before the chip was
-        designed &mdash; the OS&rsquo;s needs shaped the hardware. Symphact applies the same philosophy to open-source
-        silicon: by running on a simulator from day one, it discovers CFPU requirements (mailbox depth, capability
-        token width, context size, interrupt model) <em>before</em> the hardware is fixed. The feedback flows
-        through the <a href="https://github.com/FenySoft/Symphact/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
+        Apple&rsquo;s M-series achieves tight OS/silicon integration because <strong>specific software
+        mechanisms shaped specific hardware features</strong>: macOS QoS classes shaped the P-core/E-core
+        asymmetry, Core ML shaped the Neural Engine, Keychain shaped the Secure Enclave, and x86 emulation
+        (Rosetta&nbsp;2) shaped the TSO memory-ordering mode. Symphact applies this bidirectional loop to
+        open-source silicon: by running on a simulator from day one, it discovers CFPU requirements
+        (mailbox depth, capability token width, context size, interrupt model) <em>before</em> the hardware
+        is fixed. The feedback flows through the
+        <a href="https://github.com/FenySoft/Symphact/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
         workflow.
       </p>
     </div>

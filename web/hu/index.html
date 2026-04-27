@@ -255,11 +255,13 @@
     <div class="codesign">
       <h2>// hw/os co-design</h2>
       <p>
-        Az Apple M-sorozata azért éri el ennyire szoros OS/szilícium integrációt, mert a macOS létezett a chip
-        tervezése előtt &mdash; az OS igényei alakították a hardvert. A Symphact ugyanezt a filozófiát alkalmazza
-        nyílt forráskódú szilíciumra: már a nulladik naptól szimulátoron fut, így felfedezi a CFPU követelményeit
-        (mailbox mélység, capability token szélesség, kontextus méret, interrupt modell) <em>még azelőtt</em>, hogy a
-        hardver véglegesülne. A visszacsatolás az
+        Az Apple M-sorozata azért éri el ennyire szoros OS/szilícium integrációt, mert <strong>konkrét
+        szoftver-mechanizmusok konkrét hardver-egységeket alakítottak</strong>: a macOS QoS osztályok a
+        P-core/E-core aszimmetriát, a Core ML a Neural Engine-t, a Keychain a Secure Enclave-et, az x86
+        emuláció (Rosetta&nbsp;2) pedig a TSO memory-ordering módot. A Symphact ezt a kétirányú hurkot
+        alkalmazza nyílt forráskódú szilíciumra: már a nulladik naptól szimulátoron fut, így felfedezi a CFPU
+        követelményeit (mailbox mélység, capability token szélesség, kontextus méret, interrupt modell)
+        <em>még azelőtt</em>, hogy a hardver véglegesülne. A visszacsatolás az
         <a href="https://github.com/FenySoft/Symphact/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
         workflow-n át történik.
       </p>
