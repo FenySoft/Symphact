@@ -371,10 +371,10 @@ Holding the 32-bit CST index contract pins down **two rules**:
 
 ---
 
-## Version history
+## Changelog
 
-| Version | Date | Change |
-|---|---|---|
-| 1.0 | 2026-04-25 | Initial: 16-bit core-coord (undersized), 28-bit HMAC, proxy pattern |
-| 2.0 | 2026-04-25 | Finalized specification: 64-bit ref, `[HMAC:24][perms:8][actor-id:8][core-coord:24]`, bit-identical with CLI-CPU 16-byte header, threat model, brute-force cost analysis, defense pyramid |
+| Version | Date | Summary |
+|---------|------|---------|
 | 3.0 | 2026-04-28 | **MAJOR**: HMAC model eliminated, CST (Capability Slot Table) model introduced. `TActorRef(long ActorId)` 64-bit → `TActorRef(int SlotIndex)` 32-bit. SipHash/HMAC verify → 1-cycle CST HW lookup. Perms moved from header to CST. Header v3.0 (HMAC/perms fields removed, seq 16-bit, CRC-16). Brute-force analysis removed (not relevant). osreq-007 OBSOLETE. Delegation: supervisor-to-supervisor VN0, AND narrowing. seL4 capability analogy. |
+| 2.0 | 2026-04-25 | Finalized specification: 64-bit ref, `[HMAC:24][perms:8][actor-id:8][core-coord:24]`, bit-identical with CLI-CPU 16-byte header, threat model, brute-force cost analysis, defense pyramid |
+| 1.0 | 2026-04-25 | Initial: 16-bit core-coord (undersized), 28-bit HMAC, proxy pattern |

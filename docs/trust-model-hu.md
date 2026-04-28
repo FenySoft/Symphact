@@ -242,9 +242,9 @@ A Secure Edition **nemzetállami szintű támadásra** ad védelmet (dedikált a
 
 ---
 
-## Verziótörténet
+## Changelog
 
-| Verzió | Dátum | Változás |
-|---|---|---|
-| 1.0 | 2026-04-25 | Első verzió: FenySoft Strict whitelist üzleti modell, multi-tier árképzés, NEM-támogatott opciók explicit listája biztonsági indoklással, Android-modell analógia, F6.5 Secure Edition viszony |
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
 | 1.1 | 2026-04-28 | **HMAC verify → CST HW lookup**. SipHash referenciák törölve. osreq-007 hivatkozás OBSOLETE. A trust model mechanizmusa CST-alapúra frissítve, a lényeg (Strict whitelist, single trust anchor) változatlan. |
+| 1.0 | 2026-04-25 | Első verzió: FenySoft Strict whitelist üzleti modell, multi-tier árképzés, NEM-támogatott opciók explicit listája biztonsági indoklással, Android-modell analógia, F6.5 Secure Edition viszony |

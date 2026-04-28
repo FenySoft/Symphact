@@ -371,10 +371,10 @@ A 32 bites CST index kontraktus **két szabályt** köt meg:
 
 ---
 
-## Verziótörténet
+## Changelog
 
-| Verzió | Dátum | Változás |
-|---|---|---|
-| 1.0 | 2026-04-25 | Első verzió: 16 bit core-coord (alulméretezett), 28 bit HMAC, proxy minta |
-| 2.0 | 2026-04-25 | Véglegesített specifikáció: 64 bit ref, `[HMAC:24][perms:8][actor-id:8][core-coord:24]`, CLI-CPU 16 byte header bit-azonos, threat model, brute-force költségelemzés, védelmi piramis |
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
 | 3.0 | 2026-04-28 | **MAJOR**: HMAC modell megszüntetve, CST (Capability Slot Table) modell bevezetése. `TActorRef(long ActorId)` 64 bit → `TActorRef(int SlotIndex)` 32 bit. SipHash/HMAC verify → 1 ciklusú CST HW lookup. Perms a headerből a CST-be. Header v3.0 (HMAC/perms mező törölve, seq 16 bit, CRC-16). Brute-force elemzés törölve (nem releváns). osreq-007 OBSOLETE. Delegation: supervisor-to-supervisor VN0, AND szűkítés. seL4 capability analógia. |
+| 2.0 | 2026-04-25 | Véglegesített specifikáció: 64 bit ref, `[HMAC:24][perms:8][actor-id:8][core-coord:24]`, CLI-CPU 16 byte header bit-azonos, threat model, brute-force költségelemzés, védelmi piramis |
+| 1.0 | 2026-04-25 | Első verzió: 16 bit core-coord (alulméretezett), 28 bit HMAC, proxy minta |

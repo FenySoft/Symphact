@@ -2,6 +2,8 @@
 
 > English version: [osreq-006-interchip-link-en.md](osreq-006-interchip-link-en.md)
 
+> Version: 1.0
+
 > **Állapot:** Draft — hardveres visszajelzésre vár
 >
 > **Érintett CFPU fázis:** F6 (silicon), F7 (production)
@@ -103,3 +105,12 @@ Send(ref, msg):
 - CLI-CPU architecture: `Mailbox bridge (inter-chip): 4 pin`, pin budget tábla
 - OSREQ-001: fa topológia (multi-chip kiterjesztés)
 - OSREQ-002: MMIO térkép (`CHIP_ID` regiszter)
+
+
+---
+
+## Changelog
+
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
+| 1.0 | 2026-04-20 | Kezdeti kiadás |

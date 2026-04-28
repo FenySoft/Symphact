@@ -2,6 +2,8 @@
 
 > Magyar verzió: [osreq-003-core-reset-hu.md](osreq-003-core-reset-hu.md)
 
+> Version: 1.0
+
 > **Status:** Draft — awaiting hardware feedback
 >
 > **Affected CFPU phase:** F4 (multi-core FPGA), F5 (heterogeneous), F6 (silicon)
@@ -89,3 +91,12 @@ In the **let-it-crash** model, restart is a **frequent, normal operation** — n
 - Symphact roadmap: M0.3 (Supervision / Let-it-crash)
 - Boot sequence: `docs/boot-sequence-hu.md` — step 1 (POR)
 - CLI-CPU architecture: Seal Core self-test analogy
+
+
+---
+
+## Changelog
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-04-20 | Initial release |

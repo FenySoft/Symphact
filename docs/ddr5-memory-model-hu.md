@@ -211,8 +211,8 @@ A Symphact fejlesztőknek fontos tudni a HW korlátokat, amik az API-t befolyás
 
 ## Changelog
 
-| Verzió | Dátum | Változás |
-|--------|-------|---------|
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
 | 1.2 | 2026-04-24 | src_actor[16] → src_actor[8] (max 256 actor/core). src_actor kitöltése: core HW (aktív actor context regiszter), nem hamisítható. Core scheduler → Core HW javítás |
 | 1.1 | 2026-04-22 | Crash recovery aktor szintűre javítva (N:M mapping). CAM tábla src[24]+src_actor[16] alapú. Objektum-szintű aktor API (MsgLoad/MsgSave, nincs await). HW döntések tábla bővítve |
 | 1.0 | 2026-04-22 | Első verzió — capability modell, ownership, crash recovery, aktor API |

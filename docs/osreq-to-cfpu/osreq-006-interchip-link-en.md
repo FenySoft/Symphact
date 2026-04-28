@@ -2,6 +2,8 @@
 
 > Magyar verzió: [osreq-006-interchip-link-hu.md](osreq-006-interchip-link-hu.md)
 
+> Version: 1.0
+
 > **Status:** Draft — awaiting hardware feedback
 >
 > **Affected CFPU phase:** F6 (silicon), F7 (production)
@@ -103,3 +105,12 @@ Send(ref, msg):
 - CLI-CPU architecture: `Mailbox bridge (inter-chip): 4 pin`, pin budget table
 - OSREQ-001: tree topology (multi-chip extension)
 - OSREQ-002: MMIO map (`CHIP_ID` register)
+
+
+---
+
+## Changelog
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-04-20 | Initial release |

@@ -2,6 +2,8 @@
 
 > A Symphact indulási folyamata — a hardveres boot **után**, az első alkalmazás actor-ig.
 
+> Version: 1.0
+
 ---
 
 ## Repo felelősségek
@@ -214,3 +216,11 @@ A boot sequence fenti leírása a **CFPU hardverre** vonatkozik. A .NET referenc
 | 9-11. App actors | Nano core-okon futnak | Thread pool-on futnak |
 
 **Ez a reference impl célja:** igazolni, hogy az actor modell működik, a supervision helyes, a message routing korrekt — **mielőtt szilícium lenne**.
+
+---
+
+## Changelog
+
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
+| 1.0 | 2026-04-18 | Kezdeti kiadás |

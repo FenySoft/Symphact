@@ -2,6 +2,8 @@
 
 > Magyar verzió: [osreq-002-mmio-memory-map-hu.md](osreq-002-mmio-memory-map-hu.md)
 
+> Version: 1.0
+
 > **Status:** Draft — awaiting hardware feedback
 >
 > **Affected CFPU phase:** F4 (multi-core FPGA), F5 (heterogeneous), F6 (silicon)
@@ -117,3 +119,12 @@ In the .NET reference implementation there is no MMIO — `TActorSystem` manages
 - Symphact boot sequence: `docs/boot-sequence-hu.md` — steps 1–8
 - CLI-CPU architecture: `docs/architecture-hu.md` — memory map section
 - OSREQ-001: tree topology (cluster registers: `0xF0000108–0xF0000114`)
+
+
+---
+
+## Changelog
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-04-20 | Initial release |

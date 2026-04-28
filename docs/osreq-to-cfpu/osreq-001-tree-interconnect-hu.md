@@ -2,6 +2,8 @@
 
 > English version: [osreq-001-tree-interconnect-en.md](osreq-001-tree-interconnect-en.md)
 
+> Version: 1.0
+
 > **Állapot:** Draft — hardveres visszajelzésre vár
 >
 > **Érintett CFPU fázis:** F4 (multi-core FPGA), F5 (heterogén), F6 (silicon)
@@ -171,3 +173,12 @@ A **fa topológia** azért természetes a CFPU-hoz, mert:
 - Symphact roadmap: M2.3 (Router), M2.4 (Memory Manager)
 - Boot sequence: `docs/boot-sequence-hu.md` — 8. lépés (Nano Core-ok Wake)
 - CLI-CPU architecture: `docs/architecture-hu.md` — „Skálázódás F6-ra" szekció
+
+
+---
+
+## Changelog
+
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
+| 1.0 | 2026-04-20 | Kezdeti kiadás |

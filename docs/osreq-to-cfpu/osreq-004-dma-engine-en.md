@@ -2,6 +2,8 @@
 
 > Magyar verzió: [osreq-004-dma-engine-hu.md](osreq-004-dma-engine-hu.md)
 
+> Version: 1.0
+
 > **Status:** Draft — awaiting hardware feedback
 >
 > **Affected CFPU phase:** F5 (heterogeneous), F6 (silicon)
@@ -84,3 +86,12 @@ The primary target device for persistence is **FRAM** — non-volatile, fast wri
 - CLI-CPU architecture: OPI bus, FRAM section
 - OSREQ-001: cluster topology (per-cluster DMA alignment)
 - OSREQ-002: MMIO map (DMA register addresses)
+
+
+---
+
+## Changelog
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-04-20 | Initial release |

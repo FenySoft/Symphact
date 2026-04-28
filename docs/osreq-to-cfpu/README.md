@@ -2,6 +2,8 @@
 
 > Magyar verzió: [README-hu.md](README-hu.md)
 
+> Version: 1.0
+
 This directory collects **OS-driven requirements** surfaced during Symphact development that should be considered in the CFPU hardware design (tracked in [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU)).
 
 ## Workflow
@@ -30,3 +32,11 @@ The Apple M-series success is rooted in exactly this loop: macOS QoS classes inf
 | [OSREQ-004](osreq-004-dma-engine-en.md) | DMA engine — non-blocking persistence | F5, F6 | Draft |
 | [OSREQ-005](osreq-005-mailbox-interrupt-en.md) | Mailbox interrupt vs polling — core notification | F4, F5, F6 | Draft |
 | [OSREQ-006](osreq-006-interchip-link-en.md) | Inter-chip link protocol — distributed fabric | F6, F7 | Draft |
+
+---
+
+## Changelog
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-04-16 | Initial release |

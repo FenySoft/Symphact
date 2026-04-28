@@ -2,6 +2,8 @@
 
 > Az aktor-runtime fejlesztési mérföldkövei — a CFPU hardverrel együtt-tervezve.
 
+> Version: 1.0
+
 ## Összesítés
 
 | Fázis | Milestone-ok | Becsült óra | Mit ad? |
@@ -633,3 +635,11 @@ API reference site (DocFX vagy hasonló).
 | Első partner onboarding | 1-2 early adopter cég bevonása. |
 
 **Becsült óra:** ~12-16
+
+---
+
+## Changelog
+
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
+| 1.0 | 2026-04-18 | Kezdeti kiadás |

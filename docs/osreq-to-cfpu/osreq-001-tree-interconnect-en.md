@@ -2,6 +2,8 @@
 
 > Magyar verzió: [osreq-001-tree-interconnect-hu.md](osreq-001-tree-interconnect-hu.md)
 
+> Version: 1.0
+
 > **Status:** Draft — awaiting hardware feedback
 >
 > **Affected CFPU phase:** F4 (multi-core FPGA), F5 (heterogeneous), F6 (silicon)
@@ -154,3 +156,12 @@ This is O(1) routing, not O(N) lookup.
 - Symphact roadmap: M2.3 (Router), M2.4 (Memory Manager)
 - Boot sequence: `docs/boot-sequence-hu.md` — step 8 (Nano Core Wake)
 - CLI-CPU architecture: `docs/architecture-hu.md` — "Scaling to F6" section
+
+
+---
+
+## Changelog
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-04-20 | Initial release |

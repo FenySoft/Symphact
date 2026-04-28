@@ -242,9 +242,9 @@ The Secure Edition provides defense against **nation-state-level attacks** (dedi
 
 ---
 
-## Version history
+## Changelog
 
-| Version | Date | Change |
-|---|---|---|
-| 1.0 | 2026-04-25 | Initial: FenySoft Strict whitelist business model, multi-tier pricing, explicit list of NOT-supported options with security rationale, Android-model analogy, F6.5 Secure Edition relationship |
+| Version | Date | Summary |
+|---------|------|---------|
 | 1.1 | 2026-04-28 | **HMAC verify replaced by CST HW lookup**. SipHash references removed. osreq-007 reference marked OBSOLETE. Trust model mechanism updated to CST-based; the essence (Strict whitelist, single trust anchor) is unchanged. |
+| 1.0 | 2026-04-25 | Initial: FenySoft Strict whitelist business model, multi-tier pricing, explicit list of NOT-supported options with security rationale, Android-model analogy, F6.5 Secure Edition relationship |

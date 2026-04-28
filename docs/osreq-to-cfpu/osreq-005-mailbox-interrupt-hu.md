@@ -2,6 +2,8 @@
 
 > English version: [osreq-005-mailbox-interrupt-en.md](osreq-005-mailbox-interrupt-en.md)
 
+> Version: 1.0
+
 > **Állapot:** Draft — hardveres visszajelzésre vár
 >
 > **Érintett CFPU fázis:** F4 (multi-core FPGA), F5 (heterogén), F6 (silicon)
@@ -111,3 +113,12 @@ A `???` a kérdés.
 - Symphact roadmap: M0.4 (Scheduler / Per-Actor Parallelism)
 - CLI-CPU architecture: „Event-driven, nem clock-driven" szekció, Sleep/Wake logika
 - OSREQ-002: MMIO térkép (IRQ regiszterek)
+
+
+---
+
+## Changelog
+
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
+| 1.0 | 2026-04-20 | Kezdeti kiadás |

@@ -4,6 +4,8 @@
 >
 > en: Actor-runtime development milestones — co-designed with the CFPU hardware.
 
+> Version: 1.0
+
 ## Összesítés / Summary
 
 | Fázis / Phase | Milestone-ok | Becsült óra / Est. hours | Mit ad? / Delivers |
@@ -985,3 +987,11 @@
 > hu: A partner onboarding a legfontosabb — az első fizető ügyfelek visszajelzése formálja a Phase 8-at (ha lesz).
 >
 > en: Partner onboarding is most important — the first paying customers' feedback shapes Phase 8 (if any).
+
+---
+
+## Changelog
+
+| Version | Date | Summary |
+|---------|------|---------|
+| 1.0 | 2026-04-18 | Initial release |

@@ -2,6 +2,8 @@
 
 > English version: [README.md](README.md)
 
+> Version: 1.0
+
 Ez a könyvtár a Symphact fejlesztése során felszínre kerülő **OS-oldali követelményeket** gyűjti, amelyeket a CFPU hardvertervezésnél figyelembe kell venni (nyilvántartva a [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) repóban).
 
 ## Munkafolyamat
@@ -30,3 +32,11 @@ Az Apple M-sorozat sikere pontosan erre a hurokra épül: a macOS QoS osztályok
 | [OSREQ-004](osreq-004-dma-engine-hu.md) | DMA engine — nem-blokkoló persistence | F5, F6 | Draft |
 | [OSREQ-005](osreq-005-mailbox-interrupt-hu.md) | Mailbox interrupt vs polling — core értesítés | F4, F5, F6 | Draft |
 | [OSREQ-006](osreq-006-interchip-link-hu.md) | Inter-chip link protokoll — elosztott fabric | F6, F7 | Draft |
+
+---
+
+## Changelog
+
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
+| 1.0 | 2026-04-17 | Kezdeti kiadás |

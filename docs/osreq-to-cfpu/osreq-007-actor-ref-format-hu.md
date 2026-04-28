@@ -2,6 +2,8 @@
 
 > English version: [osreq-007-actor-ref-format-en.md](osreq-007-actor-ref-format-en.md)
 
+> Version: 1.0
+
 > **Állapot:** Draft — hardveres visszajelzésre vár
 >
 > **Érintett CFPU fázis:** F6 (silicon, ChipIgnite tape-out), F6.5 (Secure Edition opcionális megerősítés)
@@ -253,8 +255,8 @@ A FenySoft termékvonal **kötelezően** ezt a szigorú konfigurációt használ
 - **`CLI-CPU/docs/quench-ram-hu.md`** — sealed kulcs storage
 - **`CLI-CPU/docs/security-hu.md`** — eliminált CWE-k
 
-## Verziótörténet
+## Changelog
 
-| Verzió | Dátum | Változás |
-|---|---|---|
+| Verzió | Dátum | Összefoglaló |
+|--------|-------|-------------|
 | 1.0 | 2026-04-25 | Első verzió: header v2.5, mailbox-edge HMAC verify unit, fail-stop, counter, AuthCode quarantine integráció, trust anchor szigorítás |

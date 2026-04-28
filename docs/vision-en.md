@@ -1051,6 +1051,6 @@ This is the CLI-CPU project's most distant, **most valuable** horizon, and **thi
 
 | Version | Date | Summary |
 |---------|------|---------|
-| 1.0 | 2026-04-14 | Initial version, translated from Hungarian |
-| 1.3 | 2026-04-17 | **Moved to the Symphact repository** (previously `CLI-CPU/docs/symphact-en.md`). A short stub remains in CLI-CPU for historical links. Header boxes updated (the implementation now lives in this same repo). |
 | 1.4 | 2026-04-28 | **TActorRef: 64-bit to 32-bit CST index** (`TActorRef(int SlotIndex)`). HMAC/SipHash references removed — HW-managed CST model. Perms stored in CST, not in header. Interconnect header v3.0. osreq-007 OBSOLETE. |
+| 1.3 | 2026-04-17 | **Moved to the Symphact repository** (previously `CLI-CPU/docs/symphact-en.md`). A short stub remains in CLI-CPU for historical links. Header boxes updated (the implementation now lives in this same repo). |
+| 1.0 | 2026-04-14 | Initial version, translated from Hungarian |

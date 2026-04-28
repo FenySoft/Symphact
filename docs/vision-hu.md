@@ -1051,6 +1051,6 @@ Ez a CLI-CPU projekt legtávolabbi, **legértékesebb** horizontja, és **ez a v
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
-| 1.0 | 2026-04-14 | Kezdeti verziózott kiadás |
-| 1.3 | 2026-04-17 | **Átköltözés a Symphact repóba** (korábban `CLI-CPU/docs/symphact-hu.md`). A CLI-CPU-ban most stub marad a történelmi linkekhez. Bevezető boxok frissítve (most már ebben a repóban van az implementáció is). |
 | 1.4 | 2026-04-28 | **TActorRef: 64-bit → 32-bit CST index** (`TActorRef(int SlotIndex)`). HMAC/SipHash referenciák törölve — HW-managed CST modell. Perms a CST-ben, nem a header-ben. Interconnect header v3.0. osreq-007 OBSOLETE. |
+| 1.3 | 2026-04-17 | **Átköltözés a Symphact repóba** (korábban `CLI-CPU/docs/symphact-hu.md`). A CLI-CPU-ban most stub marad a történelmi linkekhez. Bevezető boxok frissítve (most már ebben a repóban van az implementáció is). |
+| 1.0 | 2026-04-14 | Kezdeti verziózott kiadás |
