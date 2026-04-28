@@ -10,7 +10,7 @@
 
 > Magyar verzió: [vision-hu.md](vision-hu.md)
 
-> Version: 1.3
+> Version: 1.4
 
 ## Philosophy -- replacing the Unix legacy, realizing the Erlang vision
 
@@ -158,7 +158,7 @@ This section provides a concrete comparison showing why we do **not** want to ex
 | **Memory safety** | Manual (C), unsafe by default, Rust is the new hope but the existing 30M lines of C remain | **Per-actor GC, type-safe by default, architecturally guaranteed** |
 | **Namespace model** | Global (/dev/sda, filesystem, PID table) | **Capability-based** -- no global namespace, possession = authorization |
 | **Kernel/user mode** | Expensive context switch (~1000+ cycles per syscall) | **No kernel/user mode** -- everything is an actor, hardware isolation |
-| **POSIX permissions** | 1970s thinking (user, group, other, rwx) | Capability (fine-grained, delegatable, revocable, HMAC-signed) |
+| **POSIX permissions** | 1970s thinking (user, group, other, rwx) | Capability (fine-grained, delegatable, revocable, CST HW-managed) |
 | **IPC primitives** | 7+ mechanisms (pipes, sockets, shared memory, message queues, signals, semaphores, futex) | A **single** primitive -- mailbox message passing (everything else is reducible to it) |
 | **Filesystem** | Universal abstraction (byte stream), but does not fit every data structure | Actor-based storage service, structured |
 | **Shared libraries** | DLL hell, ABI bugs, supply chain attacks (log4j, xz-utils) | Hot code loading at actor level, each standalone, tree-shaken |
@@ -331,8 +331,8 @@ The router handles all four **transparently**. The developer uses the same `send
 ```csharp
 public struct Message {
     public int  MessageId;       // globally unique
-    public long SenderActorRef;  // who sends it (64-bit opaque, see actor-ref-scaling-en.md)
-    public long ReceiverActorRef;// to whom
+    public int  SenderSlotIndex;  // who sends it (32-bit CST index)
+    public int  ReceiverSlotIndex;// to whom (32-bit CST index)
     public int  MessageKind;     // type (struct hash)
     public long Timestamp;       // when sent (determinism)
     public int  PayloadSize;     // payload size in bytes
@@ -385,17 +385,16 @@ ActorRef uartDevice = ...;  // this is a capability
 uartDevice.Send(new WriteByte(0x41));  // works only because I have the reference
 ```
 
-The received `ActorRef` is an **opaque 64-bit token** — to the user, a single `long` value whose internal structure is visible only to the runtime:
+The received `ActorRef` is an **opaque 32-bit CST index** — to the user, a single `int` value whose internal structure is visible only to the runtime:
 
 ```csharp
-public readonly record struct TActorRef(long ActorId);   // 64 bit, opaque, public
+public readonly record struct TActorRef(int SlotIndex);   // 32 bit, opaque CST index, public
 
-// Internal bit layout (chip-local, runtime-only interpretation):
-// [HMAC:24][perms:8][actor-id:8][core-coord:24]
-// Details: docs/actor-ref-scaling-en.md
+// Capability data (perms, actor-id, core-coord) resides in the HW-managed
+// CST (Capability Slot Table) — NOT in the token itself.
 ```
 
-The HMAC is issued by the `capability_registry` (M2.5), and the **target-core mailbox-edge HW unit** verifies it on every incoming message — NOT the interconnect router. The HW verify is consistent with the CFPU "one mailbox IRQ per core" principle (see `CLI-CPU/docs/architecture-hu.md`). On a forged or expired capability, the HW unit **drops** the message, triggers a **fail-stop** on the sender core, and initiates **AuthCode quarantine** against the signer (see the defense pyramid in `actor-ref-scaling-en.md`).
+The CST slot is allocated by the `capability_registry` (M2.5), and the **target-core mailbox-edge HW unit** performs a CST lookup on every incoming message — NOT the interconnect router. The HW lookup is consistent with the CFPU "one mailbox IRQ per core" principle (see `CLI-CPU/docs/architecture-hu.md`). On an invalid CST slot, the HW unit **drops** the message, triggers a **fail-stop** on the sender core, and initiates **AuthCode quarantine** against the signer.
 
 ### Delegation and revocation
 
@@ -970,7 +969,7 @@ These are questions we **cannot decide now**, because real-world experience is n
 3. **Preemptive or cooperative scheduling?** Cooperative is simpler, but a misbehaving actor can consume the core. Perhaps watchdog-based semi-preemptive?
 4. **Garbage collection algorithm?** Bump + mark-sweep is simple, but incremental is needed for real-time systems. This is an F5-F6 decision.
 5. **Network protocol for inter-chip?** Custom, or existing (e.g., gRPC-like)? Custom is simpler but not portable.
-6. **Capability signature algorithm?** HMAC-SHA256? Poly1305? Simpler CRC? Security vs. performance tradeoff.
+6. **CST table size and lookup latency?** How many CST slots fit per core? How many cycles does HW lookup take? This is an F5-F6 decision. *(Previous question: capability signature algorithm — superseded by CST model.)*
 7. **How do we solve real-time guarantees?** Is a hard real-time actor needed (for ASIL-D targets), or is soft real-time sufficient?
 8. **How compatible should the Akka.NET API be?** A 1:1 port, or an inspired API?
 
@@ -1054,3 +1053,4 @@ This is the CLI-CPU project's most distant, **most valuable** horizon, and **thi
 |---------|------|---------|
 | 1.0 | 2026-04-14 | Initial version, translated from Hungarian |
 | 1.3 | 2026-04-17 | **Moved to the Symphact repository** (previously `CLI-CPU/docs/symphact-en.md`). A short stub remains in CLI-CPU for historical links. Header boxes updated (the implementation now lives in this same repo). |
+| 1.4 | 2026-04-28 | **TActorRef: 64-bit to 32-bit CST index** (`TActorRef(int SlotIndex)`). HMAC/SipHash references removed — HW-managed CST model. Perms stored in CST, not in header. Interconnect header v3.0. osreq-007 OBSOLETE. |

@@ -2,7 +2,7 @@
 
 > English version: [trust-model-en.md](trust-model-en.md)
 
-> Version: 1.0
+> Version: 1.1
 
 > Státusz: véglegesített deployment policy, F6-Silicon One és későbbi tape-out-ok alapja
 
@@ -24,10 +24,10 @@ Gyártás (FenySoft):
 
 Életmód:
    Minden bytecode FenySoft-aláírt vagy delegáltan-aláírt cert-tel.
-   Hibás HMAC = aláíró azonnal blacklist-be (issuer-trust quarantine).
+   Érvénytelen CST slot = aláíró azonnal blacklist-be (issuer-trust quarantine).
 ```
 
-Ez a modell biztosítja a `actor-ref-scaling-hu.md` "Védelmi piramis" 24 bit HMAC szegmensének realisztikus védelmi szintjét (~70 ezer év brute-force).
+Ez a modell biztosítja a CST (Capability Slot Table) HW-managed capability modell integritását.
 
 ---
 
@@ -187,7 +187,7 @@ Cserébe a vásárló kapja:
 
 | Garancia | Hatás |
 |---|---|
-| Hardware-szintű brute-force védelem | ~70 ezer év a 24 bit HMAC-en, FenySoft-controlled gating-gel |
+| Hardware-szintű CST védelem | HW-managed capability tábla, FenySoft-controlled gating-gel |
 | Central revocation | Egy malware-bytecode-ot a FenySoft globálisan revoke-olhat — minden chipen, azonnal |
 | Compliance trail | Minden cert kibocsátás auditálható (GDPR, ISO 26262, IEC 61508, FIPS 140-3) |
 | Brand bizalmi pecsét | "FenySoft Verified" minőségjelzés a termékhomlokon |
@@ -199,7 +199,7 @@ A consumer / IoT / enterprise / ipari kritikus célközönség **többségének*
 
 ## Az eFuse OTP konfiguráció rögzítése
 
-A `osreq-007-actor-ref-format-hu.md` Követelmény 5 explicit rögzíti a trust anchor szigorítást:
+(**Megjegyzés:** osreq-007 OBSOLETE — a CST modell váltja fel.) A trust anchor szigorítás:
 
 ```
 eFuse {
@@ -233,7 +233,7 @@ A Secure Edition **nemzetállami szintű támadásra** ad védelmet (dedikált a
 ## Kapcsolódó dokumentumok
 
 - **`actor-ref-scaling-hu.md`** — TActorRef bit-elrendezés és védelmi piramis
-- **`osreq-to-cfpu/osreq-007-actor-ref-format-hu.md`** — HW követelmények, trust anchor szigorítás
+- ~~**`osreq-to-cfpu/osreq-007-actor-ref-format-hu.md`**~~ — **OBSOLETE** (CST modell váltja fel)
 - **`vision-hu.md`** — capability-based security tervezési alapok
 - **`roadmap-hu.md`** M2.5 — Capability Registry implementáció
 - **`CLI-CPU/docs/authcode-hu.md`** — AuthCode trust chain specifikáció
@@ -247,3 +247,4 @@ A Secure Edition **nemzetállami szintű támadásra** ad védelmet (dedikált a
 | Verzió | Dátum | Változás |
 |---|---|---|
 | 1.0 | 2026-04-25 | Első verzió: FenySoft Strict whitelist üzleti modell, multi-tier árképzés, NEM-támogatott opciók explicit listája biztonsági indoklással, Android-modell analógia, F6.5 Secure Edition viszony |
+| 1.1 | 2026-04-28 | **HMAC verify → CST HW lookup**. SipHash referenciák törölve. osreq-007 hivatkozás OBSOLETE. A trust model mechanizmusa CST-alapúra frissítve, a lényeg (Strict whitelist, single trust anchor) változatlan. |

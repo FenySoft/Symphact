@@ -10,7 +10,7 @@
 
 > English version: [vision-en.md](vision-en.md)
 
-> Version: 1.3
+> Version: 1.4
 
 ## Filozófia — az Unix örökség leváltása, az Erlang vízió megvalósítása
 
@@ -158,7 +158,7 @@ Ez az a szekció, amely konkrét összehasonlítással mutatja, miért **nem a L
 | **Memory safety** | Manual (C), unsafe by default, Rust az új remény, de a meglévő 30 M sor C marad | **Per-aktor GC, type-safe by default, architekturálisan garantált** |
 | **Namespace modell** | Globális (/dev/sda, fájlrendszer, PID tábla) | **Capability-based** — nincs globális névtér, birtoklás = jogosultság |
 | **Kernel/user mode** | Expensive context switch (~1000+ ciklus per syscall) | **Nincs kernel/user mód** — minden aktor, hardveres isolation |
-| **POSIX permission** | 1970-es gondolkodás (user, group, other, rwx) | Capability (fine-grained, delegálhat, revokálható, HMAC-aláírt) |
+| **POSIX permission** | 1970-es gondolkodás (user, group, other, rwx) | Capability (fine-grained, delegálható, revokálható, CST HW-managed) |
 | **IPC primitívek** | 7+ mechanizmus (pipes, sockets, shared memory, message queues, signals, semaphores, futex) | **Egyetlen** primitiv — mailbox üzenetküldés (minden másra lebontható) |
 | **Fájlrendszer** | Univerzális absztrakció (bytes stream), de nem illik minden adatstruktúrához | Aktor-alapú storage service, strukturált |
 | **Shared library** | DLL hell, ABI bug, supply chain támadás (log4j, xz-utils) | Hot code loading aktor-szinten, mindegyik önálló, tree-shaken |
@@ -331,8 +331,8 @@ A router **transparensen** kezeli mind a négyet. A fejlesztő ugyanazt a `send(
 ```csharp
 public struct Message {
     public int  MessageId;       // globálisan unique
-    public long SenderActorRef;  // ki küldi (64 bit opaque, lásd actor-ref-scaling-hu.md)
-    public long ReceiverActorRef;// kinek
+    public int  SenderSlotIndex;  // ki küldi (32 bit CST index)
+    public int  ReceiverSlotIndex;// kinek (32 bit CST index)
     public int  MessageKind;     // mi a típusa (struct hash)
     public long Timestamp;       // mikor küldve (determinism)
     public int  PayloadSize;     // payload mérete byte-ban
@@ -385,17 +385,16 @@ ActorRef uartDevice = ...;  // ez egy capability
 uartDevice.Send(new WriteByte(0x41));  // csak azért megy, mert van referenciám
 ```
 
-A kapott `ActorRef` egy **opaque 64 bites token** — a felhasználó számára egyetlen `long` érték, amelynek belső struktúrája csak a runtime számára látszik:
+A kapott `ActorRef` egy **opaque 32 bites CST index** — a felhasználó számára egyetlen `int` érték, amelynek belső struktúrája csak a runtime számára látszik:
 
 ```csharp
-public readonly record struct TActorRef(long ActorId);   // 64 bit, opaque, public
+public readonly record struct TActorRef(int SlotIndex);   // 32 bit, opaque CST index, public
 
-// Belső bit-elrendezés (chip-local, csak a runtime értelmezi):
-// [HMAC:24][perms:8][actor-id:8][core-coord:24]
-// Részletek: docs/actor-ref-scaling-hu.md
+// A capability adatok (perms, actor-id, core-coord) a HW-managed CST
+// (Capability Slot Table) táblában vannak — NEM a token-ben.
 ```
 
-A HMAC-et a `capability_registry` állítja ki (M2.5), és a **célcore mailbox-edge HW unit** ellenőrzi minden üzenet beérkezésekor — NEM az interconnect router. A HW verify a CFPU "egy mailbox IRQ per core" elvével konzisztens (lásd `CLI-CPU/docs/architecture-hu.md`). Hamisított vagy lejárt capability esetén a HW unit **eldobja** az üzenetet, **fail-stop**-ot trigger-el a küldő core-on, és **AuthCode quarantine**-t indít az aláíró ellen (lásd a védelmi piramist a `actor-ref-scaling-hu.md`-ben).
+A CST slot-ot a `capability_registry` allokálja (M2.5), és a **célcore mailbox-edge HW unit** CST lookup-ot végez minden üzenet beérkezésekor — NEM az interconnect router. A HW lookup a CFPU "egy mailbox IRQ per core" elvével konzisztens (lásd `CLI-CPU/docs/architecture-hu.md`). Érvénytelen CST slot esetén a HW unit **eldobja** az üzenetet, **fail-stop**-ot trigger-el a küldő core-on, és **AuthCode quarantine**-t indít az aláíró ellen.
 
 ### Delegation és revocation
 
@@ -970,7 +969,7 @@ Ezek olyan kérdések, amelyeket **nem tudunk most eldönteni**, mert valós tap
 3. **Preemptív vagy kooperatív scheduling?** Kooperatív egyszerűbb, de egy rosszul viselkedő aktor megeheti a core-t. Esetleg watchdog-alapú félpreemptív?
 4. **Garbage collection algoritmus?** Bump + mark-sweep az egyszerű, de real-time rendszerhez inkrementális kell. Ez F5-F6 döntés.
 5. **Network protokoll inter-chip-re?** Saját, vagy meglévő (pl. GRPC-szerű)? Saját egyszerűbb, de nem portabilis.
-6. **Capability signature algoritmus?** HMAC-SHA256? Poly1305? Egyszerűbb CRC? Biztonsági vs teljesítmény kompromisszum.
+6. **CST tábla méret és lookup latencia?** Hány CST slot fér el per core? A HW lookup hány ciklus? Ez F5-F6 döntés. *(Korábbi kérdés: capability signature algoritmus — a CST modell ezt kiváltotta.)*
 7. **Hogyan oldjuk meg a real-time garanciákat?** Szükség van-e hard real-time aktorra (ASIL-D célra), vagy soft real-time elég?
 8. **Akka.NET API mennyire legyen kompatibilis?** 1:1 portból vagy inspirált API?
 
@@ -1054,3 +1053,4 @@ Ez a CLI-CPU projekt legtávolabbi, **legértékesebb** horizontja, és **ez a v
 |--------|-------|-------------|
 | 1.0 | 2026-04-14 | Kezdeti verziózott kiadás |
 | 1.3 | 2026-04-17 | **Átköltözés a Symphact repóba** (korábban `CLI-CPU/docs/symphact-hu.md`). A CLI-CPU-ban most stub marad a történelmi linkekhez. Bevezető boxok frissítve (most már ebben a repóban van az implementáció is). |
+| 1.4 | 2026-04-28 | **TActorRef: 64-bit → 32-bit CST index** (`TActorRef(int SlotIndex)`). HMAC/SipHash referenciák törölve — HW-managed CST modell. Perms a CST-ben, nem a header-ben. Interconnect header v3.0. osreq-007 OBSOLETE. |

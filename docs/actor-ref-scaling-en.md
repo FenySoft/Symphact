@@ -2,11 +2,11 @@
 
 > Magyar verzió: [actor-ref-scaling-hu.md](actor-ref-scaling-hu.md)
 
-> Version: 2.0
+> Version: 3.0
 
 > Status: finalized specification, basis for M0.6 / M0.7 / M2.5
 
-This document records the **finalized bit layout**, **wire format**, and **defense-in-depth pyramid** of `TActorRef`. The reasoning walks through the design decisions: why 64 bits, why this allocation, why a 24-bit HMAC, and why this defense suffices for the Symphact target audience (consumer + enterprise + industrial critical).
+This document records the **finalized bit layout**, **wire format**, and **defense-in-depth pyramid** of `TActorRef`. Version 3.0 is a **MAJOR change**: the previous HMAC-based model is replaced by the **CST (Capability Slot Table)** model — software never sees raw dst/src addresses, only an opaque CST index.
 
 > **Audience:** Symphact runtime developers, CFPU HW designers (sister repo: `FenySoft/CLI-CPU`), reviewers of the API contract, security auditors.
 
@@ -17,12 +17,12 @@ This document records the **finalized bit layout**, **wire format**, and **defen
 `TActorRef` is the **cornerstone** of the Symphact public API: every actor-to-actor communication flows through it. `CLAUDE.md` records the API contract:
 
 ```csharp
-public readonly record struct TActorRef(long ActorId);   // 64 bit, opaque, public
+public readonly record struct TActorRef(int SlotIndex);   // 32 bit, opaque CST index, public
 ```
 
-The 64 bits are **chip-local** in meaning, and **bit-identical** to the lower segment of the CLI-CPU interconnect cell header (see the wire-format section below). The user does not reach into the runtime's internal representation — the `long` is an opaque token, relevant only as `Equals`/`GetHashCode`/Send-parameter.
+The 32 bits are a **CST (Capability Slot Table) index** — opaque to software, resolved by HW at runtime to actual dst/src addresses. The user does not reach into the runtime's internal representation — the `int` is an opaque token, relevant only as `Equals`/`GetHashCode`/Send-parameter.
 
-Earlier spec inconsistencies (160-bit struct in vision-en.md, roadmap M0.7 `[16][16][24][8]`) created **incompatibilities** with the CLI-CPU side's 24-bit HW address and 16-bit `src_actor`/`dst_actor` fields. This v2.0 document resolves those inconsistencies.
+The previous spec (v2.0) prescribed a 64-bit `long ActorId` with `[HMAC:24][perms:8][actor-id:8][core-coord:24]` layout. Version 3.0 **eliminates the HMAC model** and the software-visible bit layout: the CST HW table holds the destination address, actor ID, and permissions.
 
 ---
 
@@ -32,14 +32,17 @@ The Symphact defense model focuses on **software + supply-chain** attacks. Physi
 
 | Attack vector | Defense | Scope |
 |---|---|---|
-| Software brute-force (chip-internal or network) | HMAC verify + HW fail-stop + counter | **In-scope** |
-| Another actor reads an actor's key | Shared-nothing per-core SRAM isolation | **In-scope** |
+| Software permission forgery (fake CST index) | CST HW lookup + SEAL protection (invalid index = trap) | **In-scope** |
+| Another actor reads an actor's CST table | Shared-nothing per-core QSRAM isolation + SEAL | **In-scope** |
 | Compromised signer (malicious software) | AuthCode + supply-chain quarantine | **In-scope** |
+| Permission escalation (perms manipulation) | Perms in CST, HW-only write, software cannot modify | **In-scope** |
 | Cold boot (post-power-off freezing) | Quench-RAM RELEASE atomic wipe (side effect) | **In-scope** |
 | **Bus-MITM, chip-decap, FIB probing** | — | **Out-of-scope** (physical access — stealing the SSD is easier) |
 | **Side-channel (timing, power)** | — | **Out-of-scope** at base (Secure Edition F6.5 covers it) |
 
 This is the Linux/Windows/macOS commercial threat model, and only the Secure Element (F6.5) extends to physical defense. Production deployments must explicitly document this (see [`trust-model-en.md`](trust-model-en.md)).
+
+> **seL4 analogy:** The CST model is conceptually similar to seL4's capability-based security system — software receives capability handles (slot indices) that are resolved through a HW/kernel-level capability table. Software cannot see or modify the actual permission entries.
 
 ---
 
@@ -58,84 +61,120 @@ Scaling projection (`CLI-CPU/docs/chiplet-packaging-hu.md`):
 - 2033+ (1.4nm): 262,144 cores/package → 18 bit
 - F-9+ extrapolation (1–10M): 20–24 bit
 
-**A 24-bit core-coord** (16M cores) is sufficient through F-9 generations — exactly matching the CLI-CPU `architecture-hu.md:1320` 24-bit HW address.
+The **24-bit core-coord** (16M cores) in the header is sufficient through F-9 generations — exactly matching the CLI-CPU `architecture-hu.md:1320` 24-bit HW address. The software-side `TActorRef` **does not contain this directly** — the CST HW table resolves it.
 
 ---
 
-## Decision 1: `TActorRef` stays 64-bit as the API contract
+## Decision 1: `TActorRef` is 32-bit CST index
 
-### 1.a) Rejected: 160-bit struct (earlier `vision-en.md`)
+### 1.a) Rejected: 64-bit `long` HMAC-based ref (v2.0)
+
+The previous `TActorRef(long ActorId)` encoded all information in 64 bits: `[HMAC:24][perms:8][actor-id:8][core-coord:24]`. This exposed HW address and permission bits to software.
+
+**Why rejected:**
+- Software-visible perms/HMAC bits represent an **attack surface**
+- HMAC cryptographic verify is **area-expensive** (~5k gate / verify unit) and **latency-costly** (~10 cycles)
+- The CST model replaces it with 1-cycle HW lookup, no cryptographic overhead
+
+### 1.b) Rejected: 160-bit struct (earlier `vision-en.md`)
 
 A 4-field struct (CoreId int + MailboxIndex int + CapabilityTag long + Permissions int) pushes complexity to the user, and increases the HW interconnect header size.
 
 **Why rejected:**
 - A capability must be an **opaque token** — the developer should not know the contents
 - 160-bit verbatim transit on the tree fabric adds ~5–10% area
-- Complexity surfaces on the **usage side**, not the runtime side (where it belongs)
 
-### 1.b) Rejected: 128-bit (`UInt128`) now
+### 1.c) Decision: `TActorRef(int SlotIndex)` — 32-bit, opaque CST index
 
-128 bits would resolve every bit-budget concern, **but**:
-- The CLI-CPU interconnect cell header is **128-bit** = 16 bytes. Of those, 64 bits already cover the entire TActorRef field set (see Decision 2). A 128-bit ref would be redundant.
-- Pre-alpha (0.1) version, API-break is cheapest now, **yet still unnecessary**
+```csharp
+public readonly record struct TActorRef(int SlotIndex);   // 32 bit, opaque
+```
 
-### 1.c) Decision: 64-bit, opaque, with chip-local meaning
+The `SlotIndex` points to a per-core CST (Capability Slot Table) entry. Software:
+- **Cannot see** the destination core address, actor ID, or permissions
+- **Cannot modify** the CST entry (HW-only write, SEAL-protected QSRAM)
+- Can only issue **Send(ref, msg)** calls — HW lookup resolves CST → header mapping
 
-`TActorRef` remains `readonly record struct(long ActorId)`. The 64 bits are chip-local — cross-chip addressing uses the proxy-actor pattern (see Decision 3).
+`TActorRef` is chip-local — cross-chip addressing uses the proxy-actor pattern (see Decision 3).
 
 ---
 
-## Decision 2: Allocation of the 64 bits
+## Decision 2: CST (Capability Slot Table) model
 
-The CLI-CPU interconnect header and DDR5 CAM table already pin canonical field widths. `TActorRef` must be **bit-identical** to these so that Send requires no conversion.
+The previous v2.0 solution (`[HMAC:24][perms:8][actor-id:8][core-coord:24]` software bit layout) is **obsolete**. The HW-managed CST model replaces it.
 
-### 2.a) Original roadmap `[core-id:16][offset:16][HMAC:24][perms:8]`
+### 2.a) Rejected: software HMAC-based bit layout (v2.0)
 
-This is **incompatible** with the CLI-CPU side:
-- `core-id:16` < CLI-CPU `dst[24]` (24-bit HW address)
-- `offset:16` (mailbox offset) ≠ CLI-CPU `dst_actor[16]` (actor identifier)
+`TActorRef` carried all information in 64 bits. **Problems:**
+- Required cryptographic defense against software brute-force (SipHash-128, area/latency overhead)
+- `perms` bit-flags in the ref → software-manipulable (even though HW also checked)
+- `core-coord` in the ref → software sees HW topology information (NOT opaque)
 
-The roadmap values were based on a **misreading** — the "mailbox offset" is actually the actor-id, and the HW address is 24 bits in the CFPU.
+### 2.b) Decision: HW-managed CST in QSRAM, SEAL-protected
 
-### 2.b) Y3 proposal: `[HMAC:64][reserved:16][perms:8][actor-id:16][core-coord:24]` (128 bit)
-
-CLI-CPU-compatible at 128 bits, but **redundant**: the header is already 128 bits, and TActorRef fits in 64.
-
-### 2.c) Decision: `[HMAC:24][perms:8][actor-id:8][core-coord:24]` (64 bit)
+The CST is a per-core QSRAM table managed by hardware. Each entry is 8 bytes, aligned:
 
 ```
- 63          40 39    32 31    24 23                            0
-┌──────────────┬────────┬────────┬─────────────────────────────────┐
-│  HMAC tag    │ perms  │actor-id│       core-coord                │
-│   24 bit     │  8 bit │  8 bit │        24 bit                   │
-└──────────────┴────────┴────────┴─────────────────────────────────┘
+ 63                                40 39    32 31    24 23          0
+┌──────────────────────────────────────┬────────┬────────┬──────────┐
+│            reserved                  │ perms  │actor-id│   dst    │
+│             24 bit                   │  8 bit │  8 bit │  24 bit  │
+└──────────────────────────────────────┴────────┴────────┴──────────┘
+                                                          Σ = 64 bit (8 bytes)
 ```
 
 | Field | Width | Rationale |
 |---|---|---|
-| `core-coord` | 24 bit | = CLI-CPU `dst[24]` in interconnect header. 16M cores → sufficient through F-9+ generations |
-| `actor-id` | 8 bit | 256 actors/core. CLI-CPU `dst_actor` reduced from 16 to 8 (see osreq-007) — typical core hosts 1–100 actors (SRAM-bound) |
-| `perms` | 8 bit, **bit-flag** | 8 capability flags: Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate |
-| `HMAC` | 24 bit | SipHash-128 MSB-truncate. Defense is multi-layered (see Decision 5 and brute-force cost analysis) |
+| `dst` | 24 bit | Destination core HW address. = CLI-CPU `dst[24]` in interconnect header. 16M cores → sufficient through F-9+ generations |
+| `actor-id` | 8 bit | Destination actor ID. 256 actors/core — typical core hosts 1–100 actors (SRAM-bound) |
+| `perms` | 8 bit, **bit-flags** | Send / Watch / Stop / Delegate / DelegateOnce / Migrate / MaxPri[2] |
+| `reserved` | 24 bit | Reserved for future expansion (zeroed) |
 
-### 2.d) `actor-id` reduction rationale
+**CST characteristics:**
+- **QSRAM storage**: the CST lives in SEAL-protected Quench-RAM, cold-boot protected
+- **HW-only write**: software cannot write to the CST directly — only the supervisor kernel can request CST entry creation/deletion via HW trap
+- **1-cycle lookup**: on Send, HW resolves the `SlotIndex` in 1 clock cycle → dst, actor-id, perms
+- **No cryptographic overhead**: no HMAC verify, no SipHash, no key management
 
-CLI-CPU `interconnect-hu.md:75, 93` currently specifies `src_actor[16]` and `dst_actor[16]` ("max 65,536 actors / core"). This is an **unnecessary ceiling**:
-- Nano core (4 KB SRAM): typically 1–10 actors
-- Actor core (64 KB SRAM): typically 10–100 actors
-- Rich core (256 KB SRAM): typically 50–500 actors
+### 2.c) Permission bits
 
-8 bits (256 actors/core) is more than sufficient; the freed 16 bits go to header `perms[8]` and `HMAC[24]` fields (see osreq-007 header v2.5 proposal).
+| Bit | Flag | Meaning |
+|---|---|---|
+| 0 | Send | Send message to the target actor |
+| 1 | Watch | Monitor target actor lifecycle |
+| 2 | Stop | Stop the target actor |
+| 3 | Delegate | Delegate CST slot (new slot, narrowed perms) |
+| 4 | DelegateOnce | One-shot delegation (automatic revoke) |
+| 5 | Migrate | Move the target actor to another core |
+| 6–7 | MaxPri[2] | Maximum message priority (0–3), HW-enforced |
+
+### 2.d) Delegation mechanism
+
+CST delegation occurs on the **supervisor-to-supervisor VN0** channel:
+
+```
+Supervisor A (core 17)
+    │  DelegateRequest { OrigSlot, TargetCore, RequestedPerms }
+    │  → VN0 (management virtual network)
+    ▼
+Supervisor B (core 42)
+    │  new_perms = RequestedPerms AND OriginalPerms   ← HW narrows
+    │  CST.Allocate(new_entry) → new SlotIndex
+    ▼
+Response: TActorRef(newSlotIndex)   ← in target core's CST
+```
+
+**Invariant:** `new_perms ⊆ original_perms` — the HW AND operation ensures that delegation can **never escalate permissions** (seL4 capability monotonicity).
 
 ---
 
 ## Decision 3: Cross-chip addressing (inter-chip communication)
 
-The 24-bit core-coord is **a single chip's internal address space**. For multi-chip fabric, a proxy-actor pattern:
+The 24-bit `dst` field is **a single chip's internal address space**. For multi-chip fabric, a proxy-actor pattern:
 
 ### 3.a) Rejected: flat global core-id
 
-20+ bit flat core-id squeezes HMAC below the cryptographic floor. The flat address space is a **non-existent abstraction** — the physical topology is hierarchical.
+20+ bit flat core-id unnecessarily enlarges the CST table. The flat address space is a **non-existent abstraction** — the physical topology is hierarchical.
 
 ### 3.b) Rejected: hierarchical address inside the ref
 
@@ -147,24 +186,24 @@ The 24-bit core-coord is **a single chip's internal address space**. For multi-c
 
 > Actors can be migrated between cores at runtime — the same `Send(actor_ref, msg)` works in every case, and the router (hardware + software) decides where the message goes.
 
-`TActorRef` is always **chip-local**. Communication with a remote actor goes **through a proxy actor**:
+`TActorRef` is always **chip-local** (CST index into the local core's CST). Communication with a remote actor goes **through a proxy actor**:
 
 ```
 Application actor (chip A, core 17)
         │
-        │  Send(remoteProxyRef, msg)    ← local 64-bit ref
+        │  Send(remoteProxyRef, msg)    ← local CST index
         ▼
 [remote_proxy actor] (chip A, core 0)   ← in private state:
         │                                  { TargetChipId, TargetCoreId,
-        │                                    InterChipHmac, … }
+        │                                    TargetActorId, … }
         │  inter-chip link write (osreq-006)
         ▼
    Other chip → target actor
 ```
 
 **Strengths:**
-- 64-bit ref is enough forever (chip-local meaning)
-- Two HMACs, two key rings (chip-internal + inter-chip), defense-in-depth
+- 32-bit CST index is enough forever (chip-local meaning)
+- The proxy actor's internal state carries the inter-chip routing information
 - Location transparency: the application actor sees only refs
 - Battle-tested: Akka.Remote, Erlang/OTP distributed, Pony ORCA
 
@@ -175,57 +214,66 @@ Application actor (chip A, core 17)
 
 ---
 
-## Decision 4: Wire format — match with CLI-CPU interconnect header
+## Decision 4: Wire format — CLI-CPU interconnect header v3.0
 
-CLI-CPU `interconnect-hu.md` v2.5 (osreq-007 proposed change) header structure:
+CLI-CPU interconnect v3.0 header structure:
 
 ```
 ┌───────────┬───────┬─────────────────────────────────────────────────────────────┐
 │   Field   │ Width │                          Meaning                            │
 ├───────────┼───────┼─────────────────────────────────────────────────────────────┤
 │ dst       │ 24    │ Destination core HW address                                 │
+│ dst_actor │ 8     │ Destination actor ID (max 256 actors / core)                │
 │ src       │ 24    │ Source core HW address (HW-filled, unforgeable)             │
-│ src_actor │ 8     │ Sender actor ID — max 256 actors / core                     │
-│ dst_actor │ 8     │ Destination actor ID                                        │
-│ perms     │ 8     │ Actor capability bit-flags                                  │
-│ HMAC      │ 24    │ SipHash-128 MSB-truncate                                    │
-│ seq       │ 8     │ Sequence number (fragmented messages)                       │
+│ src_actor │ 8     │ Sender actor ID                                             │
+│ seq       │ 16    │ Sequence number (fragmented messages)                       │
 │ flags     │ 8     │ VN0/VN1, relay flag                                         │
 │ len       │ 8     │ Payload byte count                                          │
-│ CRC-8     │ 8     │ Header integrity                                            │
+│ reserved  │ 8     │ Reserved (zeroed)                                           │
+│ CRC-16    │ 16    │ Header integrity (16 bit)                                   │
+│ CRC-8     │ 8     │ Header CRC supplement                                       │
 └───────────┴───────┴─────────────────────────────────────────────────────────────┘
                                                                        Σ = 128 bit
 ```
 
-The 64-bit `TActorRef` is **bit-identical** to the following header fields:
-- `core-coord[24]` ↔ `dst[24]`
-- `actor-id[8]` ↔ `dst_actor[8]`
-- `perms[8]` ↔ `perms[8]`
-- `HMAC[24]` ↔ `HMAC[24]`
+**Changes from v2.5 header:**
+- **HMAC field removed** — no cryptographic verify needed, CST HW lookup replaces it
+- **perms field removed from header** — permissions live in the CST, HW checks on Send
+- **seq field expanded to 16 bits** (from 8) — larger fragmentation range
+- **CRC-16 + CRC-8** — stronger header integrity protection (CRC-8 retained for compatibility)
 
-**On Send, the runtime transfers the lower 64 bits 1:1 into the header**, no conversion.
+**The `TActorRef` (CST index) is NOT bit-identical to the header.** On Send, the HW:
+1. CST lookup: `SlotIndex` → `{dst, actor-id, perms}`
+2. Perms check: if the Send flag is not set → trap
+3. Header fill: `dst`, `dst_actor` from CST; `src`, `src_actor` filled by HW automatically
 
 ---
 
-## Decision 5: HMAC algorithm and defense pyramid
+## Decision 5: CST defense model (replaces former HMAC algorithm)
 
-### 5.a) Rejected: HMAC-SHA256 truncate
+### 5.a) Rejected: SipHash-128 HMAC verify (v2.0)
 
-~80 cycle HW verify, ~30k gate area. **Unnecessarily heavy** for short-message MAC.
+The previous model used SipHash-128 MSB-truncate to 24 bits for per-message HMAC verify.
 
-### 5.b) Decision: SipHash-128 MSB-truncate to 24 bits
+**Why rejected:**
+- ~5k gate / verify unit area cost **on every target core**
+- ~10 cycle / verify latency on every message
+- Key management complexity (rotation, per-core keys, counter thresholds)
+- The CST model provides **the same protection without cryptographic cost**
+
+### 5.b) Decision: CST HW lookup + SEAL protection
 
 | Property | Value | Rationale |
 |---|---|---|
-| Algorithm | SipHash-128 | Specifically designed for short-message MAC (Aumasson & Bernstein) |
-| Truncate | upper 24 bits | NIST SP 800-107 convention (MSB) |
-| HW area | ~5k gate / verify unit | 6× smaller than HMAC-SHA256 |
-| Verify cycle | ~10 cycle @ 500 MHz = 20 ns | 8× faster than HMAC-SHA256 |
-| Forgery resistance | 1 : 16.8 million (alone) | Evaluated together with the defense pyramid |
+| Defense mechanism | CST QSRAM lookup | HW-managed, software cannot modify |
+| Lookup cycle | **1 cycle** @ 500 MHz = 2 ns | 10× faster than previous SipHash verify |
+| HW area | ~1k gate (index decoder + comparator) | 5× smaller than SipHash verify unit |
+| Invalid index | HW trap (supervisor IRQ + drop) | Fail-stop, as before |
+| Perms enforce | CST entry perms AND operation | Same cycle, part of the lookup |
 
-### 5.c) Defense pyramid (defense-in-depth)
+### 5.c) Defense pyramid (defense-in-depth) — v3.0
 
-The 24-bit HMAC alone is **not sufficient** — a five-layer pyramid backs it:
+The CST model is **not cryptographic**, but a five-layer pyramid protects it:
 
 ```
 ┌────────────────────────────────────────────────────────────────────┐
@@ -242,123 +290,80 @@ The 24-bit HMAC alone is **not sufficient** — a five-layer pyramid backs it:
 │ 3. Spawn-time:                                                     │
 │    capability_registry (M2.5): signer-blacklist check              │
 │    Bytecode SHA blacklist check                                    │
+│    CST slot allocation: via supervisor HW trap                     │
 ├────────────────────────────────────────────────────────────────────┤
 │ 4. Send-time:                                                      │
-│    HMAC verify (target-core mailbox-edge HW unit, osreq-007)       │
-│    perms verify (capability bit-flags)                             │
+│    CST HW lookup: SlotIndex → {dst, actor-id, perms} (1 cycle)    │
+│    Invalid index → HW trap + drop                                  │
+│    perms verify: missing required flag → HW trap + drop            │
 ├────────────────────────────────────────────────────────────────────┤
-│ 5. Quarantine trigger (on bad HMAC):                               │
+│ 5. Quarantine trigger (on invalid CST access):                     │
 │    HW fail-stop: sender core supervisor IRQ + drop                 │
 │    AuthCode quarantine: cert.SubjectId → revocation_list           │
 │    Bytecode SHA → blacklist                                        │
 │    Running instances from that signer: supervisor terminate        │
-│    Per-chip bad-HMAC counter increment → threshold crossed:        │
-│      chip-wide key rotation (capability_registry) + alarm          │
+│    Per-chip invalid-CST counter → threshold → alarm                │
 └────────────────────────────────────────────────────────────────────┘
                                       │
-                              7. Foundations:
+                              Foundations:
                               Shared-nothing per-core SRAM isolation
                               Quench-RAM SEAL/RELEASE
+                              CST QSRAM: SEAL-protected, HW-only write
 ```
 
----
-
-## Brute-force cost analysis with realistic throughput
-
-Earlier pessimistic estimates (88k core × 1 GHz × 1 verify/cycle = 10¹³ tries/sec) are **absurd upper bounds**. Realistic numbers:
-
-### Throughput limits
-
-```
-SipHash verify HW unit:        10 cycle / verify @ 500 MHz = 20 ns
-Per target-core mailbox-edge:  sequential, ~5 × 10⁷ verify/sec MAX (verify bottleneck)
-Cross-region roundtrip:        2 × 139 cycle + verify ≈ 600 ns @ 500 MHz
-Hot-spot backpressure:         88k cores → 1 target = mailbox FIFO 8–64 deep saturates,
-                               87,936 cores blocked
-```
-
-The attacker **must wait for a response** to know which HMAC was successful (in the Symphact shared-nothing model there is no inter-actor side-channel). Throughput: **~10⁶ tries/sec** aggregate.
-
-### Bytecode-level gating (Open mode)
-
-Even if the attacker tries to bypass the signer blacklist with new certs, **every new attempt = new bytecode + new cert + new load**:
-
-| Step | Time |
-|---|---|
-| Random HMAC tag in bytecode payload | < 1 ns |
-| Bytecode rebuild (new SHA-256) | ~1 ms |
-| PQC self-signing (new cert) | ~10–100 ms |
-| Bytecode + cert load to chip | **~1–10 sec** ← bottleneck |
-| AuthCode Seal Core verify | ~1 ms |
-| Spawn actor + Send + roundtrip | ~1 ms |
-
-**Per-attempt total time (Open mode): ~1–10 seconds**.
-
-### Brute-force time table
-
-| HMAC bit | Keyspace | Strict mode (FenySoft KYC, ~3 days/signer) | Open mode (~1 sec/try) |
-|---|---|---|---|
-| **24** (chosen) | 1.7 × 10⁷ | **~70,000 years** | ~6 months–5 years |
-| 32 | 4.3 × 10⁹ | ~36 million years | ~140 years |
-| 48 | 2.8 × 10¹⁴ | ~2 trillion years | ~9 million years |
-| 64 | 9.2 × 10¹⁸ | ~10¹⁷ years | ~290 billion years |
-
-Plus **storage saturation** defense: 16.8M attempts × 32-byte SHA = 537 MB blacklist storage, far exceeding the chip's on-chip blacklist capacity (kilobyte–megabyte) → the attack stalls before success, with `MEM_FULL` admin alarm.
-
-### Conclusion
-
-The **24-bit HMAC + defense pyramid** combination:
-- **Strict mode**: ~70,000 years brute-force defense (FenySoft Strict whitelist)
-- **Open mode**: ~6 months–5 years brute-force defense (only relevant on developer chips, **NOT EXISTENT in the FenySoft product** — see `trust-model-en.md`)
-
-Both levels are **post-quantum-grade for the Symphact target audience** (consumer, IoT, enterprise, industrial critical). For nation-state-level attacks the Secure Edition (F6.5) provides separate defense (`CLI-CPU/docs/secure-element-en.md`).
+**Why sufficient without cryptography:**
+- Software **never sees** the actual dst address or permissions — only the CST index
+- CST QSRAM is **SEAL-protected** — software writes are physically impossible
+- Invalid CST index → immediate HW trap (not trial-and-error, but fail-stop)
+- No brute-force attack vector: the CST index is either valid (result of a legitimate spawn) or invalid (immediate trap)
 
 ---
 
 ## Production deployment trust model
 
-The defense level of the 24-bit HMAC depends on the integrity of the **gating function**. The FenySoft product line ships **mandatorily in Strict whitelist mode** with a FenySoft-controlled signer pool:
+The defense level of the CST depends on the integrity of the **SEAL QSRAM**. The FenySoft product line ships **mandatorily in Strict whitelist mode**:
 
 - `eFuse.CaRootHash` is a single slot, **OTP**, programmed with the FenySoft master key SHA
 - Multi-root array, Open-mode bit, deployment-mode toggle: **NOT supported** (would be attack vectors)
 - Customer bytecode signing only via FenySoft KYC + audit process
+- CST slot allocation exclusively through supervisor kernel via HW trap
 
-Detailed business model, justification of the unsupported options, and multi-tier pricing: [`trust-model-en.md`](trust-model-en.md).
+Detailed business model, justification of unsupported options, and multi-tier pricing: [`trust-model-en.md`](trust-model-en.md).
 
 ---
 
 ## What this means for code today (invariants)
 
-Holding the 64-bit contract pins down **two rules**:
+Holding the 32-bit CST index contract pins down **two rules**:
 
-1. **Forbidden** to write code assuming `ActorId = 1, 2, 3, …` is sequential. E.g., `for (long i = 0; i < count; i++)` ref iteration is an **anti-pattern** — future refs are "sparse" (HMAC random, core-coord sparse).
-2. **Forbidden** to leave the `long` type — no `string ActorName`, no `Guid`, no two-field record. The 64 bits are the contract.
+1. **Forbidden** to write code assuming `SlotIndex = 0, 1, 2, …` is sequential. CST slot allocation is implementation-dependent — future refs may be "sparse" (deallocated slots, reuse).
+2. **Forbidden** to leave the `int` type — no `string ActorName`, no `Guid`, no two-field record. The 32-bit CST index is the contract.
 
-**Tests must not** rely on sequential IDs either. Correct pattern: use the ref returned by `TActorSystem.Spawn`.
+**Tests must not** rely on sequential indices either. Correct pattern: use the ref returned by `TActorSystem.Spawn`.
 
 ---
 
 ## Open questions
 
-1. **HMAC counter threshold value** — proposed: 16 (false-positive minimum, brute-force max bound). Part of osreq-007, requires CFPU team agreement.
-2. **Per-core HMAC key rotation frequency** — automatic rotation on counter threshold (event-driven), or scheduled (timed)? Proposed: event-driven, since timed rotation adds complexity without value.
-3. **Inter-chip HMAC algorithm** — same SipHash-128, or stronger (HMAC-SHA256)? The off-chip threat profile is harsher; stronger may be warranted. Part of osreq-006.
-4. **Shared use of proxy actors** — chip A's 100 actors all sending to chip B: shared `remote_proxy(chip B)`, or per-sender? Sharing is simpler but introduces back-pressure.
-5. **Ref leakage across chip boundaries** — chip A actor passes a chip-A-internal ref to chip B actor: runtime detects and creates new proxy on chip B, or forbidden?
+1. **CST size per core type** — Nano core (4 KB SRAM): how many CST slots fit? Actor core: how many? The QSRAM partitioning ratio between CST and actor data must be pinned down.
+2. **CST slot garbage collection** — automatic release on actor death (supervisor-driven), or explicit revoke? Proposed: supervisor-driven automatic, explicit revoke optional.
+3. **Shared use of proxy actors** — chip A's 100 actors all sending to chip B: shared `remote_proxy(chip B)`, or per-sender? Sharing is simpler but introduces back-pressure.
+4. **Ref leakage across chip boundaries** — chip A actor passes a chip-A-internal ref to chip B actor: runtime detects and creates new proxy on chip B, or forbidden?
+5. **CST overflow handling** — when a core's CST fills up, how should the supervisor react? Proposed: back-pressure on spawn (wait or trap to the requester).
 
 ---
 
 ## Related plans and milestones
 
-- **`CLAUDE.md`** — 64-bit public surface contract record
+- **`CLAUDE.md`** — 32-bit CST index public surface contract record
 - **`docs/trust-model-en.md`** — FenySoft Strict whitelist business model, unsupported options
-- **`docs/osreq-to-cfpu/osreq-007-actor-ref-format-en.md`** — HW requirements (header v2.5, mailbox-edge HMAC verify unit, counter, fail-stop, single-root eFuse)
+- ~~**`docs/osreq-to-cfpu/osreq-007-actor-ref-format-en.md`**~~ — **OBSOLETE** (HMAC-based header v2.5, mailbox-edge HMAC verify unit, counter, fail-stop — superseded by CST model)
 - **`docs/roadmap.md` M0.6 — Remoting** — proxy-actor pattern first iteration
-- **`docs/roadmap.md` M0.7 — CFPU Hardware Integration** — final bit-layout in silicon, MMIO mailbox integration
-- **`docs/roadmap.md` M2.5 — Capability Registry** — kernel-side HMAC key management and issuance, AuthCode integration
+- **`docs/roadmap.md` M0.7 — CFPU Hardware Integration** — final CST implementation in silicon, MMIO mailbox integration
+- **`docs/roadmap.md` M2.5 — Capability Registry** — kernel-side CST slot management and issuance, AuthCode integration
 - **`docs/vision-en.md`** — capability-based security and location transparency design foundations
 - **`CLI-CPU/docs/architecture-hu.md`** — 24-bit HW address, software-dispatched actor addressing
-- **`CLI-CPU/docs/interconnect-hu.md`** — cell header structure, tree topology, backpressure
+- **`CLI-CPU/docs/interconnect-hu.md`** — cell header structure (v3.0), tree topology, backpressure
 - **`CLI-CPU/docs/ddr5-architecture-hu.md`** — CAM table for actor-level memory authorization
 - **`CLI-CPU/docs/authcode-hu.md`** — AuthCode trust chain, SHA-256 binding, revocation
 - **`CLI-CPU/docs/quench-ram-hu.md`** — SEAL/RELEASE invariant, cold-boot defense
@@ -371,4 +376,5 @@ Holding the 64-bit contract pins down **two rules**:
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-04-25 | Initial: 16-bit core-coord (undersized), 28-bit HMAC, proxy pattern |
-| 2.0 | 2026-04-25 | **Finalized specification**: 64-bit ref, `[HMAC:24][perms:8][actor-id:8][core-coord:24]`, bit-identical with CLI-CPU 16-byte header, threat model section, brute-force cost analysis with realistic throughput, defense pyramid, FenySoft Strict whitelist reference, justification of unsupported options |
+| 2.0 | 2026-04-25 | Finalized specification: 64-bit ref, `[HMAC:24][perms:8][actor-id:8][core-coord:24]`, bit-identical with CLI-CPU 16-byte header, threat model, brute-force cost analysis, defense pyramid |
+| 3.0 | 2026-04-28 | **MAJOR**: HMAC model eliminated, CST (Capability Slot Table) model introduced. `TActorRef(long ActorId)` 64-bit → `TActorRef(int SlotIndex)` 32-bit. SipHash/HMAC verify → 1-cycle CST HW lookup. Perms moved from header to CST. Header v3.0 (HMAC/perms fields removed, seq 16-bit, CRC-16). Brute-force analysis removed (not relevant). osreq-007 OBSOLETE. Delegation: supervisor-to-supervisor VN0, AND narrowing. seL4 capability analogy. |

@@ -43,7 +43,7 @@
 | Elem | Leírás |
 |---|---|
 | `IMailbox` / `TMailbox` | FIFO mailbox (lock-free MPMC, `ConcurrentQueue`). |
-| `TActorRef` | Capability token (`readonly record struct`, 64 bit). |
+| `TActorRef` | Capability token (`readonly record struct`, 32-bit CST index). |
 | `TActor<TState>` | Absztrakt aktor: `Init()` + `Handle(state, msg)`. |
 | `TActorSystem` | Runtime: `Spawn`, `Send`, `DrainAsync`, `GetState` (teszt). |
 
@@ -134,7 +134,7 @@
 
 | Elem | Leírás |
 |---|---|
-| `TActorRef` kiterjesztés | Location info (chip-id + core-id + offset). |
+| `TActorRef` kiterjesztés | `TActorRef(int SlotIndex)` — 32-bit CST index, opaque token. A capability (perms, actor-id, core-coord) a CST (Capability Slot Table) HW táblában van. |
 | Serialization layer | HW message formátummal kompatibilis. |
 | `ITransport` / `TTcpTransport` | Transport absztrakció + TCP referencia. |
 
@@ -154,8 +154,8 @@
 | Elem | Leírás |
 |---|---|
 | `TMmioMailbox` | MMIO-alapú HW FIFO mailbox implementáció. |
-| `TActorRef` végleges formátum | `[HMAC:24][perms:8][actor-id:8][core-coord:24]` = 64 bit (chip-local). Bit-azonos a CLI-CPU 16 byte interconnect header alsó 64 bitjével. Részletek: [actor-ref-scaling-hu.md](actor-ref-scaling-hu.md), [osreq-007](osreq-to-cfpu/osreq-007-actor-ref-format-hu.md). |
-| CLI-CPU szinkronizáció | `osreq-to-cfpu` feedback loop a HW repo-val. |
+| `TActorRef` végleges formátum | `TActorRef(int SlotIndex)` — 32-bit CST index. A SlotIndex opaque token; a capability adatok (perms, actor-id, core-coord) a HW-managed CST (Capability Slot Table) táblában vannak. Interconnect header v3.0: `dst[24]+dst_actor[8] | src[24]+src_actor[8] | seq[16]+flags[8]+len[8] | reserved[8]+CRC-16[16]+CRC-8[8]`. |
+| CLI-CPU szinkronizáció | `osreq-to-cfpu` feedback loop a HW repo-val. **Megjegyzés:** osreq-007 OBSOLETE — a CST modell váltja fel. |
 
 **Becsült óra:** ~30-50
 > A legbizonytalanabb becslés — függ a CLI-CPU HW készültségétől. MMIO register hozzáférés .NET-ből (unsafe kód vagy P/Invoke). TActorRef végleges bit layout. Hardver teszteléshez FPGA vagy szimulátor kell. ~3-4 új fájl, ~200-400 sor runtime. Teszt korlátozott (HW-függő tesztek szimulátort igényelnek).
@@ -266,17 +266,17 @@
 
 | Elem | Leírás |
 |---|---|
-| `TCapabilityRegistry` actor | Capability-k nyilvántartása. |
-| `TActorRef` ≡ `TCapability` | A ref maga a capability — egyetlen 64 bit token: `[HMAC:24][perms:8][actor-id:8][core-coord:24]`. Bit-azonos a CLI-CPU header alsó 64 bitjével. Részletek: [actor-ref-scaling-hu.md](actor-ref-scaling-hu.md). |
-| Capability kiadás | Spawn-kor a registry SipHash-128 MAC-cel aláírja. |
-| Delegálás | Actor továbbadhatja a ref-et üzenetben (a perms-szel együtt — attenuation lehetséges). |
-| Visszavonás | Per-chip kulcsrotáció (event-driven, hibás-HMAC counter threshold átlépésére). |
+| `TCapabilityRegistry` actor | Capability-k nyilvántartása — CST HW tábla kezelés. |
+| `TActorRef` ≡ `TCapability` | A ref egy opaque 32-bit CST index (`TActorRef(int SlotIndex)`). A capability adatok (perms, actor-id, core-coord) a HW-managed CST táblában vannak — NEM a token-ben. |
+| Capability kiadás | Spawn-kor a registry CST slot-ot allokál és tölti ki. |
+| Delegálás | Actor továbbadhatja a SlotIndex-et üzenetben (a CST-ben tárolt perms-szel együtt — attenuation lehetséges). |
+| Visszavonás | CST slot invalidálás (event-driven). |
 | Permission bit-flag | Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate. |
 | AuthCode integráció | Spawn-time aláíró-blacklist + bytecode SHA blacklist check. |
 
 **Építő elem:** M0.6 TActorRef kiterjesztésre épül, és a CFPU AuthCode rendszerre (`CLI-CPU/docs/authcode-hu.md`).
 
-**CFPU:** A célcore mailbox-edge HW unit ellenőrzi az HMAC-ot minden Send-nél (NEM az interconnect router — a "egy mailbox IRQ per core" elv). Hamis HMAC → drop + fail-stop a küldő core-on + AuthCode quarantine az aláíró ellen. Részletek: [osreq-007](osreq-to-cfpu/osreq-007-actor-ref-format-hu.md), [trust-model-hu.md](trust-model-hu.md).
+**CFPU:** A célcore mailbox-edge HW unit CST lookup-ot végez minden Send-nél (NEM az interconnect router — a "egy mailbox IRQ per core" elv). Érvénytelen CST slot → drop + fail-stop a küldő core-on + AuthCode quarantine az aláíró ellen. Részletek: [trust-model-hu.md](trust-model-hu.md). (**Megjegyzés:** osreq-007 OBSOLETE — a CST modell váltja fel.)
 
 **Becsült óra:** ~28-36
 
@@ -436,11 +436,11 @@
 
 | Elem | Leírás |
 |---|---|
-| `TCapability` ≡ `TActorRef` | A capability ÉS a ref ugyanaz a 64 bit token. Layout: `[HMAC:24][perms:8][actor-id:8][core-coord:24]` (lásd [actor-ref-scaling-hu.md](actor-ref-scaling-hu.md)). NEM külön struct. |
-| SipHash-128 MAC | capability_registry per-core kulccsal, MSB-truncate 24 bit. |
-| Permission bit-flag | Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate. |
-| Runtime ellenőrzés | Célcore mailbox-edge HW unit minden Send-nél (osreq-007). |
-| Audit trail | Hibás HMAC + AuthCode quarantine események naplózva. |
+| `TCapability` ≡ `TActorRef` | A capability a CST (Capability Slot Table) HW táblában van, a ref egy opaque 32-bit index (`TActorRef(int SlotIndex)`). NEM külön struct. |
+| CST HW lookup | Célcore mailbox-edge HW unit CST lookup minden Send-nél. |
+| Permission bit-flag | Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate — a CST-ben tárolt 8 bit. |
+| Runtime ellenőrzés | Célcore mailbox-edge HW unit CST lookup minden Send-nél. (**Megjegyzés:** osreq-007 OBSOLETE — a CST modell váltja fel.) |
+| Audit trail | Érvénytelen CST slot + AuthCode quarantine események naplózva. |
 
 **Becsült óra:** ~28-36
 

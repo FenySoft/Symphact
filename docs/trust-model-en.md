@@ -2,7 +2,7 @@
 
 > Magyar verzió: [trust-model-hu.md](trust-model-hu.md)
 
-> Version: 1.0
+> Version: 1.1
 
 > Status: finalized deployment policy, basis for F6-Silicon One and later tape-outs
 
@@ -24,10 +24,10 @@ Manufacture (FenySoft):
 
 Operation:
    Every bytecode signed with FenySoft cert (or delegated subordinate CA cert).
-   Bad HMAC = signer immediately blacklisted (issuer-trust quarantine).
+   Invalid CST slot = signer immediately blacklisted (issuer-trust quarantine).
 ```
 
-This model establishes the realistic defense level of the 24-bit HMAC segment in `actor-ref-scaling-en.md` "Defense pyramid" (~70,000 years brute-force).
+This model establishes the integrity of the CST (Capability Slot Table) HW-managed capability model.
 
 ---
 
@@ -187,7 +187,7 @@ In return, the customer gets:
 
 | Guarantee | Effect |
 |---|---|
-| Hardware-level brute-force defense | ~70,000 years on the 24-bit HMAC, with FenySoft-controlled gating |
+| Hardware-level CST defense | HW-managed capability table, with FenySoft-controlled gating |
 | Central revocation | A malware bytecode can be revoked globally by FenySoft — across all chips, instantly |
 | Compliance trail | Every cert issuance auditable (GDPR, ISO 26262, IEC 61508, FIPS 140-3) |
 | Brand trust mark | "FenySoft Verified" quality mark on the product |
@@ -199,7 +199,7 @@ For the **majority** of consumer / IoT / enterprise / industrial-critical target
 
 ## eFuse OTP configuration locked
 
-`osreq-007-actor-ref-format-en.md` Requirement 5 explicitly records the trust anchor hardening:
+(**Note:** osreq-007 is OBSOLETE — superseded by the CST model.) The trust anchor hardening:
 
 ```
 eFuse {
@@ -233,7 +233,7 @@ The Secure Edition provides defense against **nation-state-level attacks** (dedi
 ## Related documents
 
 - **`actor-ref-scaling-en.md`** — TActorRef bit layout and defense pyramid
-- **`osreq-to-cfpu/osreq-007-actor-ref-format-en.md`** — HW requirements, trust anchor hardening
+- ~~**`osreq-to-cfpu/osreq-007-actor-ref-format-en.md`**~~ — **OBSOLETE** (superseded by CST model)
 - **`vision-en.md`** — capability-based security design foundations
 - **`roadmap.md`** M2.5 — Capability Registry implementation
 - **`CLI-CPU/docs/authcode-hu.md`** — AuthCode trust chain specification
@@ -247,3 +247,4 @@ The Secure Edition provides defense against **nation-state-level attacks** (dedi
 | Version | Date | Change |
 |---|---|---|
 | 1.0 | 2026-04-25 | Initial: FenySoft Strict whitelist business model, multi-tier pricing, explicit list of NOT-supported options with security rationale, Android-model analogy, F6.5 Secure Edition relationship |
+| 1.1 | 2026-04-28 | **HMAC verify replaced by CST HW lookup**. SipHash references removed. osreq-007 reference marked OBSOLETE. Trust model mechanism updated to CST-based; the essence (Strict whitelist, single trust anchor) is unchanged. |

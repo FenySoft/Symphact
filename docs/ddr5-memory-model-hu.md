@@ -2,7 +2,7 @@
 
 > English version: [ddr5-memory-model-en.md](ddr5-memory-model-en.md)
 
-> Version: 1.1
+> Version: 1.2
 
 Ez a dokumentum a Symphact **DDR5 memóriakezelési modelljét** rögzíti: hogyan kér egy aktor hozzáférést, hogyan használja a memóriát, és hogyan adja vissza. Nem csak a végeredményt, hanem az **érvelési utat** is dokumentálja.
 
@@ -186,15 +186,15 @@ Ha egy aktor crash-el, és nem adta vissza a capability-t:
 
 ```
 1. Aktor trap-et generál
-2. A core scheduler érzékeli (cooperative switching szint)
+2. A core HW érzékeli (cooperative switching szint)
 3. Scheduler értesíti a supervisor-t: MsgActorCrashed(ActorId)
-4. Supervisor jelzi a kernel_io_sup-nak: MsgActorCrashed(src[24], src_actor[16])
+4. Supervisor jelzi a kernel_io_sup-nak: MsgActorCrashed(src[24], src_actor[8])
 5. kernel_io_sup törli CSAK az adott aktor CAM bejegyzéseit
 6. A többi aktor ugyanazon a core-on zavartalanul fut tovább
 7. A tartomány felszabadul — más aktor megkaphatja
 ```
 
-Ez az Erlang/OTP "let it crash" modell hardveres implementációja — az aktor nem kell, hogy "takarítson maga után", a supervisor hierarchy kezeli. Az N:M actor-to-core mapping miatt a crash recovery **aktor szintű**, nem core szintű — a DDR5 Controller CAM tábla `src[24] + src_actor[16]` alapján azonosítja a bejegyzéseket (lásd `interconnect-hu.md` v2.4 header spec).
+Ez az Erlang/OTP "let it crash" modell hardveres implementációja — az aktor nem kell, hogy "takarítson maga után", a supervisor hierarchy kezeli. Az N:M actor-to-core mapping miatt a crash recovery **aktor szintű**, nem core szintű — a DDR5 Controller CAM tábla `src[24] + src_actor[8]` alapján azonosítja a bejegyzéseket (lásd `interconnect-hu.md` v2.4 header spec).
 
 ## Kapcsolódó HW döntések
 
@@ -204,14 +204,15 @@ A Symphact fejlesztőknek fontos tudni a HW korlátokat, amik az API-t befolyás
 |---------|----------------|
 | A DDR5 Controller **10 portja** van | Max ~10 egyidejű DDR5 kérés feldolgozás — de a core-ok ritkán fordulnak DDR5-höz (SRAM-ból dolgoznak) |
 | A CAM tábla **véges méretű** | A kernel_io_sup-nak nyilván kell tartania az aktív capability-ket, és limitálnia az egyidejű grant-ok számát |
-| A CAM `src[24] + src_actor[16]` alapján ellenőriz | **Aktor szintű** jogosultság — egy core-on több aktor kaphat külön DDR5 tartományt |
+| A CAM `src[24] + src_actor[8]` alapján ellenőriz | **Aktor szintű** jogosultság — egy core-on több aktor kaphat külön DDR5 tartományt (max 256 actor/core) |
 | A **src[24] nem hamisítható** (HW) | Az OS nem kell, hogy külön azonosítsa a core-t — a HW megtette |
-| A **src_actor[16] a core-on belül hamisítható** | A core scheduler felelős az actor ID integritásáért — kompromittált aktor más aktor ID-jával küldhet |
+| A **src_actor[8] a core HW tölti ki** (aktív actor context regiszter), nem hamisítható | Az aktor nem tudja felülírni a saját actor ID-ját — a HW automatikusan az aktuális context regiszterből tölti |
 | A config port **hardwired** | A kernel_io_sup-nak azon a Rich Core-on kell futnia, amelyik fizikailag össze van kötve a config porttal |
 
 ## Changelog
 
 | Verzió | Dátum | Változás |
 |--------|-------|---------|
+| 1.2 | 2026-04-24 | src_actor[16] → src_actor[8] (max 256 actor/core). src_actor kitöltése: core HW (aktív actor context regiszter), nem hamisítható. Core scheduler → Core HW javítás |
 | 1.1 | 2026-04-22 | Crash recovery aktor szintűre javítva (N:M mapping). CAM tábla src[24]+src_actor[16] alapú. Objektum-szintű aktor API (MsgLoad/MsgSave, nincs await). HW döntések tábla bővítve |
 | 1.0 | 2026-04-22 | Első verzió — capability modell, ownership, crash recovery, aktor API |

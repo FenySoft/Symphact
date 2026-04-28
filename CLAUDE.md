@@ -40,7 +40,7 @@ Three primitives form the core; understanding their contracts is enough to navig
    FIFO mailbox with `Post` / `TryReceive`. `TMailbox` is the in-memory reference impl on `ConcurrentQueue<object>` (lock-free MPMC). Designed so a future `TMmioMailbox` against CFPU hardware FIFO can drop in without API changes — keep the interface narrow and thread-safe.
 
 2. **`TActorRef`** (`src/Symphact.Core/TActorRef.cs`)
-   `readonly record struct TActorRef(long ActorId)` — value-type capability token. `default` is invalid (`IsValid=false`, `TActorRef.Invalid`). Equality/hash by `ActorId`. The single-integer form is a placeholder — the future shape (`core-id + mailbox offset + HMAC tag + permissions`) must preserve the same public surface.
+   `readonly record struct TActorRef(int SlotIndex)` — value-type capability token. `default` is invalid (`IsValid=false`, `TActorRef.Invalid`). Equality/hash by `SlotIndex`. The `SlotIndex` is an opaque CST (Capability Slot Table) index — the hardware resolves it at runtime to core-id + mailbox offset + permissions. Software must not interpret or construct SlotIndex values directly.
 
 3. **`TActor<TState>` + `TActorSystem`** (`src/Symphact.Core/TActor.cs`, `TActorSystem.cs`)
    - `TActor<TState>` abstract: `Init()` returns initial state; `Handle(state, msg)` returns new state. Handlers must be side-effect-free — the only legitimate "side-effect" (sending messages) will arrive via a future context parameter.

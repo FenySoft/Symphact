@@ -47,7 +47,7 @@
 | Elem / Item | Leírás / Description |
 |---|---|
 | `IMailbox` / `TMailbox` | hu: FIFO mailbox (lock-free MPMC, `ConcurrentQueue`). / en: FIFO mailbox (lock-free MPMC, `ConcurrentQueue`). |
-| `TActorRef` | hu: Capability token (`readonly record struct`, 64 bit). / en: Capability token (`readonly record struct`, 64-bit). |
+| `TActorRef` | hu: Capability token (`readonly record struct`, 32-bit CST index). / en: Capability token (`readonly record struct`, 32-bit CST index). |
 | `TActor<TState>` | hu: Absztrakt aktor: `Init()` + `Handle(state, msg)`. / en: Abstract actor: `Init()` + `Handle(state, msg)`. |
 | `TActorSystem` | hu: Runtime: `Spawn`, `Send`, `DrainAsync`, `GetState` (teszt). / en: Runtime: `Spawn`, `Send`, `DrainAsync`, `GetState` (test-only). |
 
@@ -185,7 +185,7 @@
 
 | Elem / Item | Leírás / Description |
 |---|---|
-| `TActorRef` kiterjesztés | hu: Location info (chip-id + core-id + offset). / en: Location info (chip-id + core-id + offset). |
+| `TActorRef` kiterjesztés | hu: `TActorRef(int SlotIndex)` — 32-bit CST index, opaque token. A capability (perms, actor-id, core-coord) a CST (Capability Slot Table) HW táblában van. / en: `TActorRef(int SlotIndex)` — 32-bit CST index, opaque token. The capability (perms, actor-id, core-coord) resides in the CST (Capability Slot Table) HW table. |
 | Serialization layer | hu: HW message formátummal kompatibilis. / en: Compatible with HW message format. |
 | `ITransport` / `TTcpTransport` | hu: Transport absztrakció + TCP referencia. / en: Transport abstraction + TCP reference. |
 
@@ -219,8 +219,8 @@
 | Elem / Item | Leírás / Description |
 |---|---|
 | `TMmioMailbox` | hu: MMIO-alapú HW FIFO mailbox implementáció. / en: MMIO-based HW FIFO mailbox implementation. |
-| `TActorRef` végleges formátum | hu: `[HMAC:24][perms:8][actor-id:8][core-coord:24]` = 64 bit (chip-local). Bit-azonos a CLI-CPU 16 byte interconnect header alsó 64 bitjével. Részletek: [actor-ref-scaling-hu.md](actor-ref-scaling-hu.md), [osreq-007](osreq-to-cfpu/osreq-007-actor-ref-format-hu.md). / en: `[HMAC:24][perms:8][actor-id:8][core-coord:24]` = 64 bits (chip-local). Bit-identical with the lower 64 bits of the CLI-CPU 16-byte interconnect header. Details: [actor-ref-scaling-en.md](actor-ref-scaling-en.md), [osreq-007](osreq-to-cfpu/osreq-007-actor-ref-format-en.md). |
-| CLI-CPU szinkronizáció | hu: `osreq-to-cfpu` feedback loop a HW repo-val. / en: `osreq-to-cfpu` feedback loop with HW repo. |
+| `TActorRef` végleges formátum | hu: `TActorRef(int SlotIndex)` — 32-bit CST index. A SlotIndex opaque token; a capability adatok (perms, actor-id, core-coord) a HW-managed CST (Capability Slot Table) táblában vannak. Interconnect header v3.0: `dst[24]+dst_actor[8] | src[24]+src_actor[8] | seq[16]+flags[8]+len[8] | reserved[8]+CRC-16[16]+CRC-8[8]`. / en: `TActorRef(int SlotIndex)` — 32-bit CST index. The SlotIndex is an opaque token; capability data (perms, actor-id, core-coord) resides in the HW-managed CST (Capability Slot Table). Interconnect header v3.0: `dst[24]+dst_actor[8] | src[24]+src_actor[8] | seq[16]+flags[8]+len[8] | reserved[8]+CRC-16[16]+CRC-8[8]`. |
+| CLI-CPU szinkronizáció | hu: `osreq-to-cfpu` feedback loop a HW repo-val. **Megjegyzés:** osreq-007 OBSOLETE — a CST modell váltja fel. / en: `osreq-to-cfpu` feedback loop with HW repo. **Note:** osreq-007 is OBSOLETE — superseded by the CST model. |
 
 **Becsült óra / Est. hours:** ~30-50
 > hu: A legbizonytalanabb becslés — függ a CLI-CPU HW készültségétől. MMIO register hozzáférés .NET-ből
@@ -396,23 +396,23 @@
 | Elem / Item | Leírás / Description |
 |---|---|
 | `TCapabilityRegistry` actor | hu: Capability-ek nyilvántartása és aláírása. / en: Capability ledger and signing authority. |
-| `TActorRef` ≡ `TCapability` | hu: A ref maga a capability — egyetlen 64 bit token: `[HMAC:24][perms:8][actor-id:8][core-coord:24]`. Bit-azonos a CLI-CPU header alsó 64 bitjével. Részletek: [actor-ref-scaling-hu.md](actor-ref-scaling-hu.md). / en: The ref IS the capability — single 64-bit token. Bit-identical with the lower 64 bits of the CLI-CPU header. Details: [actor-ref-scaling-en.md](actor-ref-scaling-en.md). |
-| Spawn-kori kiadás / Spawn issuance | hu: A registry SipHash-128 MAC-cel aláírja Spawn-kor. / en: Registry signs with SipHash-128 MAC at Spawn time. |
-| Delegálás / Delegation | hu: Actor üzenetben továbbadhatja a ref-et (a perms-szel együtt — attenuation lehetséges). / en: Actor can forward the ref in a message (along with perms — attenuation possible). |
-| Visszavonás / Revocation | hu: Per-chip kulcsrotáció (event-driven, hibás-HMAC counter threshold átlépésére). / en: Per-chip key rotation (event-driven, on bad-HMAC counter threshold crossing). |
+| `TActorRef` ≡ `TCapability` | hu: A ref egy opaque 32-bit CST index (`TActorRef(int SlotIndex)`). A capability adatok (perms, actor-id, core-coord) a HW-managed CST táblában vannak — NEM a token-ben. / en: The ref is an opaque 32-bit CST index (`TActorRef(int SlotIndex)`). Capability data (perms, actor-id, core-coord) resides in the HW-managed CST — NOT in the token. |
+| Spawn-kori kiadás / Spawn issuance | hu: A registry CST slot-ot allokál és tölti ki Spawn-kor. / en: Registry allocates and populates a CST slot at Spawn time. |
+| Delegálás / Delegation | hu: Actor üzenetben továbbadhatja a SlotIndex-et (a CST-ben tárolt perms-szel együtt — attenuation lehetséges). / en: Actor can forward the SlotIndex in a message (along with CST-stored perms — attenuation possible). |
+| Visszavonás / Revocation | hu: CST slot invalidálás (event-driven). / en: CST slot invalidation (event-driven). |
 | Permission bit-flag | hu: Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate — 8 bit. / en: Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate — 8 bits. |
 | AuthCode integráció / AuthCode integration | hu: Spawn-time aláíró-blacklist + bytecode SHA blacklist check. / en: Spawn-time signer-blacklist + bytecode SHA blacklist check. |
 
 **CFPU:**
-> hu: A célcore mailbox-edge HW unit ellenőrzi az HMAC-ot minden Send-nél (NEM az interconnect router — a "egy mailbox IRQ per core" elv). Hamis HMAC → drop + fail-stop a küldő core-on + AuthCode quarantine az aláíró ellen. Részletek: [osreq-007](osreq-to-cfpu/osreq-007-actor-ref-format-hu.md), [trust-model-hu.md](trust-model-hu.md).
+> hu: A célcore mailbox-edge HW unit a CST táblában végez HW lookup-ot minden Send-nél (NEM az interconnect router — a "egy mailbox IRQ per core" elv). Érvénytelen CST slot → drop + fail-stop a küldő core-on + AuthCode quarantine az aláíró ellen. Részletek: [trust-model-hu.md](trust-model-hu.md). (**Megjegyzés:** osreq-007 OBSOLETE — a CST modell váltja fel.)
 >
-> en: The target-core mailbox-edge HW unit verifies HMAC on every Send (NOT the interconnect router — "one mailbox IRQ per core" principle). Forged HMAC → drop + fail-stop on sender core + AuthCode quarantine against the signer. Details: [osreq-007](osreq-to-cfpu/osreq-007-actor-ref-format-en.md), [trust-model-en.md](trust-model-en.md).
+> en: The target-core mailbox-edge HW unit performs a CST HW lookup on every Send (NOT the interconnect router — "one mailbox IRQ per core" principle). Invalid CST slot → drop + fail-stop on sender core + AuthCode quarantine against the signer. Details: [trust-model-en.md](trust-model-en.md). (**Note:** osreq-007 is OBSOLETE — superseded by the CST model.)
 
 **Becsült óra / Est. hours:** ~28-36
-> hu: M0.6 TActorRef kiterjesztésre épül. HMAC implementáció. Capability lifecycle management.
+> hu: M0.6 TActorRef kiterjesztésre épül. CST HW tábla kezelés. Capability lifecycle management.
 > ~5-6 új fájl, ~400-500 sor runtime, ~500-600 sor teszt.
 >
-> en: Builds on M0.6 TActorRef extension. HMAC implementation. Capability lifecycle management.
+> en: Builds on M0.6 TActorRef extension. CST HW table management. Capability lifecycle management.
 > ~5-6 new files, ~400-500 lines runtime, ~500-600 lines test.
 
 ---
@@ -680,22 +680,22 @@
 
 | Elem / Item | Leírás / Description |
 |---|---|
-| `TCapability` ≡ `TActorRef` | hu: A capability ÉS a ref ugyanaz a 64 bit token: `[HMAC:24][perms:8][actor-id:8][core-coord:24]` (lásd [actor-ref-scaling-hu.md](actor-ref-scaling-hu.md)). NEM külön struct. / en: The capability AND the ref are the same 64-bit token (see [actor-ref-scaling-en.md](actor-ref-scaling-en.md)). NOT a separate struct. |
-| SipHash-128 signing | hu: Capability registry per-core kulccsal, MSB-truncate 24 bit. / en: With capability registry per-core key, MSB-truncate 24 bit. |
-| Permission bit-flag | hu: Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate — 8 bit. / en: Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate — 8 bits. |
-| Runtime check | hu: Célcore mailbox-edge HW unit minden Send-nél (osreq-007). / en: Target-core mailbox-edge HW unit on every Send (osreq-007). |
-| Audit trail | hu: Hibás HMAC + AuthCode quarantine események naplózva. / en: Bad HMAC + AuthCode quarantine events logged. |
+| `TCapability` ≡ `TActorRef` | hu: A capability a CST (Capability Slot Table) HW táblában van, a ref egy opaque 32-bit index (`TActorRef(int SlotIndex)`). NEM külön struct. / en: The capability resides in the CST (Capability Slot Table) HW table; the ref is an opaque 32-bit index (`TActorRef(int SlotIndex)`). NOT a separate struct. |
+| CST HW lookup | hu: Célcore mailbox-edge HW unit CST lookup minden Send-nél. / en: Target-core mailbox-edge HW unit CST lookup on every Send. |
+| Permission bit-flag | hu: Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate — a CST-ben tárolt 8 bit. / en: Send, Stop, Watch, Delegate, Revoke, Query, Snapshot, Migrate — 8 bits stored in CST. |
+| Runtime check | hu: Célcore mailbox-edge HW unit CST lookup minden Send-nél. / en: Target-core mailbox-edge HW unit CST lookup on every Send. |
+| Audit trail | hu: Érvénytelen CST slot + AuthCode quarantine események naplózva. / en: Invalid CST slot + AuthCode quarantine events logged. |
 
 **CFPU:**
-> hu: A célcore mailbox-edge HW unit ellenőrzi az HMAC-ot (NEM az interconnect router). Hamis HMAC → drop + fail-stop + AuthCode quarantine. Részletek: [osreq-007](osreq-to-cfpu/osreq-007-actor-ref-format-hu.md), [trust-model-hu.md](trust-model-hu.md).
+> hu: A célcore mailbox-edge HW unit CST lookup-ot végez (NEM az interconnect router). Érvénytelen CST slot → drop + fail-stop + AuthCode quarantine. Részletek: [trust-model-hu.md](trust-model-hu.md). (**Megjegyzés:** osreq-007 OBSOLETE — a CST modell váltja fel.)
 >
-> en: The target-core mailbox-edge HW unit verifies HMAC (NOT the interconnect router). Forged HMAC → drop + fail-stop + AuthCode quarantine. Details: [osreq-007](osreq-to-cfpu/osreq-007-actor-ref-format-en.md), [trust-model-en.md](trust-model-en.md).
+> en: The target-core mailbox-edge HW unit performs CST lookup (NOT the interconnect router). Invalid CST slot → drop + fail-stop + AuthCode quarantine. Details: [trust-model-en.md](trust-model-en.md). (**Note:** osreq-007 is OBSOLETE — superseded by the CST model.)
 
 **Becsült óra / Est. hours:** ~28-36
-> hu: M2.5 Capability Registry-re épül. HMAC teljesítmény kritikus — minden Send-nél fut.
+> hu: M2.5 Capability Registry-re épül. CST lookup teljesítmény kritikus — minden Send-nél fut.
 > ~4-5 új fájl, ~300-400 sor runtime, ~400-500 sor teszt.
 >
-> en: Builds on M2.5 Capability Registry. HMAC performance is critical — runs on every Send.
+> en: Builds on M2.5 Capability Registry. CST lookup performance is critical — runs on every Send.
 > ~4-5 new files, ~300-400 lines runtime, ~400-500 lines test.
 
 ---

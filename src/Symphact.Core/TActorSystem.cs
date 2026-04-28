@@ -16,8 +16,8 @@ namespace Symphact.Core;
 /// </summary>
 public sealed class TActorSystem : IDisposable
 {
-    private readonly ConcurrentDictionary<long, TActorEntry> FActors = new();
-    private long FNextActorId;
+    private readonly ConcurrentDictionary<int, TActorEntry> FActors = new();
+    private int FNextSlotIndex;
     private bool FDisposed;
 
     /// <summary>
@@ -32,7 +32,7 @@ public sealed class TActorSystem : IDisposable
     {
         ThrowIfDisposed();
 
-        var id = Interlocked.Increment(ref FNextActorId);
+        var id = Interlocked.Increment(ref FNextSlotIndex);
         var actor = new TActorType();
         var entry = new TActorEntry(actor, actor.Init()!, (state, msg, ctx) => actor.Handle((TState)state, msg, ctx)!);
 
@@ -52,7 +52,7 @@ public sealed class TActorSystem : IDisposable
         ThrowIfDisposed();
         ArgumentNullException.ThrowIfNull(AMessage);
 
-        if (!ATarget.IsValid || !FActors.TryGetValue(ATarget.ActorId, out var entry))
+        if (!ATarget.IsValid || !FActors.TryGetValue(ATarget.SlotIndex, out var entry))
             throw new InvalidOperationException($"Invalid actor reference: {ATarget}");
 
         entry.Mailbox.Post(AMessage);
@@ -97,9 +97,9 @@ public sealed class TActorSystem : IDisposable
 
             anyProcessed = false;
 
-            foreach (var (actorId, entry) in FActors)
+            foreach (var (slotIndex, entry) in FActors)
             {
-                var context = new TActorContext(this, new TActorRef(actorId));
+                var context = new TActorContext(this, new TActorRef(slotIndex));
 
                 while (entry.Mailbox.TryReceive(out var message))
                 {
@@ -124,7 +124,7 @@ public sealed class TActorSystem : IDisposable
     {
         ThrowIfDisposed();
 
-        if (!FActors.TryGetValue(AActor.ActorId, out var entry))
+        if (!FActors.TryGetValue(AActor.SlotIndex, out var entry))
             throw new InvalidOperationException($"Unknown actor: {AActor}");
 
         return (TState)entry.State;
