@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Symphact** — capability-based actor runtime for .NET, co-designed with the Cognitive Fabric Processing Unit (CFPU). Today a reference runtime on any .NET host; tomorrow runs natively on CFPU silicon where each core is physically an actor with private SRAM and hardware mailbox FIFOs. Apache-2.0.
 
-Version: **0.1 (pre-alpha)** — the actor core (mailbox / ref / actor / system) is the first milestone; no supervision, multi-core scheduling, persistence, or distribution yet.
+Version: **0.1 (pre-alpha)** — the actor core (mailbox / ref / actor / system) and supervision (M0.3) are complete; multi-core scheduling, persistence, and distribution are deferred milestones.
 
 Sister repo: [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) (CFPU hardware, CERN-OHL-S). OS → HW feedback flows via `docs/osreq-to-cfpu/` and the `osreq-for-cfpu` issue template.
 
@@ -58,8 +58,11 @@ Three primitives form the core; understanding their contracts is enough to navig
 ### Project layout
 
 ```
-src/Symphact.Core/              runtime (only project today)
+src/Symphact.Core/              runtime + HAL interfaces (platform-agnostic, zero .NET BCL using)
+src/Symphact.Platform.DotNet/   .NET reference platform (ConcurrentQueue mailbox, no HW limits)
+src/Symphact.Platform.Cfpu/     CLI-CPU simulator bridge (stub — awaiting F4 multi-core)
 tests/Symphact.Core.Tests/      xUnit, mirrors src/ structure
+tests/Symphact.Platform.DotNet.Tests/  TMailbox tests
 samples/                        (empty — CounterActor demo is the first target)
 docs/osreq-to-cfpu/             OS→HW requirements feeding CLI-CPU
 .github/workflows/ci.yml        multi-OS build+test

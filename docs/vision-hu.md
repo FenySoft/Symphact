@@ -61,13 +61,13 @@ Ez nem „még egy OS" — ez **egy új paradigma**, amely arra épül, amit az 
 
 Eddig az aktor-alapú OS-ek **marginális nikében** maradtak, mert a szoftveres implementáció lassabb volt a hagyományos shared-memory OS-eknél. Joe Armstrong (Erlang atyja) 2014-es „The Mess We're In" előadásában pontosan erről beszélt: **szükség van egy olyan hardverre, amelynek architektúrája natívan aktor-orientált**. Akkor nem létezett ilyen — a nyílt forrású chip tervezés, a Tiny Tapeout, az eFabless Caravel mind 2020 után jelent meg.
 
-**Ma van.** A CLI-CPU cognitive fabric architektúrája az első olyan **hardveres alap**, ahol az aktor modell **nem szoftveres overhead, hanem az architektúra alapja**:
+**Ma van.** A CLI-CPU cognitive fabric architektúrája az első olyan **hardveres alap**, ahol az aktor modell **nem szoftveres overhead, hanem az architektúra alapja**. A következő jellemzők **CLI-CPU hardver-specifikusak** (a .NET referencia runtime szoftveres megfelelőkkel biztosítja ugyanezt):
 
 - Minden core **fizikailag elszigetelt** saját SRAM-mal — nincs shared memory trükk
 - A core-ok közötti üzenetküldés **hardveres mailbox FIFO-kon** megy, nem szoftveres queue-kon
 - A context switch **~5-8 ciklus** (csak a TOS cache és a PC), nem 500-2000
 - A supervisor trap **hardveres interrupt vonalon** érkezik egy másik core-nak, nem signal-alapú
-- A capability model **hardveresen** kikényszerített, nem szoftveres check
+- A capability modellt **CFPU-n a hardver kényszeríti ki; .NET hoszton a runtime biztosítja ugyanezt**
 
 Ebben az architektúrában **az aktor modell legnagyobb hátránya (a performance overhead) eltűnik**, és ami marad, az minden előnye — **sokkal erősebben, mint amit a Linux valaha is nyújthat** a backward compatibility terhe alatt.
 
@@ -280,7 +280,7 @@ while (running) {
     if (state.ShouldStop) running = false;
 }
 ```
-A `WaitForMessage()` hardveres wait-for-interrupt, tehát a core **fizikailag alszik**, ha nincs üzenet.
+A `WaitForMessage()` CFPU-n hardveres wait-for-interrupt, tehát a core **fizikailag alszik**, ha nincs üzenet; .NET hoszton a szál blokkolódik.
 
 ### 3. Run
 Az aktor üzeneteket dolgoz fel, állapotot változtat, más aktoroknak üzen. **Kooperatív multitasking**: a scheduler **nem** szakítja félbe az üzenet-feldolgozást (kivéve, ha egy watchdog timer triggerel).
@@ -404,7 +404,7 @@ A CST slot-ot a `capability_registry` allokálja (M2.5), és a **célcore mailbo
 ### Isolation garanciája
 
 A CLI-CPU hardveres **shared-nothing** architektúrája a következőt garantálja:
-- Egy aktor **nem** tud írni egy másik aktor memóriájába — a hardver fizikailag nem engedi
+- Egy aktor **nem** tud írni egy másik aktor memóriájába — CFPU-n a hardver fizikailag nem engedi; .NET hoszton a runtime és a nyelvi tervezés biztosítja az izolációt
 - Egy aktor **nem** tud hívni egy másik aktor kódját — csak üzeneteken keresztül
 - Egy aktor **nem** tud elérni egy perifériát, ha nem ismeri a device aktor referenciáját
 - Egy aktor **nem** tud megtévesztő üzenetet küldeni egy másik aktor nevében — a router ellenőrzi a küldő capability-jét
@@ -490,7 +490,7 @@ public class UartDevice : DeviceActor {
 
 ### Perifériák tulajdonjoga — capability
 
-Ahogy említettem: a device aktor **capability-je** dönti el, ki férhet a perifériához. Az `app_supervisor` dönt, hogy az alkalmazásoknak mely device aktor-okhoz **adja át** a capability-t. Ha egy alkalmazás nem kapott `uart_device` referenciát, **fizikailag** nem tud UART-ra írni.
+Ahogy említettem: a device aktor **capability-je** dönti el, ki férhet a perifériához. Az `app_supervisor` dönt, hogy az alkalmazásoknak mely device aktor-okhoz **adja át** a capability-t. Ha egy alkalmazás nem kapott `uart_device` referenciát, **nem tud** UART-ra írni — CFPU-n fizikailag kikényszerítve, .NET hoszton a capability modell által.
 
 ### Fájlrendszer — mint aktor service
 
@@ -760,7 +760,7 @@ A Symphact-en az **adat aktor-üzenetek** formájában érkezik és megy, és a 
 
 Nincs `pthread_mutex_lock`, `pthread_cond_wait`, `shm_open`, `mmap(MAP_SHARED)`. **Miért jobb:** ezek a primitívek **architekturálisan lehetővé teszik** a race condition-öket, dead lock-okat, data corruption-t. Évtizedek óta a **legnehezebben javítható** bugok osztálya a programozásban.
 
-Az aktor message passing **architekturálisan kizárja** ezeket. Nem nehezebbé teszi, **fizikailag lehetetlenné**. A performance, amit a shared memory ígért, a Symphact + CLI-CPU kombinációban **zero-copy mailbox** formájában megtalálható, de **anélkül** a race condition veszélye nélkül.
+Az aktor message passing **architekturálisan kizárja** ezeket. CFPU-n **fizikailag lehetetlenné teszi**; .NET hoszton az aktor modell **architektúrálisan kizárja**. A performance, amit a shared memory ígért, a Symphact + CLI-CPU kombinációban **zero-copy mailbox** formájában megtalálható, de **anélkül** a race condition veszélye nélkül.
 
 ### 5. Nem POSIX user/group permissions — helyette capability-based security
 
@@ -829,7 +829,7 @@ A modern játékok **természeténél fogva** aktor-szerűek. Az **Entity Compon
 | Input | Polling vs event | **Mailbox-alapú** |
 
 **Ami fundamentálisan jobb:**
-- **Nincs data race** az NPC-k között — a hagyományos játékok **tele vannak** szinkronizációs bugokkal, amelyek a Symphact-en **fizikailag lehetetlenek**
+- **Nincs data race** az NPC-k között — a hagyományos játékok **tele vannak** szinkronizációs bugokkal, amelyek CFPU-alapú Symphact-en **fizikailag lehetetlenek**, .NET hoszton **architektúrálisan kizártak** az aktor modell által
 - **Massively parallel AI** — egy MMO-ban 10 000 NPC? Minden NPC egy Nano core, valós párhuzamossággal. **Olyan skála**, amit a mai játékmotorok nem tudnak
 - **Deterministic multiplayer sync** — mivel minden üzenet szigorú sorrendben érkezik, és minden aktor determinisztikus, **lockstep** multiplayer szinkronizáció **natívan** megvalósítható (ami a hagyományos rendszereken nagyon nehéz)
 - **Hot modding** — új NPC viselkedések, új szabályok, új items **futás közben** tölthetők be Erlang-stílusú hot code loading-gal. A Minecraft modding ökoszisztémája ezen a modellen **exponenciálisan egyszerűbb** lenne

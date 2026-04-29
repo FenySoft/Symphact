@@ -63,11 +63,13 @@ Until now, actor-based operating systems have remained in a **marginal niche** b
 
 **Now it does.** The CLI-CPU cognitive fabric architecture is the first **hardware foundation** where the actor model is **not software overhead, but the basis of the architecture**:
 
+**On CLI-CPU hardware:**
+
 - Every core is **physically isolated** with its own SRAM -- there is no shared memory trick
 - Inter-core messaging runs on **hardware mailbox FIFOs**, not software queues
 - Context switch takes **~5-8 cycles** (just the TOS cache and the PC), not 500-2000
 - The supervisor trap arrives on a **hardware interrupt line** to another core, not signal-based
-- The capability model is **enforced in hardware**, not by software checks
+- The capability model is **enforced in hardware** on CFPU, not by software checks — on .NET hosts, the same model is enforced by the runtime
 
 In this architecture, **the actor model's biggest disadvantage (performance overhead) vanishes**, and what remains is all of its advantages -- **far stronger than what Linux could ever provide** under the burden of backward compatibility.
 
@@ -280,7 +282,7 @@ while (running) {
     if (state.ShouldStop) running = false;
 }
 ```
-`WaitForMessage()` is a hardware wait-for-interrupt, so the core **physically sleeps** when there is no message.
+`WaitForMessage()`: on CFPU, the core **physically sleeps** (hardware wait-for-interrupt); on .NET hosts, the thread yields when there is no message.
 
 ### 3. Run
 The actor processes messages, changes state, sends messages to other actors. **Cooperative multitasking**: the scheduler does **not** interrupt message processing (unless a watchdog timer triggers).
@@ -404,7 +406,7 @@ The CST slot is allocated by the `capability_registry` (M2.5), and the **target-
 ### Isolation guarantee
 
 The CLI-CPU's hardware **shared-nothing** architecture guarantees:
-- An actor **cannot** write to another actor's memory -- the hardware physically does not allow it
+- An actor **cannot** write to another actor's memory -- on CFPU the hardware physically prevents this; on .NET hosts the runtime enforces isolation by design
 - An actor **cannot** call another actor's code -- only through messages
 - An actor **cannot** access a peripheral unless it knows the device actor reference
 - An actor **cannot** send a deceptive message on behalf of another actor -- the router verifies the sender's capability
@@ -490,7 +492,7 @@ public class UartDevice : DeviceActor {
 
 ### Peripheral ownership -- capability
 
-As mentioned: the device actor's **capability** determines who can access the peripheral. The `app_supervisor` decides which application receives the capability for which device actors. If an application did not receive the `uart_device` reference, it **physically cannot** write to UART.
+As mentioned: the device actor's **capability** determines who can access the peripheral. The `app_supervisor` decides which application receives the capability for which device actors. If an application did not receive the `uart_device` reference, it **cannot** write to UART — on CFPU this is physically enforced, on .NET hosts it is enforced by the capability model in the runtime.
 
 ### Filesystem -- as an actor service
 
@@ -748,7 +750,7 @@ Instead, Symphact provides **modern alternatives**: `Spawn<Actor>()` (not `fork`
 
 ### 2. Not a monolithic kernel -- instead, an actor hierarchy
 
-No kernel space, no user space, no system call overhead. **Why this is better:** the kernel/user mode switch costs ~1000 cycles on every system call, and Spectre/Meltdown/L1TF all attempt to cross privilege boundaries. On Symphact **there are no such boundaries** -- every component is an actor, and hardware shared-nothing isolation guarantees what other OSes provide via kernel/user mode switching. An actor cannot write to another actor's memory **not because the kernel stops it**, but because **no such physical path exists**.
+No kernel space, no user space, no system call overhead. **Why this is better:** the kernel/user mode switch costs ~1000 cycles on every system call, and Spectre/Meltdown/L1TF all attempt to cross privilege boundaries. On Symphact **there are no such boundaries** -- every component is an actor, and hardware shared-nothing isolation guarantees what other OSes provide via kernel/user mode switching. An actor cannot write to another actor's memory **not because the kernel stops it**, but because **on CFPU, no such physical path exists; on .NET hosts, the actor model enforces this architecturally**.
 
 ### 3. Not a global filesystem scheme -- instead, a structured storage service
 
@@ -760,7 +762,7 @@ On Symphact, **data arrives and departs as actor messages**, and the "storage se
 
 There is no `pthread_mutex_lock`, `pthread_cond_wait`, `shm_open`, `mmap(MAP_SHARED)`. **Why this is better:** these primitives **architecturally enable** race conditions, deadlocks, and data corruption. For decades, they have been the **hardest class of bugs to fix** in programming.
 
-Actor message passing **architecturally excludes** these. It does not make them harder -- it makes them **physically impossible**. The performance that shared memory promised is available in the Symphact + CLI-CPU combination as **zero-copy mailbox**, but **without** the risk of race conditions.
+Actor message passing **architecturally excludes** these. It does not make them harder -- on CFPU it makes them **physically impossible**; on .NET hosts the actor model architecturally excludes them. The performance that shared memory promised is available in the Symphact + CLI-CPU combination as **zero-copy mailbox**, but **without** the risk of race conditions.
 
 ### 5. Not POSIX user/group permissions -- instead, capability-based security
 
@@ -829,7 +831,7 @@ Modern games are **actor-like by nature**. The **Entity Component System (ECS)**
 | Input | Polling vs event | **Mailbox-based** |
 
 **What is fundamentally better:**
-- **No data races** between NPCs -- traditional games are **full of** synchronization bugs that on Symphact are **physically impossible**
+- **No data races** between NPCs -- traditional games are **full of** synchronization bugs that on CFPU-based Symphact are **physically impossible**, and on .NET hosts are **architecturally excluded** by the actor model
 - **Massively parallel AI** -- 10,000 NPCs in an MMO? Every NPC on its own Nano core, with real parallelism. **A scale** that today's game engines cannot achieve
 - **Deterministic multiplayer sync** -- since every message arrives in strict order and every actor is deterministic, **lockstep** multiplayer synchronization is **natively** achievable (which is very difficult on traditional systems)
 - **Hot modding** -- new NPC behaviors, new rules, new items can be **loaded at runtime** with Erlang-style hot code loading. The Minecraft modding ecosystem would be **exponentially simpler** on this model

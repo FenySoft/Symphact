@@ -1,7 +1,7 @@
 # Symphact
 
 > **Capability-based actor runtime for secure .NET computing — co-designed with the Cognitive Fabric Processing Unit (CFPU).**
-> Every entity is an actor. Communication happens exclusively through messages. Hardware-enforced isolation, formal verifiability, and co-evolution with open silicon.
+> Every entity is an actor. Communication happens exclusively through messages. Software-enforced isolation on .NET hosts, hardware-enforced on CFPU. Formal verifiability and co-evolution with open silicon.
 
 > Magyar verzió: [README-hu.md](README-hu.md)
 
@@ -11,7 +11,7 @@
 
 Symphact is a **capability-based actor runtime** for .NET, built on a simple idea:
 
-> Every stateful entity is an actor. Actors communicate exclusively through immutable messages over mailboxes. Isolation is a hardware property, not a software convention.
+> Every stateful entity is an actor. Actors communicate exclusively through immutable messages over mailboxes. Isolation is enforced by the runtime on .NET hosts, and as a hardware property on CFPU.
 
 Today, Symphact runs on **any .NET host** (Windows, Linux, macOS) as a reference runtime. Tomorrow, it will run natively on the **Cognitive Fabric Processing Unit (CFPU)** — a new category of processing unit where each core is physically an actor, with private SRAM and hardware mailbox FIFOs.
 

@@ -1,7 +1,7 @@
 # Symphact
 
 > **Capability-alapú aktor runtime biztonságos .NET számításhoz — co-designed a Cognitive Fabric Processing Unit (CFPU) hardverrel.**
-> Minden entitás aktor. A kommunikáció kizárólag üzenetküldéssel történik. Hardveresen kikényszerített izoláció, formális verifikálhatóság, és közös fejlődés a nyílt szilíciummal.
+> Minden entitás aktor. A kommunikáció kizárólag üzenetküldéssel történik. .NET hoszton szoftveres, CFPU-n hardveres izoláció. Formális verifikálhatóság, és közös fejlődés a nyílt szilíciummal.
 
 > English version: [README.md](README.md)
 
@@ -11,7 +11,7 @@
 
 A Symphact egy **capability-alapú aktor runtime** .NET-re, egyetlen egyszerű elvre építve:
 
-> Minden állapot-tartó entitás egy aktor. Az aktorok kizárólag immutable üzenetekkel kommunikálnak, mailbox-okon keresztül. Az izoláció **hardveres tulajdonság**, nem szoftveres konvenció.
+> Minden állapot-tartó entitás egy aktor. Az aktorok kizárólag immutable üzenetekkel kommunikálnak, mailbox-okon keresztül. Az izolációt .NET hoszton a runtime biztosítja, CFPU-n a **hardver kényszeríti ki**.
 
 Ma a Symphact **bármely .NET hoszton** (Windows, Linux, macOS) fut referencia runtime-ként. Holnap natívan fog futni a **Cognitive Fabric Processing Unit (CFPU)** hardveren — egy új kategóriájú feldolgozó egységen, ahol minden core **fizikailag egy aktor**, saját privát SRAM-mal és hardveres mailbox FIFO-kkal.
 
