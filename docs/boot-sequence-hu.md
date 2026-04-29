@@ -1,5 +1,7 @@
 # Symphact Boot Sequence
 
+> English version: [boot-sequence-en.md](boot-sequence-en.md)
+
 > A Symphact indulási folyamata — a hardveres boot **után**, az első alkalmazás actor-ig.
 
 > Version: 1.0
