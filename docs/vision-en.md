@@ -908,7 +908,7 @@ Symphact provides **architectural** defense:
 - The agent **cannot** reach other actors beyond those whose references it holds
 - A supervisor actor can **monitor** agent behavior and **shut it down** if it detects anomalies
 
-This means that **no matter how prompt injection tricks an LLM**, Symphact **physically does not allow** the desired malicious operation to be carried out. **This is an entirely new security paradigm for AI agents.**
+This means that **no matter how prompt injection tricks an LLM**, Symphact **does not allow** the desired malicious operation to be carried out — enforced in software on .NET hosts, and **physically in hardware** on CFPU. **This is an entirely new security paradigm for AI agents.**
 
 ##### (6) Federated / distributed learning natively
 

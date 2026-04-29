@@ -908,7 +908,7 @@ A Symphact **architekturális** védelmet ad:
 - Az agent **nem tudja** elérni más aktorokat, csak azokat, akiknek referenciáját birtokolja
 - Egy supervisor aktor **megfigyelheti** az agent viselkedését és **leállíthatja**, ha anomáliát észlel
 
-Ez azt jelenti, hogy **akárhogyan is rávesznek egy LLM-et prompt injection-nel**, a Symphact **fizikailag nem engedi**, hogy a kívánt rosszindulatú műveletet végrehajtsa. **Ez egy teljesen új biztonsági paradigma az AI agent-eknek.**
+Ez azt jelenti, hogy **akárhogyan is rávesznek egy LLM-et prompt injection-nel**, a Symphact **nem engedi**, hogy a kívánt rosszindulatú műveletet végrehajtsa — .NET hoszton szoftveresen, CFPU-n pedig **fizikailag, hardveresen** kényszerítve. **Ez egy teljesen új biztonsági paradigma az AI agent-eknek.**
 
 ##### (6) Federated / distributed learning natívan
 
