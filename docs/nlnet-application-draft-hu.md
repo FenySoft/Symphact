@@ -45,7 +45,7 @@ A Symphact négy bizonyított ötletet kombinál egy runtime-ban, modern alapoko
 
 1. **Supervision + Scheduler (M1):** `ISupervisorStrategy` implementáció (OneForOne, AllForOne), lifecycle hookok (`PreStart`, `PostStop`, `PreRestart`, `PostRestart`), `IScheduler` + `TRoundRobinScheduler` + `TDedicatedThreadScheduler`. Deliverable: ~80+ új xUnit teszt, let-it-crash + supervision tree end-to-end működéssel.
 
-2. **Kernel aktorok + capability biztonság (M2):** `capability_registry` HMAC-aláírt token-ekkel, `router` location transparency-vel, persistencia event sourcing-gal (állapot túléli a restart-ot). Deliverable: capability-alapú üzenet routing revocation + delegation támogatással.
+2. **Kernel aktorok + capability biztonság (M2):** `capability_registry` CST-alapú capability token-ekkel (CFPU-n HW-managed, .NET hoszton szoftveresen), `router` location transparency-vel, persistencia event sourcing-gal (állapot túléli a restart-ot). Deliverable: capability-alapú üzenet routing revocation + delegation támogatással.
 
 3. **Első device aktorok + referencia app (M3):** `uart_device`, `gpio_device`, `timer_device` aktorok .NET host-on szimulált MMIO réteggel. Első end-to-end demó: elosztott számláló 4 core-on keresztül, a CLI-CPU referencia szimulátoron keresztül (a készülő `FenySoft.CilCpu.Sim` NuGet csomaggal). Deliverable: reprodukálható referencia alkalmazás dokumentációval.
 
@@ -88,7 +88,7 @@ A Symphact projekt 2026 áprilisában kezdődött, és ~14 óra fókuszált TDD 
 | Mérföldkő | Leírás | Óra | Összeg | Időkeret |
 |-----------|--------|-----|--------|----------|
 | **M1: Supervision + Scheduler** (M0.3-M0.4) | `ISupervisorStrategy` (OneForOne/AllForOne), lifecycle hookok, aktor hierarchia, `IScheduler` round-robin + dedicated-thread variánsokkal. ~80+ új xUnit teszt. | ~65ó | €6,000 | 1-4. hónap |
-| **M2: Persistencia + Location Transparency** (M0.5-M0.7) | Event-sourcing persistencia, capability registry HMAC tokenekkel, router revocation + delegation támogatással. ~60+ új teszt. | ~85ó | €7,000 | 3-8. hónap |
+| **M2: Persistencia + Location Transparency** (M0.5-M0.7) | Event-sourcing persistencia, capability registry CST-alapú tokenekkel, router revocation + delegation támogatással. ~60+ új teszt. | ~85ó | €7,000 | 3-8. hónap |
 | **M3: Kernel aktorok + Device aktorok** (M2.1-M3.2) | `memory_manager`, `hot_code_loader` alap, első device aktorok (`uart_device`, `gpio_device`, `timer_device`) szimulált MMIO-n. ~50+ új teszt. | ~60ó | €5,500 | 6-11. hónap |
 | **M4: CFPU integrációs demó** | End-to-end demó: elosztott számláló aktor 4 szimulált CFPU core-on keresztül a `FenySoft.CilCpu.Sim` NuGet segítségével. 3-5 konkrét HW követelmény felfedezése, `osreq-to-cfpu` issue-ként iktatva. | ~35ó | €3,500 | 9-12. hónap |
 | **M5: Developer experience + dokumentáció** | NuGet csomag publikáció (Symphact.Core), CLI eszköz (`symphactos-cli`), angol architektúra dokumentáció, contribution guide, 3 blogposzt, lightning talk egy .NET konferencián. | ~70ó | €5,500 | Folyamatos |
@@ -149,7 +149,7 @@ A projektnek **útvonala van az önfenntartáshoz a 3. évre**, folyamatos grant
 
 ## Jelentős technikai kihívások
 
-1. **Capability token hamisítás-ellenállás:** A `TActorRef` struct `HMAC-CapabilityTag`-et hordoz. A kihívás: capability tokenek generálása, verifikálása és visszavonása trusted execution environment nélkül (a CLI-CPU szilícium végül biztosítani fogja, de az első év szoftver host-okat céloz). Mitigáció: HMAC-SHA256 runtime-generált kulccsal egy átlátszatlan registry aktorban tárolva; formális specifikáció a threat model-re.
+1. **Capability token hamisítás-ellenállás:** A `TActorRef` struct egy opaque CST (Capability Slot Table) index. CFPU hardveren a capability-k HW-managed QRAM-ban (Quench-RAM) élnek; .NET hoszton a kihívás a capability tokenek generálása, verifikálása és visszavonása trusted execution environment nélkül. Mitigáció: CST-alapú capability registry aktor runtime-managed slot allokációval; formális specifikáció a threat model-re.
 
 2. **Supervisor restart szemantika shared-memory host-okon:** Az Erlang "restart"-ja feltételezi, hogy az aktor állapot izolált (külön heap). Egy .NET shared-GC host-on az aktor újraindítása gondos állapot-tisztítást igényel cross-actor szivárgások megelőzésére. Kihívás: tiszta restart határok teljesítmény kompromittálása nélkül. Mitigáció: per-actor arena allokátorok (ArrayPool-backed) + explicit állapot szerializáció az M0.5-ben.
 

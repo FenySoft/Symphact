@@ -42,7 +42,7 @@ Symphact combines four proven ideas into one runtime, on a modern foundation:
 
 1. **Supervision + Scheduler (M1):** Implement `ISupervisorStrategy` (OneForOne, AllForOne), lifecycle hooks (`PreStart`, `PostStop`, `PreRestart`, `PostRestart`), `IScheduler` + `TRoundRobinScheduler` + `TDedicatedThreadScheduler`. Deliverable: ~80+ new xUnit tests, let-it-crash + supervision tree working end-to-end.
 
-2. **Kernel actors + capability security (M2):** `capability_registry` with HMAC-signed tokens, `router` with location transparency, persistence via event sourcing (state survives restart). Deliverable: capability-based message routing with revocation + delegation.
+2. **Kernel actors + capability security (M2):** `capability_registry` with CST-based capability tokens (HW-managed on CFPU, software-managed on .NET hosts), `router` with location transparency, persistence via event sourcing (state survives restart). Deliverable: capability-based message routing with revocation + delegation.
 
 3. **First device actors + reference app (M3):** `uart_device`, `gpio_device`, `timer_device` actors running on .NET host against a simulated MMIO layer. First end-to-end demo: a distributed counter across 4 cores using the CLI-CPU reference simulator (via the upcoming `FenySoft.CilCpu.Sim` NuGet package). Deliverable: reproducible reference app with docs.
 
@@ -81,7 +81,7 @@ The Symphact project itself began in April 2026, and in ~14 hours of focused TDD
 | Milestone | Description | Hours | Budget | Timeline |
 |-----------|-------------|-------|--------|----------|
 | **M1: Supervision + Scheduler** (M0.3-M0.4) | `ISupervisorStrategy` (OneForOne/AllForOne), lifecycle hooks, actor hierarchy, `IScheduler` with round-robin + dedicated-thread variants. ~80+ new xUnit tests. | ~65h | €6,000 | Month 1-4 |
-| **M2: Persistence + Location Transparency** (M0.5-M0.7) | Event-sourcing persistence, capability registry with HMAC tokens, router with revocation + delegation. ~60+ new tests. | ~85h | €7,000 | Month 3-8 |
+| **M2: Persistence + Location Transparency** (M0.5-M0.7) | Event-sourcing persistence, capability registry with CST-based tokens, router with revocation + delegation. ~60+ new tests. | ~85h | €7,000 | Month 3-8 |
 | **M3: Kernel actors + Device actors** (M2.1-M3.2) | `memory_manager`, `hot_code_loader` foundation, first device actors (`uart_device`, `gpio_device`, `timer_device`) on simulated MMIO. ~50+ new tests. | ~60h | €5,500 | Month 6-11 |
 | **M4: CFPU integration demo** | End-to-end demo: distributed counter actor across 4 simulated CFPU cores via `FenySoft.CilCpu.Sim` NuGet. Discover 3-5 concrete HW requirements, file as `osreq-to-cfpu` issues. | ~35h | €3,500 | Month 9-12 |
 | **M5: Developer experience + docs** | NuGet package publication (Symphact.Core), CLI tool (`symphactos-cli`), English architecture docs, contribution guide, 3 blog posts, lightning talk at a .NET conference. | ~70h | €5,500 | Ongoing |
@@ -136,7 +136,7 @@ The project has a **path to self-sustainability by Year 3** without reliance on 
 
 ## What are significant technical challenges you expect to solve during the project?
 
-1. **Capability token forgery resistance:** The `TActorRef` struct carries an `HMAC-CapabilityTag`. The challenge: generating, verifying, and revoking capability tokens without a trusted execution environment (the CLI-CPU silicon will eventually provide this, but the first year targets software hosts). Mitigation: HMAC-SHA256 with a runtime-generated key kept in an opaque registry actor; formal specification of the threat model.
+1. **Capability token forgery resistance:** The `TActorRef` struct is an opaque CST (Capability Slot Table) index. On CFPU hardware, capabilities are HW-managed in QRAM (Quench-RAM); on .NET hosts, the challenge is generating, verifying, and revoking capability tokens without a trusted execution environment. Mitigation: CST-based capability registry actor with runtime-managed slot allocation; formal specification of the threat model.
 
 2. **Supervisor restart semantics on shared-memory hosts:** Erlang's "restart" assumes actor state is isolated (separate heap). On a .NET shared-GC host, restarting an actor requires careful state teardown to prevent cross-actor leaks. Challenge: clean restart boundaries without compromising performance. Mitigation: per-actor arena allocators (ArrayPool-backed) + explicit state serialization in M0.5.
 
