@@ -1,17 +1,18 @@
 using System.Collections.Concurrent;
+using Symphact.Core;
 
-namespace Symphact.Core;
+namespace Symphact.Platform.DotNet;
 
 /// <summary>
 /// hu: In-memory, thread-safe FIFO mailbox implementáció. A .NET ConcurrentQueue-ra épül,
 /// amely lock-free MPMC (multi-producer multi-consumer) szemantikát biztosít. Ez a referencia
-/// implementáció tetszőleges .NET hoszton fut; a jövőbeli CFPU-backed implementációk (TMmioMailbox)
+/// implementáció tetszőleges .NET hoszton fut; a jövőbeli CFPU-backed implementációk
 /// ugyanezt az IMailbox interfészt fogják megvalósítani.
 /// <br />
 /// en: In-memory, thread-safe FIFO mailbox implementation. Built on .NET ConcurrentQueue, which
 /// provides lock-free MPMC (multi-producer multi-consumer) semantics. This reference implementation
-/// runs on any .NET host; future CFPU-backed implementations (TMmioMailbox) will implement the
-/// same IMailbox interface.
+/// runs on any .NET host; future CFPU-backed implementations will implement the same IMailbox
+/// interface.
 /// </summary>
 public sealed class TMailbox : IMailbox
 {

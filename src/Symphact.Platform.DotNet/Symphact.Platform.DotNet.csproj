@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Symphact.Platform.DotNet</RootNamespace>
+    <AssemblyName>Symphact.Platform.DotNet</AssemblyName>
+    <Description>DotNet platform implementation for the Symphact actor runtime. Fast, unconstrained mock for unit testing — uses ConcurrentQueue-based mailboxes with no hardware limits.</Description>
+    <PackageId>FenySoft.Symphact.Platform.DotNet</PackageId>
+    <PackageTags>actor;runtime;symphact;platform;dotnet</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Symphact.Core\Symphact.Core.csproj" />
+  </ItemGroup>
+
+</Project>

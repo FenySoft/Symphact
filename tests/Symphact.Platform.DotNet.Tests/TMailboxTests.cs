@@ -1,6 +1,7 @@
 using Symphact.Core;
+using Symphact.Platform.DotNet;
 
-namespace Symphact.Core.Tests;
+namespace Symphact.Platform.DotNet.Tests;
 
 /// <summary>
 /// hu: Az in-memory mailbox (TMailbox) viselkedésének tesztjei. Ez az alapköve a teljes aktor

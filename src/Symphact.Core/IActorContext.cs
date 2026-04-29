@@ -56,4 +56,55 @@ public interface IActorContext
     /// en: If AMessage is null.
     /// </exception>
     void Send(TActorRef ATarget, object AMessage);
+
+    /// <summary>
+    /// hu: Gyerek aktor létrehozása az aktuális aktorból. A gyerek szülője az aktuálisan futó
+    /// aktor lesz — ez a szülő-gyerek hierarchia alapja a supervision-höz.
+    /// <br />
+    /// en: Spawn a child actor from the current actor. The child's parent will be the currently
+    /// executing actor — this is the foundation of parent-child hierarchy for supervision.
+    /// </summary>
+    /// <typeparam name="TActorType">
+    /// hu: Az aktor típusa.
+    /// <br />
+    /// en: The actor type.
+    /// </typeparam>
+    /// <typeparam name="TState">
+    /// hu: Az aktor állapot típusa.
+    /// <br />
+    /// en: The actor state type.
+    /// </typeparam>
+    /// <returns>
+    /// hu: Az új gyerek aktor referenciája.
+    /// <br />
+    /// en: The new child actor's reference.
+    /// </returns>
+    TActorRef Spawn<TActorType, TState>()
+        where TActorType : TActor<TState>, new();
+
+    /// <summary>
+    /// hu: Egy másik aktor figyelése. Ha a figyelt aktor megáll, a figyelő TTerminated üzenetet
+    /// kap a mailboxába. Ha a cél már leállt, azonnal kézbesít.
+    /// <br />
+    /// en: Watch another actor. When the watched actor stops, the watcher receives a TTerminated
+    /// message in its mailbox. If the target is already stopped, delivers immediately.
+    /// </summary>
+    /// <param name="ATarget">
+    /// hu: A figyelendő aktor referenciája.
+    /// <br />
+    /// en: The reference of the actor to watch.
+    /// </param>
+    void Watch(TActorRef ATarget);
+
+    /// <summary>
+    /// hu: Egy korábban figyelt aktor figyelésének leállítása.
+    /// <br />
+    /// en: Stop watching a previously watched actor.
+    /// </summary>
+    /// <param name="ATarget">
+    /// hu: Az aktor referenciája, akinek figyelését le akarjuk állítani.
+    /// <br />
+    /// en: The reference of the actor to stop watching.
+    /// </param>
+    void Unwatch(TActorRef ATarget);
 }

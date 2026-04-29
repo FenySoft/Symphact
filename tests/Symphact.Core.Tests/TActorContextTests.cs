@@ -199,13 +199,13 @@ public sealed class TActorContextTests
     // ── Tests ──────────────────────────────────────────────────────────────────
 
     [Fact]
-    public async Task Context_Self_ReturnsCorrectActorRef()
+    public void Context_Self_ReturnsCorrectActorRef()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TSelfReportActor, TActorRef>();
 
         system.Send(actorRef, "report");
-        await system.DrainAsync();
+        system.Drain();
 
         var savedSelf = system.GetState<TActorRef>(actorRef);
 
@@ -213,111 +213,111 @@ public sealed class TActorContextTests
     }
 
     [Fact]
-    public async Task Context_Send_DeliversMessageToTargetActor()
+    public void Context_Send_DeliversMessageToTargetActor()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var counterRef = system.Spawn<TCounterActor, int>();
         var forwarderRef = system.Spawn<TForwarderActor, TForwarderState>();
 
         system.Send(forwarderRef, new TSetPartnerMsg(counterRef));
         system.Send(forwarderRef, "increment");
-        await system.DrainAsync();
+        system.Drain();
 
         Assert.Equal(1, system.GetState<int>(counterRef));
     }
 
     [Fact]
-    public async Task Context_Send_PingPong_MultiRound()
+    public void Context_Send_PingPong_MultiRound()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var pingRef = system.Spawn<TPingActor, TPingPongState>();
         var pongRef = system.Spawn<TPongActor, TPingPongState>();
 
         system.Send(pingRef, new TSetPartnerMsg(pongRef));
         system.Send(pongRef, new TSetPartnerMsg(pingRef));
-        await system.DrainAsync();
+        system.Drain();
 
         system.Send(pingRef, "start");
-        await system.DrainAsync();
+        system.Drain();
 
         Assert.Equal(5, system.GetState<TPingPongState>(pingRef).Count);
         Assert.Equal(5, system.GetState<TPingPongState>(pongRef).Count);
     }
 
     [Fact]
-    public async Task Context_Send_ChainForwarding_ThreeActors()
+    public void Context_Send_ChainForwarding_ThreeActors()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var cRef = system.Spawn<TCounterActor, int>();
         var bRef = system.Spawn<TForwarderActor, TForwarderState>();
         var aRef = system.Spawn<TForwarderActor, TForwarderState>();
 
         system.Send(bRef, new TSetPartnerMsg(cRef));
         system.Send(aRef, new TSetPartnerMsg(bRef));
-        await system.DrainAsync();
+        system.Drain();
 
         system.Send(aRef, "increment");
-        await system.DrainAsync();
+        system.Drain();
 
         Assert.Equal(1, system.GetState<int>(cRef));
     }
 
     [Fact]
-    public async Task Context_Send_DisposedSystem_ThrowsObjectDisposedException()
+    public void Context_Send_DisposedSystem_ThrowsObjectDisposedException()
     {
-        var system = new TActorSystem();
+        var system = new TActorSystem(new TDotNetPlatform());
         system.Spawn<TCounterActor, int>();
         system.Dispose();
 
-        await Assert.ThrowsAsync<ObjectDisposedException>(() => system.DrainAsync());
+        Assert.Throws<ObjectDisposedException>(() => system.Drain());
     }
 
     [Fact]
-    public async Task Context_Send_InvalidRef_ThrowsInvalidOperationException()
+    public void Context_Send_InvalidRef_ThrowsInvalidOperationException()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var badRef = system.Spawn<TBadRefSendActor, int>();
 
         system.Send(badRef, "trigger");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => system.DrainAsync());
+        Assert.Throws<InvalidOperationException>(() => system.Drain());
     }
 
     [Fact]
-    public async Task Context_Send_NullMessage_ThrowsArgumentNullException()
+    public void Context_Send_NullMessage_ThrowsArgumentNullException()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var targetRef = system.Spawn<TCounterActor, int>();
         var senderRef = system.Spawn<TNullMsgSendActor, TActorRef>();
 
         system.Send(senderRef, new TSetPartnerMsg(targetRef));
-        await system.DrainAsync();
+        system.Drain();
 
         system.Send(senderRef, "go");
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => system.DrainAsync());
+        Assert.Throws<ArgumentNullException>(() => system.Drain());
     }
 
     [Fact]
-    public async Task DrainAsync_CircularSend_RespectsMaxRounds()
+    public void DrainAsync_CircularSend_RespectsMaxRounds()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var aRef = system.Spawn<TInfiniteEchoActor, TActorRef>();
         var bRef = system.Spawn<TInfiniteEchoActor, TActorRef>();
 
         system.Send(aRef, new TSetPartnerMsg(bRef));
         system.Send(bRef, new TSetPartnerMsg(aRef));
-        await system.DrainAsync();
+        system.Drain();
 
         system.Send(aRef, "ping");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => system.DrainAsync(AMaxRounds: 10));
+        Assert.Throws<InvalidOperationException>(() => system.Drain(AMaxRounds: 10));
     }
 
     [Fact]
-    public async Task DrainAsync_WithContextSend_ProcessesMultipleRounds()
+    public void DrainAsync_WithContextSend_ProcessesMultipleRounds()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var cRef = system.Spawn<TCounterActor, int>();
         var bRef = system.Spawn<TForwarderActor, TForwarderState>();
         var aRef = system.Spawn<TForwarderActor, TForwarderState>();
@@ -325,43 +325,43 @@ public sealed class TActorContextTests
         system.Send(bRef, new TSetPartnerMsg(cRef));
         system.Send(aRef, new TSetPartnerMsg(bRef));
         system.Send(aRef, "increment");
-        await system.DrainAsync();
+        system.Drain();
 
         Assert.Equal(1, system.GetState<int>(cRef));
     }
 
     [Fact]
-    public async Task DrainAsync_AMaxRoundsZero_ThrowsImmediately()
+    public void DrainAsync_AMaxRoundsZero_ThrowsImmediately()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
 
         system.Send(actorRef, "increment");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => system.DrainAsync(AMaxRounds: 0));
+        Assert.Throws<InvalidOperationException>(() => system.Drain(AMaxRounds: 0));
     }
 
     [Fact]
-    public async Task DrainAsync_AMaxRoundsNegative_ThrowsImmediately()
+    public void DrainAsync_AMaxRoundsNegative_ThrowsImmediately()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
 
         system.Send(actorRef, "increment");
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => system.DrainAsync(AMaxRounds: -1));
+        Assert.Throws<InvalidOperationException>(() => system.Drain(AMaxRounds: -1));
     }
 
     [Fact]
-    public async Task Context_Self_DifferentForEachActor()
+    public void Context_Self_DifferentForEachActor()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var aRef = system.Spawn<TSelfReportActor, TActorRef>();
         var bRef = system.Spawn<TSelfReportActor, TActorRef>();
 
         system.Send(aRef, "report");
         system.Send(bRef, "report");
-        await system.DrainAsync();
+        system.Drain();
 
         var aSelf = system.GetState<TActorRef>(aRef);
         var bSelf = system.GetState<TActorRef>(bRef);

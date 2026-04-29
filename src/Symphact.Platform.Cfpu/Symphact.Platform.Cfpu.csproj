@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Symphact.Platform.Cfpu</RootNamespace>
+    <AssemblyName>Symphact.Platform.Cfpu</AssemblyName>
+    <Description>CFPU hardware platform bridge for the Symphact actor runtime. Connects to the CLI-CPU golden reference simulator (CilCpu.Sim) for hardware-fidelity integration testing.</Description>
+    <PackageId>FenySoft.Symphact.Platform.Cfpu</PackageId>
+    <PackageTags>actor;runtime;symphact;platform;cfpu;simulator</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Symphact.Core\Symphact.Core.csproj" />
+  </ItemGroup>
+
+</Project>

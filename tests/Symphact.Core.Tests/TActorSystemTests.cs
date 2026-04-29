@@ -31,7 +31,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void Spawn_ReturnsValidActorRef()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
 
         var actorRef = system.Spawn<TCounterActor, int>();
 
@@ -41,7 +41,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void Spawn_Twice_ReturnsDifferentRefs()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
 
         var a = system.Spawn<TCounterActor, int>();
         var b = system.Spawn<TCounterActor, int>();
@@ -52,7 +52,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void GetState_InitialValue_IsFromInit()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
 
         var state = system.GetState<int>(actorRef);
@@ -61,56 +61,56 @@ public sealed class TActorSystemTests
     }
 
     [Fact]
-    public async Task Send_SingleMessage_AdvancesState()
+    public void Send_SingleMessage_AdvancesState()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
 
         system.Send(actorRef, "increment");
-        await system.DrainAsync();
+        system.Drain();
 
         Assert.Equal(1, system.GetState<int>(actorRef));
     }
 
     [Fact]
-    public async Task Send_MultipleMessages_AccumulatesState()
+    public void Send_MultipleMessages_AccumulatesState()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
 
         system.Send(actorRef, "increment");
         system.Send(actorRef, "increment");
         system.Send(actorRef, "increment");
         system.Send(actorRef, "decrement");
-        await system.DrainAsync();
+        system.Drain();
 
         Assert.Equal(2, system.GetState<int>(actorRef));
     }
 
     [Fact]
-    public async Task Send_UnknownMessage_LeavesStateUnchanged()
+    public void Send_UnknownMessage_LeavesStateUnchanged()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
 
         system.Send(actorRef, "increment");
         system.Send(actorRef, "some-unknown-command");
-        await system.DrainAsync();
+        system.Drain();
 
         Assert.Equal(1, system.GetState<int>(actorRef));
     }
 
     [Fact]
-    public async Task Send_IsolatesStateBetweenActors()
+    public void Send_IsolatesStateBetweenActors()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var a = system.Spawn<TCounterActor, int>();
         var b = system.Spawn<TCounterActor, int>();
 
         system.Send(a, "increment");
         system.Send(a, "increment");
         system.Send(b, "increment");
-        await system.DrainAsync();
+        system.Drain();
 
         Assert.Equal(2, system.GetState<int>(a));
         Assert.Equal(1, system.GetState<int>(b));
@@ -119,7 +119,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void Send_ToInvalidRef_Throws()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
 
         Assert.Throws<InvalidOperationException>(() =>
             system.Send(TActorRef.Invalid, "x"));
@@ -128,7 +128,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void Send_NullMessage_Throws()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
 
         Assert.Throws<ArgumentNullException>(() =>
@@ -138,7 +138,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void GetState_AfterShutdown_Throws()
     {
-        var system = new TActorSystem();
+        var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
 
         system.Dispose();
@@ -148,12 +148,12 @@ public sealed class TActorSystemTests
     }
 
     [Fact]
-    public async Task DrainAsync_WithoutMessages_CompletesImmediately()
+    public void DrainAsync_WithoutMessages_CompletesImmediately()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
 
-        await system.DrainAsync();
+        system.Drain();
 
         Assert.Equal(0, system.GetState<int>(actorRef));
     }
@@ -161,7 +161,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void GetState_UnknownRef_Throws()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
 
         Assert.Throws<InvalidOperationException>(() =>
             system.GetState<int>(new TActorRef(9999)));
@@ -170,7 +170,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void Dispose_CalledTwice_DoesNotThrow()
     {
-        var system = new TActorSystem();
+        var system = new TActorSystem(new TDotNetPlatform());
         system.Spawn<TCounterActor, int>();
 
         system.Dispose();
@@ -180,7 +180,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void Spawn_AfterDispose_ThrowsObjectDisposedException()
     {
-        var system = new TActorSystem();
+        var system = new TActorSystem(new TDotNetPlatform());
         system.Dispose();
 
         Assert.Throws<ObjectDisposedException>(() =>
@@ -190,7 +190,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void Send_AfterDispose_ThrowsObjectDisposedException()
     {
-        var system = new TActorSystem();
+        var system = new TActorSystem(new TDotNetPlatform());
         var actorRef = system.Spawn<TCounterActor, int>();
         system.Dispose();
 
@@ -201,7 +201,7 @@ public sealed class TActorSystemTests
     [Fact]
     public void Send_ToNonExistentButValidRef_Throws()
     {
-        using var system = new TActorSystem();
+        using var system = new TActorSystem(new TDotNetPlatform());
 
         var fakeRef = new TActorRef(999);
 

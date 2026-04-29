@@ -43,4 +43,15 @@ public readonly struct TActorContext : IActorContext
 
     /// <inheritdoc />
     public void Send(TActorRef ATarget, object AMessage) => FSystem.Send(ATarget, AMessage);
+
+    /// <inheritdoc />
+    public TActorRef Spawn<TActorType, TState>()
+        where TActorType : TActor<TState>, new()
+        => FSystem.SpawnChild<TActorType, TState>(Self);
+
+    /// <inheritdoc />
+    public void Watch(TActorRef ATarget) => FSystem.WatchActor(Self, ATarget);
+
+    /// <inheritdoc />
+    public void Unwatch(TActorRef ATarget) => FSystem.UnwatchActor(Self, ATarget);
 }

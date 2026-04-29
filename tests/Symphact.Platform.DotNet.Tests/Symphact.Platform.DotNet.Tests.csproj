@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <RootNamespace>Symphact.Core.Tests</RootNamespace>
-    <AssemblyName>Symphact.Core.Tests</AssemblyName>
+    <RootNamespace>Symphact.Platform.DotNet.Tests</RootNamespace>
+    <AssemblyName>Symphact.Platform.DotNet.Tests</AssemblyName>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>

@@ -61,4 +61,61 @@ public abstract class TActor<TState>
     /// en: The new actor state after the message.
     /// </returns>
     public abstract TState Handle(TState AState, object AMessage, IActorContext AContext);
+
+    /// <summary>
+    /// hu: A supervisor stratégia, amelyet ez az aktor alkalmaz a gyerekei hibáira.
+    /// Felüldefiniálható egyedi stratégiához. null = az alapértelmezett rendszer-szintű viselkedés
+    /// (root aktoroknál a hiba eszkalálódik/kidobódik).
+    /// <br />
+    /// en: The supervisor strategy this actor applies to its children's failures.
+    /// Override for a custom strategy. null = default system-level behaviour
+    /// (for root actors the failure escalates/throws).
+    /// </summary>
+    public virtual ISupervisorStrategy? SupervisorStrategy => null;
+
+    /// <summary>
+    /// hu: Az aktor indításakor hívódik, közvetlenül az Init() után. Felüldefiniálható
+    /// egyszeri inicializációs logikához (pl. erőforrás-foglalás, timer indítás).
+    /// <br />
+    /// en: Called when the actor starts, immediately after Init(). Override for one-time
+    /// initialisation logic (e.g. resource acquisition, timer start).
+    /// </summary>
+    public virtual void PreStart() { }
+
+    /// <summary>
+    /// hu: Az aktor végleges leállításakor hívódik. Felüldefiniálható erőforrás-felszabadításhoz.
+    /// Restart NEM hívja — csak végleges stop.
+    /// <br />
+    /// en: Called when the actor is permanently stopped. Override for resource cleanup.
+    /// Restart does NOT call this — only permanent stop.
+    /// </summary>
+    public virtual void PostStop() { }
+
+    /// <summary>
+    /// hu: Újraindítás előtt hívódik, a régi állapot törlése előtt. Lehetőséget ad a
+    /// hibás állapot mentésére, logolásra, vagy erőforrás-felszabadításra.
+    /// <br />
+    /// en: Called before restart, before the old state is cleared. Provides opportunity
+    /// for saving error state, logging, or resource cleanup.
+    /// </summary>
+    /// <param name="AException">
+    /// hu: Az újraindítást okozó kivétel.
+    /// <br />
+    /// en: The exception that caused the restart.
+    /// </param>
+    public virtual void PreRestart(Exception AException) { }
+
+    /// <summary>
+    /// hu: Újraindítás után hívódik, az új Init() állapot beállítása után. Lehetőséget ad
+    /// az újrainicializálásra az újraindítás kontextusában.
+    /// <br />
+    /// en: Called after restart, after the new Init() state is set. Provides opportunity
+    /// for re-initialisation in the restart context.
+    /// </summary>
+    /// <param name="AException">
+    /// hu: Az újraindítást okozó kivétel.
+    /// <br />
+    /// en: The exception that caused the restart.
+    /// </param>
+    public virtual void PostRestart(Exception AException) { }
 }
