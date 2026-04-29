@@ -59,7 +59,12 @@ This is not "yet another OS" -- it is **a new paradigm** built on what **Erlang/
 
 ### Why now, and why this moment
 
-Until now, actor-based operating systems have remained in a **marginal niche** because the software implementation was slower than traditional shared-memory OSes. Joe Armstrong (the father of Erlang) spoke precisely about this in his 2014 talk "The Mess We're In": **there is a need for hardware whose architecture is natively actor-oriented**. Back then it did not exist -- open-source chip design, Tiny Tapeout, eFabless Caravel all appeared after 2020.
+Until now, actor-based operating systems have remained in a **marginal niche** because the software implementation was slower than traditional shared-memory OSes. Joe Armstrong (co-creator of Erlang) used his 2014 Strange Loop keynote "The Mess We're In" to diagnose the exponential growth of software complexity and the accumulating entropy of poor abstractions. In separate talks and interviews he argued that message-passing concurrency is "a physical model of the world" and that hardware should natively support isolated, message-passing units -- Carl Hewitt (creator of the Actor Model) articulated a similar vision of chips with tens of thousands of cores and nanosecond-scale message passing. Back then no such hardware existed -- open-source chip design, Tiny Tapeout, eFabless Caravel all appeared after 2020. (Sources: Armstrong keynote [YouTube][arm-yt] · [transcript][arm-tr], Armstrong [interview][arm-iv], Hewitt–Armstrong–Hoare [panel][hah-panel].)
+
+[arm-yt]: https://www.youtube.com/watch?v=lKXe3HUG2l4
+[arm-tr]: https://github.com/strangeloop/StrangeLoop2014/blob/master/transcripts/Armstrong-OpeningAndKeynote.txt
+[arm-iv]: https://www.erlang-solutions.com/blog/lets-talkconcurrency-with-joe-armstrong/
+[hah-panel]: https://www.erlang-solutions.com/blog/lets-talkconcurrency-panel-discussion-with-sir-tony-hoare-joe-armstrong-and-carl-hewitt/
 
 **Now it does.** The CLI-CPU cognitive fabric architecture is the first **hardware foundation** where the actor model is **not software overhead, but the basis of the architecture**:
 
@@ -1020,11 +1025,18 @@ If all planned directions succeed:
 - **AI operating system** -- ML-driven scheduler, memory manager, self-optimizing kernel, **from 2035**
 - **Post-quantum cryptography in hardware** -- post-quantum algorithms in isolated environments, **from 2030**
 
-### "The Mess We're In" ten years later
+### The Armstrong–Hewitt vision, a decade later
 
-**Joe Armstrong, the father of Erlang, gave a talk in 2014 titled "The Mess We're In"**, where he explained that current software systems are built on **fundamentally wrong** models, and a new paradigm is needed that takes the Erlang actor model as a natural foundation. **He said there is a need for hardware where every core is an actor.** At the time it seemed unreachable, because **there was no hardware** that natively supported this.
+**Joe Armstrong** (co-creator of Erlang) and **Carl Hewitt** (creator of the Actor Model) articulated, across decades and in various forums, the idea that solving the fundamental complexity problems of software requires hardware that natively supports isolated, message-passing units.
 
-**Now there is.** The CLI-CPU cognitive fabric architecture is the first hardware that **physically makes** the Armstrong vision **possible**. And Symphact is the operating system we are building on that hardware.
+In his 2014 Strange Loop keynote ("The Mess We're In"), Armstrong spoke about the accumulating entropy of software complexity -- how systems have not improved proportionally to hardware advances, and how fundamental abstractions (filesystems, naming, shared memory) structurally accumulate disorder. In separate talks and interviews he argued that message-passing concurrency is "the natural physical model of the world" and that hardware should support this paradigm natively. Hewitt similarly articulated a vision of chips with tens of thousands of cores and nanosecond-scale message passing.
+
+**Sources:**
+- Armstrong keynote (2014, Strange Loop): [YouTube](https://www.youtube.com/watch?v=lKXe3HUG2l4) · [transcript](https://github.com/strangeloop/StrangeLoop2014/blob/master/transcripts/Armstrong-OpeningAndKeynote.txt)
+- Armstrong on message-passing concurrency: [Let's Talk Concurrency interview](https://www.erlang-solutions.com/blog/lets-talkconcurrency-with-joe-armstrong/)
+- Hewitt–Armstrong–Hoare panel (tens of thousands of cores, 10 ns message passing): [Erlang Solutions](https://www.erlang-solutions.com/blog/lets-talkconcurrency-panel-discussion-with-sir-tony-hoare-joe-armstrong-and-carl-hewitt/)
+
+**No such hardware existed then.** Now it does. The CLI-CPU cognitive fabric architecture is the first hardware that **physically makes** this vision **possible** -- every core is isolated with its own SRAM and hardware mailbox FIFOs. And Symphact is the operating system we are building on that hardware.
 
 ### The real stakes
 

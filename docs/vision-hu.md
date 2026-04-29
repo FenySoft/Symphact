@@ -59,7 +59,12 @@ Ez nem „még egy OS" — ez **egy új paradigma**, amely arra épül, amit az 
 
 ### Miért most, és miért ez a pillanat
 
-Eddig az aktor-alapú OS-ek **marginális nikében** maradtak, mert a szoftveres implementáció lassabb volt a hagyományos shared-memory OS-eknél. Joe Armstrong (Erlang atyja) 2014-es „The Mess We're In" előadásában pontosan erről beszélt: **szükség van egy olyan hardverre, amelynek architektúrája natívan aktor-orientált**. Akkor nem létezett ilyen — a nyílt forrású chip tervezés, a Tiny Tapeout, az eFabless Caravel mind 2020 után jelent meg.
+Eddig az aktor-alapú OS-ek **marginális nikében** maradtak, mert a szoftveres implementáció lassabb volt a hagyományos shared-memory OS-eknél. Joe Armstrong (az Erlang egyik társalkotója) 2014-es Strange Loop keynote-jában („The Mess We're In") a szoftverkomplexitás exponenciális növekedéséről és a rossz absztrakciók felgyülemlő entrópiájáról beszélt. Külön előadásaiban és interjúiban pedig kifejtette, hogy az üzenetküldéses konkurencia „a világ fizikai modellje", és hogy a hardvernek kellene natívan támogatnia az izolált, üzenetküldéses egységeket — Carl Hewitt (az Actor Model megalkotója) ehhez hasonló víziót fogalmazott meg tízezer core-os chipekről, nanomásodperces üzenetküldéssel. Akkor nem létezett ilyen hardver — a nyílt forrású chip tervezés, a Tiny Tapeout, az eFabless Caravel mind 2020 után jelent meg. (Források: Armstrong keynote [YouTube][arm-yt] · [átirat][arm-tr], Armstrong [interjú][arm-iv], Hewitt–Armstrong–Hoare [panel][hah-panel].)
+
+[arm-yt]: https://www.youtube.com/watch?v=lKXe3HUG2l4
+[arm-tr]: https://github.com/strangeloop/StrangeLoop2014/blob/master/transcripts/Armstrong-OpeningAndKeynote.txt
+[arm-iv]: https://www.erlang-solutions.com/blog/lets-talkconcurrency-with-joe-armstrong/
+[hah-panel]: https://www.erlang-solutions.com/blog/lets-talkconcurrency-panel-discussion-with-sir-tony-hoare-joe-armstrong-and-carl-hewitt/
 
 **Ma van.** A CLI-CPU cognitive fabric architektúrája az első olyan **hardveres alap**, ahol az aktor modell **nem szoftveres overhead, hanem az architektúra alapja**. A következő jellemzők **CLI-CPU hardver-specifikusak** (a .NET referencia runtime szoftveres megfelelőkkel biztosítja ugyanezt):
 
@@ -1018,11 +1023,18 @@ Ha minden tervezett irányban sikerül:
 - **AI operációs rendszer** — ML-vezérelt scheduler, memory manager, self-optimizing kernel, **2035-től**
 - **Kvantum-után kriptográfia hardveresen** — post-quantum algoritmusok izolált környezetben, **2030-tól**
 
-### A „The Mess We're In" 10 év múlva
+### Az Armstrong–Hewitt vízió, egy évtizeddel később
 
-**Joe Armstrong, az Erlang atyja, 2014-ben előadást tartott „The Mess We're In" címmel**, ahol elmondta, hogy a jelenlegi szoftver-rendszerek **alapjaiban rossz** modellekre épülnek, és egy új paradigma kell, amely az Erlang aktor-modelljét veszi természetes alapnak. **Azt mondta, szükség van egy olyan hardverre, ahol minden core egy aktor.** Akkor elérhetetlennek tűnt, mert **nem volt olyan hardver**, ami ezt natívan támogatná.
+**Joe Armstrong** (az Erlang egyik társalkotója) és **Carl Hewitt** (az Actor Model megalkotója) évtizedeken át, különböző fórumokon fogalmazták meg azt a gondolatot, hogy a szoftver alapvető komplexitási problémáinak megoldásához a hardvernek kellene natívan támogatnia az izolált, üzenetküldéses egységeket.
 
-**Ma van.** A CLI-CPU cognitive fabric architektúrája az első olyan hardver, amely az Armstrong-i víziót **fizikailag lehetővé teszi**. A Symphact pedig az operációs rendszer, amelyet erre a hardverre építünk.
+Armstrong 2014-es Strange Loop keynote-jában („The Mess We're In") a szoftverkomplexitás felgyülemlő entrópiájáról beszélt — arról, hogy a rendszerek nem lettek arányosan jobbak a hardver fejlődésével, és hogy az alapvető absztrakciók (fájlrendszerek, elnevezések, shared memory) strukturálisan halmozzák a rendetlenséget. Más előadásaiban és interjúiban kifejtette, hogy az üzenetküldéses konkurencia „a világ természetes fizikai modellje", és hogy a hardvernek kellene támogatnia ezt a paradigmát. Hewitt ehhez hasonlóan a tízezer core-os, nanomásodperces üzenetküldéssel működő chipek vízióját fogalmazta meg.
+
+**Források:**
+- Armstrong keynote (2014, Strange Loop): [YouTube](https://www.youtube.com/watch?v=lKXe3HUG2l4) · [átirat](https://github.com/strangeloop/StrangeLoop2014/blob/master/transcripts/Armstrong-OpeningAndKeynote.txt)
+- Armstrong az üzenetküldéses konkurenciáról: [Let's Talk Concurrency interjú](https://www.erlang-solutions.com/blog/lets-talkconcurrency-with-joe-armstrong/)
+- Hewitt–Armstrong–Hoare panel (tízezer core, 10 ns message passing): [Erlang Solutions](https://www.erlang-solutions.com/blog/lets-talkconcurrency-panel-discussion-with-sir-tony-hoare-joe-armstrong-and-carl-hewitt/)
+
+**Akkor nem létezett ilyen hardver.** Ma viszont igen. A CLI-CPU cognitive fabric architektúrája az első olyan hardver, amely ezt a víziót **fizikailag lehetővé teszi** — minden core izolált, saját SRAM-mal, hardveres mailbox FIFO-kkal. A Symphact pedig az operációs rendszer, amelyet erre a hardverre építünk.
 
 ### A valódi tét
 
