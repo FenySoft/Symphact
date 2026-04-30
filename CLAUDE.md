@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Symphact** — capability-based actor runtime for .NET, co-designed with the Cognitive Fabric Processing Unit (CFPU). Today a reference runtime on any .NET host; tomorrow runs natively on CFPU silicon where each core is physically an actor with private SRAM and hardware mailbox FIFOs. Apache-2.0.
 
-Version: **0.1 (pre-alpha)** — the actor core (mailbox / ref / actor / system) and supervision (M0.3) are complete; multi-core scheduling, persistence, and distribution are deferred milestones.
+Version: **0.1 (pre-alpha)** — the actor core (mailbox / ref / actor / system), supervision (M0.3), and the scheduler API with per-actor parallelism (M0.4 — `IScheduler`, `TInlineScheduler`, `TDedicatedThreadScheduler`) are complete; persistence and distribution are deferred milestones.
 
 Sister repo: [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) (CFPU hardware, CERN-OHL-S). OS → HW feedback flows via `docs/osreq-to-cfpu/` and the `osreq-for-cfpu` issue template.
 
@@ -44,25 +44,31 @@ Three primitives form the core; understanding their contracts is enough to navig
 
 3. **`TActor<TState>` + `TActorSystem`** (`src/Symphact.Core/TActor.cs`, `TActorSystem.cs`)
    - `TActor<TState>` abstract: `Init()` returns initial state; `Handle(state, msg)` returns new state. Handlers must be side-effect-free — the only legitimate "side-effect" (sending messages) will arrive via a future context parameter.
-   - `TActorSystem` is the runtime: `Spawn<TActorType, TState>()` → `TActorRef`; `Send(ref, msg)` enqueues; `DrainAsync()` processes every mailbox in rounds until empty (multi-round because handlers may eventually post to each other); `GetState<T>(ref)` is diagnostics-only (in a real system state is private).
-   - This is a **single-host, single-threaded reference drain**. Multi-core per-actor scheduling, supervision, persistence, remoting are deferred. Don't add them opportunistically — each is its own milestone.
+   - `TActorSystem` is the runtime: `Spawn<TActorType, TState>()` → `TActorRef`; `Send(ref, msg)` enqueues; `Drain()` processes every mailbox in rounds until empty (legacy single-threaded mode); `QuiesceAsync(timeout)` delegates to the attached scheduler (M0.4); `GetState<T>(ref)` is diagnostics-only (in a real system state is private).
+
+4. **`IScheduler` + `TInlineScheduler` / `TDedicatedThreadScheduler`** (`src/Symphact.Core/IScheduler.cs`, `TInlineScheduler.cs`, `TDedicatedThreadScheduler.cs`) — M0.4
+   - `IScheduler` decouples actor execution from the system: `Send` posts then `Signal`s the scheduler; the scheduler decides when (and on which thread) to call back via `ISchedulerHost.RunOneSlice`.
+   - `TInlineScheduler` is the synchronous, single-threaded reference impl — Drain-mode-equivalent.
+   - `TDedicatedThreadScheduler` allocates one OS thread per actor (CFPU "1 core = 1 actor" simulation), default cap **1000 actors** (configurable via ctor); uses `IMailboxSignal` (`AutoResetEvent` on .NET, WFI on CFPU).
+   - Multi-core scheduling and supervision are integrated; per-actor FIFO is preserved on every scheduler. Persistence and distribution are deferred milestones.
 
 ### Design invariants (do not violate without an architecture discussion)
 
 - **No shared memory between actors.** State lives inside the actor; messages are immutable objects crossing mailboxes.
-- **Let it crash.** Defensive error handling is an anti-pattern here; the model is supervision (not yet implemented, but its future presence informs API shape).
+- **Let it crash.** Defensive error handling is an anti-pattern here; the model is supervision.
 - **Location transparency.** `TActorRef` must not leak whether the target is local, remote, or on another chip.
-- **Determinism.** Same input sequence + same initial state → same final state. Handlers must be pure w.r.t. the state they return.
+- **Determinism (per-actor).** Each actor sees its messages in deterministic FIFO order. Under multi-threaded schedulers (e.g. `TDedicatedThreadScheduler`) the *global* interleaving across actors is non-deterministic — tests must assert end-state, not cross-actor ordering. The single-threaded `TInlineScheduler` (and `Drain`) preserve the original strict ordering.
+- **Single-threaded actor handler.** A given actor's `Handle` runs on at most one thread at any time; the scheduler enforces this. `TDedicatedThreadScheduler` trivially holds it (one thread per actor); future multi-worker schedulers must use a per-actor `Interlocked.CompareExchange` running flag.
 - **Capability = reference.** Holding a `TActorRef` is the authorization to send; there is no ambient actor lookup.
 
 ### Project layout
 
 ```
-src/Symphact.Core/              runtime + HAL interfaces (platform-agnostic, zero .NET BCL using)
-src/Symphact.Platform.DotNet/   .NET reference platform (ConcurrentQueue mailbox, no HW limits)
+src/Symphact.Core/              runtime + HAL interfaces (IScheduler, IMailboxSignal, supervision, ...)
+src/Symphact.Platform.DotNet/   .NET reference platform (ConcurrentQueue mailbox, AutoResetEvent signal)
 src/Symphact.Platform.Cfpu/     CLI-CPU simulator bridge (stub — awaiting F4 multi-core)
-tests/Symphact.Core.Tests/      xUnit, mirrors src/ structure
-tests/Symphact.Platform.DotNet.Tests/  TMailbox tests
+tests/Symphact.Core.Tests/      xUnit, mirrors src/ structure (scheduler + concurrency + stress)
+tests/Symphact.Platform.DotNet.Tests/  TMailbox + TDotNetMailboxSignal tests
 samples/                        (empty — CounterActor demo is the first target)
 docs/osreq-to-cfpu/             OS→HW requirements feeding CLI-CPU
 .github/workflows/ci.yml        multi-OS build+test

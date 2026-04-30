@@ -25,8 +25,8 @@
 |-----------|---------|-------------|-------------|
 | M0.1 | ✅ | ~6 | Közepes |
 | M0.2 | ✅ | ~8 (tény) | Közepes |
-| M0.3 | Tervezett | ~24-32 | Magas |
-| M0.4 | Tervezett | ~24-32 | Magas |
+| M0.3 | ✅ | ~24-32 | Magas |
+| M0.4 | ✅ | ~24-32 | Magas |
 | M0.5 | Tervezett | ~16-24 | Közepes-magas |
 | M0.6 | Tervezett | ~28-36 | Magas |
 | M0.7 | Tervezett | ~30-50 | Nagyon magas |
@@ -91,22 +91,30 @@
 
 ---
 
-## M0.4 — Scheduler + Per-Actor Parallelism
+## M0.4 — Scheduler + Per-Actor Parallelism ✅
 
 > Több actor párhuzamos futtatása (single-host, multi-thread).
 
 | Elem | Leírás |
 |---|---|
-| `IScheduler` | Ütemező absztrakció. |
-| `TRoundRobinScheduler` | Referencia implementáció. |
-| `TDedicatedThreadScheduler` | Per-actor thread — CFPU core szimuláció. |
+| `IScheduler` / `ISchedulerHost` | Ütemező absztrakció + host visszahívás interfész. |
+| `TInlineScheduler` | Szinkron, single-threaded — a Drain-mode utódja, default scheduler. |
+| `TDedicatedThreadScheduler` | Per-aktor egy .NET Thread — CFPU "1 core = 1 aktor" szoftveres szimuláció. Default cap 1000 aktor. |
+| `IMailboxSignal` / `TDotNetMailboxSignal` | Szinkron Wait/Notify (CFPU WFI-kompatibilis, zero Task allokáció). |
+| `TActorSystem.QuiesceAsync` | Determinisztikus barrier multi-thread tesztekhez. |
+
+**Scope-csökkentés:** A `TRoundRobinScheduler` áttolva M2.2-be (`ISchedulerPolicy` kontextusban kerül be). M0.4 a CFPU-szimuláció `TDedicatedThreadScheduler`-re fókuszál.
+
+**Synchronous supervision:** A child crash-elt thread-jén fut a strategy hívása (Restart/Stop/Escalate). Cross-thread mailbox-injekció (TFailureEnvelope) nincs — a "Capability = reference" invariáns sértetlen.
+
+**Determinizmus finomítva:** per-aktor FIFO igen, globális ordering multi-thread alatt nem (CLAUDE.md frissítve).
 
 **CFPU:** Ez a legközelebb a CFPU valóságához: minden core fizikailag egy actor, saját SRAM-mal és HW mailbox FIFO-val. A `TDedicatedThreadScheduler` a CFPU-t szimulálja .NET thread-ekkel. CFPU-n nincs "scheduling" — minden core mindig fut.
 
-**Lehetséges HW kérés:** Mailbox interrupt vs polling: a core hogyan értesül új üzenetről?
+**OSREQ jelölt:** OSREQ-008 (per-actor stack sizing), OSREQ-009 (sleep/wake idle metric).
 
-**Becsült óra:** ~24-32
-> A DrainAsync alapvetően megváltozik: single-threaded → multi-threaded. Thread safety mindenhol kritikussá válik. Concurrency tesztelés inherensen nehéz (race condition-ök, deadlock-ok). ~3-4 új fájl, ~200-300 sor runtime, ~300-500 sor teszt.
+**Tesztek:** 142 xUnit (86 új M0.4-hez): TInlineScheduler (16), TActorSystemScheduler (8), TActorSystemConcurrency (3), TDotNetMailboxSignal (12), TDedicatedThreadScheduler (11), TDedicatedThreadIntegration (6), TSchedulerStress (5). | **Tény óra:** ~6 (ügynök csapat: Architect + Devil's Advocate + Implementer + Test Guardian)
+> A scope szűkítés és a Devil's Advocate STOP-pivot előzetes terv-revíziót adott; a tényleges TDD ciklusok 10 lépésben futottak le.
 
 ---
 

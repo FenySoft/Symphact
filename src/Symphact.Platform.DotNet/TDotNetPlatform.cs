@@ -11,8 +11,16 @@ namespace Symphact.Platform.DotNet;
 /// mailbox size limit, SRAM limit, or CST capability verification. The default platform
 /// for TActorSystem when no explicit IPlatform is provided.
 /// </summary>
-public sealed class TDotNetPlatform : IPlatform
+public sealed class TDotNetPlatform : IPlatform, IMailboxSignalProvider
 {
     /// <inheritdoc />
     public IMailbox CreateMailbox() => new TMailbox();
+
+    /// <inheritdoc />
+    public IMailboxSignal? CreateSignal(IMailbox AMailbox)
+    {
+        ArgumentNullException.ThrowIfNull(AMailbox);
+
+        return new TDotNetMailboxSignal();
+    }
 }

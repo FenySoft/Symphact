@@ -25,8 +25,8 @@
 |-----------|-----------------|--------------------------|--------------------------|
 | M0.1 | ✅ | ~6 | Közepes / Medium |
 | M0.2 | ✅ | ~8 (tény / actual) | Közepes / Medium |
-| M0.3 | Tervezett / Planned | ~24-32 | Magas / High |
-| M0.4 | Tervezett / Planned | ~24-32 | Magas / High |
+| M0.3 | ✅ | ~24-32 | Magas / High |
+| M0.4 | ✅ | ~24-32 | Magas / High |
 | M0.5 | Tervezett / Planned | ~16-24 | Közepes-magas / Medium-high |
 | M0.6 | Tervezett / Planned | ~28-36 | Magas / High |
 | M0.7 | Tervezett / Planned | ~30-50 | Nagyon magas / Very high |
@@ -114,7 +114,7 @@
 
 ---
 
-## M0.4 — Scheduler + Per-Actor Parallelism
+## M0.4 — Scheduler + Per-Actor Parallelism ✅
 
 > hu: Több actor párhuzamos futtatása (single-host, multi-thread).
 >
@@ -122,9 +122,11 @@
 
 | Elem / Item | Leírás / Description |
 |---|---|
-| `IScheduler` | hu: Ütemező absztrakció. / en: Scheduler abstraction. |
-| `TRoundRobinScheduler` | hu: Referencia implementáció. / en: Reference implementation. |
-| `TDedicatedThreadScheduler` | hu: Per-actor thread — CFPU core szimuláció. / en: Per-actor thread — CFPU core simulation. |
+| `IScheduler` / `ISchedulerHost` | hu: Ütemező absztrakció + host visszahívás. / en: Scheduler abstraction + host callback. |
+| `TInlineScheduler` | hu: Szinkron, single-threaded; default scheduler. / en: Synchronous, single-threaded; default scheduler. |
+| `TDedicatedThreadScheduler` | hu: Per-aktor egy .NET Thread — CFPU core szimuláció. Default cap 1000 aktor. / en: One .NET Thread per actor — CFPU core simulation. Default cap 1000 actors. |
+| `IMailboxSignal` / `TDotNetMailboxSignal` | hu: Szinkron Wait/Notify (CFPU WFI-kompatibilis). / en: Synchronous Wait/Notify (CFPU WFI-compatible). |
+| `TActorSystem.QuiesceAsync` | hu: Determinisztikus barrier. / en: Deterministic barrier. |
 
 **CFPU:**
 > hu: Ez a legközelebb a CFPU valóságához: minden core fizikailag egy actor, saját SRAM-mal és HW mailbox FIFO-val. A `TDedicatedThreadScheduler` a CFPU-t szimulálja .NET thread-ekkel. CFPU-n nincs "scheduling" — minden core mindig fut.

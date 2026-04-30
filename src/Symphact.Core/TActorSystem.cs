@@ -9,20 +9,28 @@ namespace Symphact.Core;
 /// The internal FSlots array mirrors the CFPU Capability Slot Table (CST) — SlotIndex maps
 /// directly to an array index, O(1) access, zero hashing, cache-friendly.
 /// </summary>
-public sealed class TActorSystem : IDisposable
+public sealed class TActorSystem : IDisposable, ISchedulerHost
 {
     private const int CInitialCapacity = 16;
 
     private readonly IPlatform FPlatform;
+    private readonly IScheduler FScheduler;
+    private readonly object FSlotsLock = new();
     private TActorEntry?[] FSlots = new TActorEntry?[CInitialCapacity];
     private int FNextSlotIndex;
     private int FActorCount;
-    private bool FDisposed;
+    private volatile bool FDisposed;
 
     /// <summary>
-    /// hu: Létrehoz egy aktor rendszert a megadott platform implementációval.
+    /// hu: Létrehoz egy aktor rendszert a megadott platform implementációval. Az aktor
+    /// rendszer alapértelmezett ütemezője a TInlineScheduler (szinkron, single-threaded).
+    /// Multi-thread parallelizmushoz használd a két paraméteres konstruktort egyedi
+    /// schedulerrel (pl. TDedicatedThreadScheduler).
     /// <br />
-    /// en: Creates an actor system with the given platform implementation.
+    /// en: Creates an actor system with the given platform implementation. The default
+    /// scheduler is TInlineScheduler (synchronous, single-threaded). For multi-threaded
+    /// parallelism use the two-argument constructor with a custom scheduler such as
+    /// TDedicatedThreadScheduler.
     /// </summary>
     /// <param name="APlatform">
     /// hu: A hardver platform absztrakció (mailbox gyár, core management).
@@ -30,9 +38,35 @@ public sealed class TActorSystem : IDisposable
     /// en: The hardware platform abstraction (mailbox factory, core management).
     /// </param>
     public TActorSystem(IPlatform APlatform)
+        : this(APlatform, new TInlineScheduler())
+    {
+    }
+
+    /// <summary>
+    /// hu: Létrehoz egy aktor rendszert a megadott platformmal és egyedi schedulerrel
+    /// (M0.4). A scheduler az aktor system tulajdonába kerül — a Dispose lezárja.
+    /// <br />
+    /// en: Creates an actor system with the given platform and a custom scheduler
+    /// (M0.4). The scheduler is owned by the actor system — Dispose closes it.
+    /// </summary>
+    /// <param name="APlatform">
+    /// hu: A hardver platform absztrakció.
+    /// <br />
+    /// en: The hardware platform abstraction.
+    /// </param>
+    /// <param name="AScheduler">
+    /// hu: Az ütemező implementáció. A rendszer Attach-olja és Dispose-olja.
+    /// <br />
+    /// en: The scheduler implementation. The system attaches to it and disposes it.
+    /// </param>
+    public TActorSystem(IPlatform APlatform, IScheduler AScheduler)
     {
         ArgumentNullException.ThrowIfNull(APlatform);
+        ArgumentNullException.ThrowIfNull(AScheduler);
+
         FPlatform = APlatform;
+        FScheduler = AScheduler;
+        FScheduler.Attach(this);
     }
 
     /// <summary>
@@ -52,9 +86,11 @@ public sealed class TActorSystem : IDisposable
         var entry = CreateEntry<TActorType, TState>(id, actor, TActorRef.Invalid);
 
         SetSlot(id, entry);
+        var actorRef = new TActorRef(id);
+        FScheduler.Register(actorRef, entry.Mailbox);
         entry.PreStart();
 
-        return new TActorRef(id);
+        return actorRef;
     }
 
     /// <summary>
@@ -78,6 +114,7 @@ public sealed class TActorSystem : IDisposable
             return;
 
         entry.Mailbox.Post(AMessage);
+        FScheduler.Signal(ATarget);
     }
 
     /// <summary>
@@ -206,10 +243,18 @@ public sealed class TActorSystem : IDisposable
 
         AEntry.Stopped = true;
 
-        // Cascade: stop all children first (depth-first)
-        for (var i = 0; i < AEntry.Children.Count; i++)
+        // Cascade: stop all children first (depth-first). Snapshot children under lock to
+        // avoid concurrent-modification races against SpawnChild on another thread.
+        TActorRef[] childrenSnapshot;
+
+        lock (AEntry.ChildrenLock)
         {
-            var childEntry = GetEntry(AEntry.Children[i]);
+            childrenSnapshot = AEntry.Children.ToArray();
+        }
+
+        for (var i = 0; i < childrenSnapshot.Length; i++)
+        {
+            var childEntry = GetEntry(childrenSnapshot[i]);
 
             if (childEntry is not null)
                 StopActor(childEntry);
@@ -217,18 +262,30 @@ public sealed class TActorSystem : IDisposable
 
         AEntry.PostStop();
         NotifyWatchers(AEntry);
+        FScheduler.Unregister(new TActorRef(AEntry.SlotIndex));
     }
 
     private void NotifyWatchers(TActorEntry AEntry)
     {
         var stoppedRef = new TActorRef(AEntry.SlotIndex);
 
-        foreach (var watcherRef in AEntry.Watchers)
+        TActorRef[] watcherSnapshot;
+
+        lock (AEntry.WatchersLock)
+        {
+            watcherSnapshot = new TActorRef[AEntry.Watchers.Count];
+            AEntry.Watchers.CopyTo(watcherSnapshot);
+        }
+
+        foreach (var watcherRef in watcherSnapshot)
         {
             var watcherEntry = GetEntry(watcherRef);
 
             if (watcherEntry is not null && !watcherEntry.Stopped)
+            {
                 watcherEntry.Mailbox.Post(new TTerminated(stoppedRef));
+                FScheduler.Signal(watcherRef);
+            }
         }
     }
 
@@ -252,12 +309,18 @@ public sealed class TActorSystem : IDisposable
             var watcherEntry = GetEntry(AWatcher);
 
             if (watcherEntry is not null && !watcherEntry.Stopped)
+            {
                 watcherEntry.Mailbox.Post(new TTerminated(ATarget));
+                FScheduler.Signal(AWatcher);
+            }
 
             return;
         }
 
-        targetEntry.Watchers.Add(AWatcher);
+        lock (targetEntry.WatchersLock)
+        {
+            targetEntry.Watchers.Add(AWatcher);
+        }
     }
 
     /// <summary>
@@ -270,7 +333,14 @@ public sealed class TActorSystem : IDisposable
         ThrowIfDisposed();
 
         var targetEntry = GetEntry(ATarget);
-        targetEntry?.Watchers.Remove(AWatcher);
+
+        if (targetEntry is null)
+            return;
+
+        lock (targetEntry.WatchersLock)
+        {
+            targetEntry.Watchers.Remove(AWatcher);
+        }
     }
 
     /// <summary>
@@ -332,13 +402,46 @@ public sealed class TActorSystem : IDisposable
         var entry = GetEntry(AActor)
             ?? throw new InvalidOperationException($"Unknown actor: {AActor}");
 
-        return entry.Children;
+        lock (entry.ChildrenLock)
+        {
+            return entry.Children.ToArray();
+        }
+    }
+
+    /// <summary>
+    /// hu: Aszinkron várakozás a quiescence-re a rendszer minden aktora fölött (M0.4). Az
+    /// ütemezőn keresztül delegálja a barriert; a hívás visszatérése után minden eddig
+    /// küldött üzenet feldolgozódott (vagy a megfelelő aktor leállt). Ha a megadott időn
+    /// belül nem áll be a quiescence, TimeoutException-t dob (nem deadlockol).
+    /// <br />
+    /// en: Asynchronously wait for quiescence over all actors in the system (M0.4). Delegates
+    /// the barrier to the underlying scheduler; after the call returns, every message sent
+    /// so far has been processed (or its actor is stopped). If quiescence is not reached
+    /// within the timeout, throws TimeoutException (does not deadlock).
+    /// </summary>
+    /// <param name="ATimeout">
+    /// hu: Maximum várakozási idő. Lejárat után TimeoutException.
+    /// <br />
+    /// en: Maximum wait time. On expiry throws TimeoutException.
+    /// </param>
+    /// <param name="ACancellationToken">
+    /// hu: Megszakítási token.
+    /// <br />
+    /// en: Cancellation token.
+    /// </param>
+    public Task QuiesceAsync(TimeSpan ATimeout, CancellationToken ACancellationToken = default)
+    {
+        ThrowIfDisposed();
+
+        return FScheduler.QuiesceAsync(ATimeout, ACancellationToken);
     }
 
     /// <summary>
     /// hu: Leállítja a rendszert. A további Send/Spawn/GetState hívások ObjectDisposedException-t dobnak.
+    /// Az ütemezőt is lezárja.
     /// <br />
     /// en: Shuts down the system. Further Send/Spawn/GetState calls raise ObjectDisposedException.
+    /// Also disposes the scheduler.
     /// </summary>
     public void Dispose()
     {
@@ -346,6 +449,7 @@ public sealed class TActorSystem : IDisposable
             return;
 
         FDisposed = true;
+        FScheduler.Dispose();
         Array.Clear(FSlots);
         FActorCount = 0;
     }
@@ -367,11 +471,20 @@ public sealed class TActorSystem : IDisposable
         SetSlot(id, entry);
 
         var parentEntry = GetEntry(AParent);
-        parentEntry?.Children.Add(new TActorRef(id));
+        var actorRef = new TActorRef(id);
 
+        if (parentEntry is not null)
+        {
+            lock (parentEntry.ChildrenLock)
+            {
+                parentEntry.Children.Add(actorRef);
+            }
+        }
+
+        FScheduler.Register(actorRef, entry.Mailbox);
         entry.PreStart();
 
-        return new TActorRef(id);
+        return actorRef;
     }
 
     private void ThrowIfDisposed()
@@ -392,9 +505,12 @@ public sealed class TActorSystem : IDisposable
 
     private void SetSlot(int ASlotIndex, TActorEntry AEntry)
     {
-        EnsureCapacity(ASlotIndex);
-        FSlots[ASlotIndex] = AEntry;
-        FActorCount++;
+        lock (FSlotsLock)
+        {
+            EnsureCapacity(ASlotIndex);
+            FSlots[ASlotIndex] = AEntry;
+            FActorCount++;
+        }
     }
 
     private void EnsureCapacity(int ASlotIndex)
@@ -410,6 +526,61 @@ public sealed class TActorSystem : IDisposable
         var newSlots = new TActorEntry?[newCapacity];
         Array.Copy(FSlots, newSlots, FSlots.Length);
         FSlots = newSlots;
+    }
+
+    /// <inheritdoc />
+    bool ISchedulerHost.RunOneSlice(TActorRef AActor, int AMaxMessages)
+    {
+        if (FDisposed)
+            return false;
+
+        var entry = GetEntry(AActor);
+
+        if (entry is null || entry.Stopped)
+            return false;
+
+        var context = new TActorContext(this, AActor);
+        var processed = false;
+        var count = 0;
+
+        while (entry.Mailbox.TryReceive(out var message))
+        {
+            if (entry.Stopped)
+                break;
+
+            processed = true;
+
+            try
+            {
+                entry.State = entry.Handler(entry.State, message!, context);
+            }
+            catch (Exception ex)
+            {
+                HandleFailure(AActor, entry, ex);
+                break;
+            }
+
+            count++;
+
+            if (AMaxMessages > 0 && count >= AMaxMessages)
+                break;
+        }
+
+        return processed;
+    }
+
+    /// <inheritdoc />
+    bool ISchedulerHost.IsActorIdle(TActorRef AActor)
+    {
+        if (FDisposed)
+            return true;
+
+        var entry = GetEntry(AActor);
+
+        if (entry is null || entry.Stopped)
+            return true;
+
+        return entry.Mailbox.Count == 0;
     }
 
     private TActorEntry CreateEntry<TActorType, TState>(int ASlotIndex, TActorType AActor, TActorRef AParent)
@@ -433,6 +604,8 @@ public sealed class TActorSystem : IDisposable
 
     private sealed class TActorEntry
     {
+        private volatile bool FStopped;
+
         public TActorEntry(
             int ASlotIndex,
             object AInitialState,
@@ -469,7 +642,14 @@ public sealed class TActorSystem : IDisposable
         public IMailbox Mailbox { get; }
         public TActorRef Parent { get; init; } = TActorRef.Invalid;
         public List<TActorRef> Children { get; } = new();
+        public object ChildrenLock { get; } = new();
         public HashSet<TActorRef> Watchers { get; } = new();
-        public bool Stopped { get; set; }
+        public object WatchersLock { get; } = new();
+
+        public bool Stopped
+        {
+            get => FStopped;
+            set => FStopped = value;
+        }
     }
 }
