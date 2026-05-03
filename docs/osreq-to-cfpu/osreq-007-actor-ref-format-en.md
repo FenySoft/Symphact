@@ -20,7 +20,7 @@ These are **not optional** — the Symphact defense pyramid relies on the HW-sid
 
 ## Background — why now
 
-`TActorRef` is the cornerstone of the Symphact public API. The v1.0 spec recorded in `roadmap.md` M0.7 — `[core-id:16][offset:16][HMAC:24][perms:8]` — was **incompatible** with CLI-CPU `interconnect-hu.md` v2.4 header and `architecture-hu.md` 24-bit HW address. The `actor-ref-scaling-en.md` v2.0 document resolves the inconsistencies and locks down a **bit-identical** layout with the canonical CLI-CPU widths:
+`TActorRef` is the cornerstone of the Symphact public API. The v1.0 spec recorded in `roadmap-en.md` M0.7 — `[core-id:16][offset:16][HMAC:24][perms:8]` — was **incompatible** with CLI-CPU `interconnect-hu.md` v2.4 header and `architecture-hu.md` 24-bit HW address. The `actor-ref-scaling-en.md` v2.0 document resolves the inconsistencies and locks down a **bit-identical** layout with the canonical CLI-CPU widths:
 
 ```
 TActorRef (64 bit, opaque, public):
@@ -246,7 +246,7 @@ The FenySoft product line **mandatorily** uses this strict configuration (see `d
 
 - **`Symphact/docs/actor-ref-scaling-en.md`** — TActorRef bit layout and defense pyramid
 - **`Symphact/docs/trust-model-en.md`** — FenySoft Strict whitelist business model
-- **`Symphact/docs/roadmap.md`** M0.6, M0.7, M2.5 — implementation milestones
+- **`Symphact/docs/roadmap-en.md`** M0.6, M0.7, M2.5 — implementation milestones
 - **`Symphact/docs/vision-en.md`** — capability-based security and location transparency
 - **`CLI-CPU/docs/architecture-hu.md`** — 24-bit HW address, Actor Scheduling Pipeline
 - **`CLI-CPU/docs/interconnect-hu.md`** — cell header v2.4 (to be updated to v2.5)

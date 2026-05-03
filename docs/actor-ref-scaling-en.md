@@ -358,9 +358,9 @@ Holding the 32-bit CST index contract pins down **two rules**:
 - **`CLAUDE.md`** — 32-bit CST index public surface contract record
 - **`docs/trust-model-en.md`** — FenySoft Strict whitelist business model, unsupported options
 - ~~**`docs/osreq-to-cfpu/osreq-007-actor-ref-format-en.md`**~~ — **OBSOLETE** (HMAC-based header v2.5, mailbox-edge HMAC verify unit, counter, fail-stop — superseded by CST model)
-- **`docs/roadmap.md` M0.6 — Remoting** — proxy-actor pattern first iteration
-- **`docs/roadmap.md` M0.7 — CFPU Hardware Integration** — final CST implementation in silicon, MMIO mailbox integration
-- **`docs/roadmap.md` M2.5 — Capability Registry** — kernel-side CST slot management and issuance, AuthCode integration
+- **`docs/roadmap-en.md` M0.6 — Remoting** — proxy-actor pattern first iteration
+- **`docs/roadmap-en.md` M0.7 — CFPU Hardware Integration** — final CST implementation in silicon, MMIO mailbox integration
+- **`docs/roadmap-en.md` M2.5 — Capability Registry** — kernel-side CST slot management and issuance, AuthCode integration
 - **`docs/vision-en.md`** — capability-based security and location transparency design foundations
 - **`CLI-CPU/docs/architecture-hu.md`** — 24-bit HW address, software-dispatched actor addressing
 - **`CLI-CPU/docs/interconnect-hu.md`** — cell header structure (v3.0), tree topology, backpressure

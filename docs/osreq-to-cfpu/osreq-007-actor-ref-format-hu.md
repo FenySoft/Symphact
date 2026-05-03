@@ -20,7 +20,7 @@ Ezek **nem opcionálisak** — a Symphact védelmi piramisa a HW oldali implemen
 
 ## Háttér — miért most
 
-A `TActorRef` a Symphact publikus API alapköve. A v1.0 spec a `roadmap.md` M0.7-ben rögzített `[core-id:16][offset:16][HMAC:24][perms:8]` layout **inkompatibilis** volt a CLI-CPU `interconnect-hu.md` v2.4 header-rel és `architecture-hu.md` 24-bites HW címével. A `actor-ref-scaling-hu.md` v2.0 doksi feloldja az inkonzisztenciákat, és a CLI-CPU oldali kanonikus szélességekkel **bit-azonos** layout-ot rögzít:
+A `TActorRef` a Symphact publikus API alapköve. A v1.0 spec a `roadmap-hu.md` M0.7-ben rögzített `[core-id:16][offset:16][HMAC:24][perms:8]` layout **inkompatibilis** volt a CLI-CPU `interconnect-hu.md` v2.4 header-rel és `architecture-hu.md` 24-bites HW címével. A `actor-ref-scaling-hu.md` v2.0 doksi feloldja az inkonzisztenciákat, és a CLI-CPU oldali kanonikus szélességekkel **bit-azonos** layout-ot rögzít:
 
 ```
 TActorRef (64 bit, opaque, public):

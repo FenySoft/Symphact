@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-**Symphact** — capability-based actor runtime for .NET, co-designed with the Cognitive Fabric Processing Unit (CFPU). Today a reference runtime on any .NET host; tomorrow runs natively on CFPU silicon where each core is physically an actor with private SRAM and hardware mailbox FIFOs. Apache-2.0.
+**Symphact** — capability-based actor runtime for .NET, co-designed with the Cognitive Fabric Processing Unit (CFPU). Today a reference runtime on any .NET host; tomorrow runs natively on CFPU silicon where every actor runs on a dedicated core with private SRAM and hardware mailbox FIFOs. Apache-2.0.
 
 Version: **0.1 (pre-alpha)** — the actor core (mailbox / ref / actor / system), supervision (M0.3), and the scheduler API with per-actor parallelism (M0.4 — `IScheduler`, `TInlineScheduler`, `TDedicatedThreadScheduler`) are complete; persistence and distribution are deferred milestones.
 
@@ -49,7 +49,7 @@ Three primitives form the core; understanding their contracts is enough to navig
 4. **`IScheduler` + `TInlineScheduler` / `TDedicatedThreadScheduler`** (`src/Symphact.Core/IScheduler.cs`, `TInlineScheduler.cs`, `TDedicatedThreadScheduler.cs`) — M0.4
    - `IScheduler` decouples actor execution from the system: `Send` posts then `Signal`s the scheduler; the scheduler decides when (and on which thread) to call back via `ISchedulerHost.RunOneSlice`.
    - `TInlineScheduler` is the synchronous, single-threaded reference impl — Drain-mode-equivalent.
-   - `TDedicatedThreadScheduler` allocates one OS thread per actor (CFPU "1 core = 1 actor" simulation), default cap **1000 actors** (configurable via ctor); uses `IMailboxSignal` (`AutoResetEvent` on .NET, WFI on CFPU).
+   - `TDedicatedThreadScheduler` allocates one OS thread per actor (CFPU dedicated-core-per-actor simulation), default cap **1000 actors** (configurable via ctor); uses `IMailboxSignal` (`AutoResetEvent` on .NET, WFI on CFPU).
    - Multi-core scheduling and supervision are integrated; per-actor FIFO is preserved on every scheduler. Persistence and distribution are deferred milestones.
 
 ### Design invariants (do not violate without an architecture discussion)

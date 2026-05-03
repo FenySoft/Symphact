@@ -13,7 +13,7 @@ Symphact is a **capability-based actor runtime** for .NET, built on a simple ide
 
 > Every stateful entity is an actor. Actors communicate exclusively through immutable messages over mailboxes. Isolation is enforced by the runtime on .NET hosts, and as a hardware property on CFPU.
 
-Today, Symphact runs on **any .NET host** (Windows, Linux, macOS) as a reference runtime. Tomorrow, it will run natively on the **Cognitive Fabric Processing Unit (CFPU)** — a new category of processing unit where each core is physically an actor, with private SRAM and hardware mailbox FIFOs.
+Today, Symphact runs on **any .NET host** (Windows, Linux, macOS) as a reference runtime. Tomorrow, it will run natively on the **Cognitive Fabric Processing Unit (CFPU)** — a new category of processing unit where every actor runs on a dedicated core, with private SRAM and hardware mailbox FIFOs.
 
 **The two projects are co-developed on purpose:** the OS shapes the hardware requirements, and the hardware grounds the OS design. This bidirectional loop is how Apple's M-series chips achieve such tight OS/hardware integration — we apply the same philosophy to an open-source stack.
 
@@ -56,7 +56,7 @@ dotnet test
 - [ ] `TActor<TState>` + `TActorSystem` with `Spawn` / `Send` / `Receive` (~10 tests)
 - [ ] First end-to-end demo: `CounterActor`
 
-Full roadmap: [`docs/roadmap.md`](docs/roadmap.md).
+Full roadmap: [`docs/roadmap-en.md`](docs/roadmap-en.md).
 
 ## Relationship with CLI-CPU / CFPU
 

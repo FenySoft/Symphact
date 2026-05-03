@@ -99,7 +99,7 @@
 |---|---|
 | `IScheduler` / `ISchedulerHost` | Ütemező absztrakció + host visszahívás interfész. |
 | `TInlineScheduler` | Szinkron, single-threaded — a Drain-mode utódja, default scheduler. |
-| `TDedicatedThreadScheduler` | Per-aktor egy .NET Thread — CFPU "1 core = 1 aktor" szoftveres szimuláció. Default cap 1000 aktor. |
+| `TDedicatedThreadScheduler` | Per-aktor egy .NET Thread — CFPU dedikált-core-per-aktor szoftveres szimuláció. Default cap 1000 aktor. |
 | `IMailboxSignal` / `TDotNetMailboxSignal` | Szinkron Wait/Notify (CFPU WFI-kompatibilis, zero Task allokáció). |
 | `TActorSystem.QuiesceAsync` | Determinisztikus barrier multi-thread tesztekhez. |
 
@@ -109,7 +109,7 @@
 
 **Determinizmus finomítva:** per-aktor FIFO igen, globális ordering multi-thread alatt nem (CLAUDE.md frissítve).
 
-**CFPU:** Ez a legközelebb a CFPU valóságához: minden core fizikailag egy actor, saját SRAM-mal és HW mailbox FIFO-val. A `TDedicatedThreadScheduler` a CFPU-t szimulálja .NET thread-ekkel. CFPU-n nincs "scheduling" — minden core mindig fut.
+**CFPU:** Ez a legközelebb a CFPU valóságához: minden aktor dedikált core-on fut, saját SRAM-mal és HW mailbox FIFO-val. A `TDedicatedThreadScheduler` a CFPU-t szimulálja .NET thread-ekkel. CFPU-n nincs "scheduling" — minden aktor a saját core-ján fut.
 
 **OSREQ jelölt:** OSREQ-008 (per-actor stack sizing), OSREQ-009 (sleep/wake idle metric).
 
@@ -228,7 +228,7 @@
 
 **Építő elem:** M0.4 scheduler-re épül, de most actor-szintű döntések.
 
-**CFPU:** Cooperative + watchdog timer HW interrupt. CFPU-n nincs preemption — minden core mindig az ő actor-ját futtatja.
+**CFPU:** Cooperative + watchdog timer HW interrupt. CFPU-n nincs preemption — minden aktor a saját dedikált core-ján fut.
 
 **Becsült óra:** ~28-36
 

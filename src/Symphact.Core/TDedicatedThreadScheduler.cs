@@ -1,7 +1,7 @@
 namespace Symphact.Core;
 
 /// <summary>
-/// hu: Per-aktor egy .NET Thread ütemező (M0.4) — a CFPU "minden core fizikailag egy aktor"
+/// hu: Per-aktor egy .NET Thread ütemező (M0.4) — a CFPU "minden aktor dedikált core-on fut"
 /// modell szoftveres szimulációja. Minden Register egy új OS-thread-et indít, amely az
 /// aktorhoz tartozó IMailboxSignal-on blokkolódik. Signal érkezésekor a thread a host
 /// RunOneSlice metódusát hívja, majd visszaüvegez a Wait-be.
@@ -12,15 +12,15 @@ namespace Symphact.Core;
 /// <br />
 /// CFPU megfelelés: ez a leghasznosabb fejlesztői platform a CFPU programozási modell
 /// elsajátításához. A HW oldalon a Register = core boot, a Signal = mailbox-IRQ asserted,
-/// a Wait = WFI instrukció. CFPU-n maga a scheduler eltűnik, mert minden core önmagát futtatja.
+/// a Wait = WFI instrukció. CFPU-n maga a scheduler eltűnik, mert minden aktor a saját core-ján fut.
 /// <br />
 /// Default hard cap: 1000 aktor (1000 thread × 1 MB stack ≈ 1 GiB virtual memory). Az OS
 /// scheduler 1000 thread fölött az interleaving overhead miatt is megfojthatja a teljesítményt.
 /// Production multi-actor szcenárióhoz lásd később M2.2 — de M0.4-ben a TDedicatedThreadScheduler
 /// a CFPU-rebő szimuláció eszköze, NEM production load-balancer.
 /// <br />
-/// en: One .NET Thread per actor scheduler (M0.4) — software simulation of the CFPU "each
-/// core is physically one actor" model. Every Register starts a new OS thread, blocking on
+/// en: One .NET Thread per actor scheduler (M0.4) — software simulation of the CFPU "every
+/// actor runs on a dedicated core" model. Every Register starts a new OS thread, blocking on
 /// the actor's IMailboxSignal. On Signal, the thread calls the host's RunOneSlice and then
 /// returns to Wait.
 /// <br />
@@ -30,7 +30,7 @@ namespace Symphact.Core;
 /// <br />
 /// CFPU correspondence: this is the most useful developer platform for learning the CFPU
 /// programming model. On HW, Register = core boot, Signal = mailbox IRQ asserted, Wait = WFI
-/// instruction. On CFPU the scheduler vanishes, because each core runs itself.
+/// instruction. On CFPU the scheduler vanishes, because every actor runs on its dedicated core.
 /// <br />
 /// Default hard cap: 1000 actors (1000 threads × 1 MB stack ≈ 1 GiB virtual memory). The OS
 /// scheduler may also choke on interleaving overhead beyond 1000 threads. For production

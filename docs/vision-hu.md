@@ -68,7 +68,7 @@ Eddig az aktor-alapú OS-ek **marginális nikében** maradtak, mert a szoftveres
 
 **Ma van.** A CLI-CPU cognitive fabric architektúrája az első olyan **hardveres alap**, ahol az aktor modell **nem szoftveres overhead, hanem az architektúra alapja**. A következő jellemzők **CLI-CPU hardver-specifikusak** (a .NET referencia runtime szoftveres megfelelőkkel biztosítja ugyanezt):
 
-- Minden core **fizikailag elszigetelt** saját SRAM-mal — nincs shared memory trükk
+- Minden aktor **dedikált, fizikailag elszigetelt core-on** fut, saját SRAM-mal — nincs shared memory trükk
 - A core-ok közötti üzenetküldés **hardveres mailbox FIFO-kon** megy, nem szoftveres queue-kon
 - A context switch **~5-8 ciklus** (csak a TOS cache és a PC), nem 500-2000
 - A supervisor trap **hardveres interrupt vonalon** érkezik egy másik core-nak, nem signal-alapú
@@ -1034,7 +1034,7 @@ Armstrong 2014-es Strange Loop keynote-jában („The Mess We're In") a szoftver
 - Armstrong az üzenetküldéses konkurenciáról: [Let's Talk Concurrency interjú](https://www.erlang-solutions.com/blog/lets-talkconcurrency-with-joe-armstrong/)
 - Hewitt–Armstrong–Hoare panel (tízezer core, 10 ns message passing): [Erlang Solutions](https://www.erlang-solutions.com/blog/lets-talkconcurrency-panel-discussion-with-sir-tony-hoare-joe-armstrong-and-carl-hewitt/)
 
-**Akkor nem létezett ilyen hardver.** Ma viszont igen. A CLI-CPU cognitive fabric architektúrája az első olyan hardver, amely ezt a víziót **fizikailag lehetővé teszi** — minden core izolált, saját SRAM-mal, hardveres mailbox FIFO-kkal. A Symphact pedig az operációs rendszer, amelyet erre a hardverre építünk.
+**Akkor nem létezett ilyen hardver.** Ma viszont igen. A CLI-CPU cognitive fabric architektúrája az első olyan hardver, amely ezt a víziót **fizikailag lehetővé teszi** — minden aktor dedikált, izolált core-on fut, saját SRAM-mal, hardveres mailbox FIFO-kkal. A Symphact pedig az operációs rendszer, amelyet erre a hardverre építünk.
 
 ### A valódi tét
 

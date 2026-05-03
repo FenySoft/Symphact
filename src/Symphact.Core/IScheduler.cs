@@ -7,10 +7,10 @@ namespace Symphact.Core;
 /// (TActorSystem.RunOneSlice). Két referencia implementáció létezik:
 /// <br />
 /// 1. TInlineScheduler — szinkron, single-threaded; a régi Drain-mode belső motorja.
-/// 2. TDedicatedThreadScheduler — per-aktor egy .NET Thread; a CFPU "minden core fizikailag
-///    egy aktor" modell szoftveres szimulációja.
+/// 2. TDedicatedThreadScheduler — per-aktor egy .NET Thread; a CFPU "minden aktor dedikált
+///    core-on fut" modell szoftveres szimulációja.
 /// <br />
-/// CFPU megfelelés: HW oldalon nincs scheduler — minden core önmagát futtatja, a Signal HW
+/// CFPU megfelelés: HW oldalon nincs scheduler — minden aktor a saját core-ján fut, a Signal HW
 /// IRQ-line, a Register/Unregister core boot/reset. A TCfpuScheduler valószínűleg vékony
 /// MMIO híd lesz; a Signal-t maga a HW intézi a Send oldalán.
 /// <br />
@@ -23,9 +23,9 @@ namespace Symphact.Core;
 /// <br />
 /// 1. TInlineScheduler — synchronous, single-threaded; the inner engine of legacy Drain mode.
 /// 2. TDedicatedThreadScheduler — one .NET Thread per actor; the software simulation of the
-///    CFPU "each core is physically one actor" model.
+///    CFPU "every actor runs on a dedicated core" model.
 /// <br />
-/// CFPU correspondence: on HW there is no scheduler — each core runs itself, Signal is the
+/// CFPU correspondence: on HW there is no scheduler — every actor runs on its dedicated core, Signal is the
 /// HW IRQ line, Register/Unregister are core boot/reset. TCfpuScheduler will likely be a
 /// thin MMIO bridge; Signal is performed by the hardware itself on Send.
 /// <br />

@@ -70,7 +70,7 @@ Until now, actor-based operating systems have remained in a **marginal niche** b
 
 **On CLI-CPU hardware:**
 
-- Every core is **physically isolated** with its own SRAM -- there is no shared memory trick
+- Every actor runs on a **dedicated, physically isolated core** with its own SRAM -- there is no shared memory trick
 - Inter-core messaging runs on **hardware mailbox FIFOs**, not software queues
 - Context switch takes **~5-8 cycles** (just the TOS cache and the PC), not 500-2000
 - The supervisor trap arrives on a **hardware interrupt line** to another core, not signal-based
@@ -1036,7 +1036,7 @@ In his 2014 Strange Loop keynote ("The Mess We're In"), Armstrong spoke about th
 - Armstrong on message-passing concurrency: [Let's Talk Concurrency interview](https://www.erlang-solutions.com/blog/lets-talkconcurrency-with-joe-armstrong/)
 - Hewitt–Armstrong–Hoare panel (tens of thousands of cores, 10 ns message passing): [Erlang Solutions](https://www.erlang-solutions.com/blog/lets-talkconcurrency-panel-discussion-with-sir-tony-hoare-joe-armstrong-and-carl-hewitt/)
 
-**No such hardware existed then.** Now it does. The CLI-CPU cognitive fabric architecture is the first hardware that **physically makes** this vision **possible** -- every core is isolated with its own SRAM and hardware mailbox FIFOs. And Symphact is the operating system we are building on that hardware.
+**No such hardware existed then.** Now it does. The CLI-CPU cognitive fabric architecture is the first hardware that **physically makes** this vision **possible** -- every actor runs on a dedicated, isolated core with its own SRAM and hardware mailbox FIFOs. And Symphact is the operating system we are building on that hardware.
 
 ### The real stakes
 

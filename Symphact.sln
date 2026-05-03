@@ -17,6 +17,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symphact.Platform.Cfpu", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Symphact.Platform.DotNet.Tests", "tests\Symphact.Platform.DotNet.Tests\Symphact.Platform.DotNet.Tests.csproj", "{ABF6384B-7C34-497C-A67F-1C7836A57466}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionFolder", "SolutionFolder", "{2A6E2B2B-30F3-4EAC-8767-D9DFEBF8FBA9}"
+	ProjectSection(SolutionItems) = preProject
+		README-hu.md = README-hu.md
+		README.md = README.md
+		CLAUDE.md = CLAUDE.md
+		CONTRIBUTING-hu.md = CONTRIBUTING-hu.md
+		CONTRIBUTING.md = CONTRIBUTING.md
+		Directory.Build.props = Directory.Build.props
+		LICENSE = LICENSE
+		NOTICE = NOTICE
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

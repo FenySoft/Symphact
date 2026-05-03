@@ -5,11 +5,11 @@ namespace Symphact.Core.Tests;
 
 /// <summary>
 /// hu: A TDedicatedThreadScheduler tesztjei (M0.4 — C.6). Per-aktor egy .NET Thread, a
-/// CFPU "minden core fizikailag egy aktor" modell szoftveres szimulációja. A handler
+/// CFPU "minden aktor dedikált core-on fut" modell szoftveres szimulációja. A handler
 /// nem a hívó thread-jén, hanem a dedikált aktor-thread-en fut.
 /// <br />
 /// en: Tests for TDedicatedThreadScheduler (M0.4 — C.6). One .NET Thread per actor — the
-/// software simulation of the CFPU "each core is physically one actor" model. The handler
+/// software simulation of the CFPU "every actor runs on a dedicated core" model. The handler
 /// runs on the dedicated actor thread, not on the caller's thread.
 /// </summary>
 public sealed class TDedicatedThreadSchedulerTests

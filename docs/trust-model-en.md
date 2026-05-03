@@ -235,7 +235,7 @@ The Secure Edition provides defense against **nation-state-level attacks** (dedi
 - **`actor-ref-scaling-en.md`** — TActorRef bit layout and defense pyramid
 - ~~**`osreq-to-cfpu/osreq-007-actor-ref-format-en.md`**~~ — **OBSOLETE** (superseded by CST model)
 - **`vision-en.md`** — capability-based security design foundations
-- **`roadmap.md`** M2.5 — Capability Registry implementation
+- **`roadmap-en.md`** M2.5 — Capability Registry implementation
 - **`CLI-CPU/docs/authcode-hu.md`** — AuthCode trust chain specification
 - **`CLI-CPU/docs/secure-element-hu.md`** — F6.5 Secure Edition (optional hardening)
 - **`CLI-CPU/docs/security-hu.md`** — eliminated CWEs
