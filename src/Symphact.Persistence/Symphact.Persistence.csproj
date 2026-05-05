@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Symphact.Persistence</RootNamespace>
+    <AssemblyName>Symphact.Persistence</AssemblyName>
+    <Description>Persistence (event sourcing / message journal) abstractions for Symphact. BCL-only — no NuGet dependencies. Concrete journal implementations (SQLite, etc.) live in separate platform packages.</Description>
+    <PackageId>FenySoft.Symphact.Persistence</PackageId>
+    <PackageTags>actor;persistence;event-sourcing;journal;symphact;cfpu</PackageTags>
+  </PropertyGroup>
+
+</Project>
