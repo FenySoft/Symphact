@@ -18,7 +18,7 @@ Ez a könyvtár a Symphact fejlesztése során felszínre kerülő **OS-oldali k
 
 Ez az **OS → HW visszacsatolási hurok**. Enélkül a hardver- és OS-fejlesztés szétcsúszik, és minden CPU/OS eltérés a történelemben (x86 szegmentálás, Itanium VLIW, ARM big.LITTLE bevezetés, Spectre/Meltdown) a mi történetünk is lesz.
 
-Az Apple M-sorozat sikere pontosan erre a hurokra épül: a macOS QoS osztályok informálták a P-core/E-core aszimmetriát, a Core ML a Neural Engine-t, a Keychain a Secure Enclave-et, az x86 emuláció (Rosetta 2) pedig a TSO memory-ordering módot. Azt akarjuk, hogy a nyílt forráskódú Symphact ugyanezt tegye a nyílt forráskódú CFPU-ért.
+Dokumentált történelmi precedens az **Inmos Transputer** (Inmos technical papers, ~1984) — a HW mailbox csatornák és az Occam nyelv `chan` primitívje együtt tervezve; a **Symbolics Lisp Machine** (Moon, „Architecture of the Symbolics 3600", 1985) — tagged pointer ISA és GC hardware támogatás a Lisp runtime számára; és a **Google TPU + TensorFlow** (Jouppi et al., ISCA 2017) — publikált co-design, ahol a workload-igények mérhetően hatottak a chip mikroarchitektúrára. Az Apple M-sorozat vertikálisan integrált, de a HW és OS közti **konkrét co-design folyamat nem nyilvánosan dokumentált**. Azt akarjuk, hogy a nyílt forráskódú Symphact + CFPU **ezt az átláthatatlanságot törje meg**: minden visszahatási döntés Apache-2.0 / CERN-OHL-S licensz alatt publikus, reprodukálható, és `osreq-to-cfpu` issue-ként követhető.
 
 ## Aktuális nyitott követelmények
 

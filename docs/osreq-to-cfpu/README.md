@@ -18,7 +18,7 @@ This directory collects **OS-driven requirements** surfaced during Symphact deve
 
 This is the **OS → HW feedback loop**. Without it, hardware and OS development drift apart, and every CPU/OS mismatch in history (x86 segmentation, Itanium VLIW, ARM big.LITTLE rollout, Spectre/Meltdown) becomes our story too.
 
-The Apple M-series success is rooted in exactly this loop: macOS QoS classes informed P-core/E-core asymmetry, Core ML informed the Neural Engine, Keychain informed the Secure Enclave, and x86 emulation (Rosetta 2) informed the TSO memory-ordering mode. We want open-source Symphact to do the same for the open-source CFPU.
+Documented historical precedents include the **Inmos Transputer** (Inmos technical papers, ~1984) — HW mailbox channels and the Occam `chan` primitive co-designed together; the **Symbolics Lisp Machine** (Moon, "Architecture of the Symbolics 3600", 1985) — tagged pointer ISA and GC hardware support for the Lisp runtime; and the **Google TPU + TensorFlow** (Jouppi et al., ISCA 2017) — published co-design where workload requirements measurably shaped chip microarchitecture. Apple's M-series is vertically integrated, but the **concrete co-design process between HW and OS is not publicly documented**. Open-source Symphact + CFPU aims to **break that opacity**: every feedback decision is public under Apache-2.0 / CERN-OHL-S, reproducible, and tracked as an `osreq-to-cfpu` issue.
 
 ## Current open requirements
 
