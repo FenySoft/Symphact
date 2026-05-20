@@ -67,7 +67,7 @@
 
 ---
 
-## M0.3 — Supervision (Let-it-crash)
+## M0.3 — Supervision (Let-it-crash) ✅
 
 > Fault handling with supervisor strategies, actor hierarchy.
 

@@ -70,7 +70,7 @@
 
 ---
 
-## M0.3 — Supervision (Let-it-crash)
+## M0.3 — Supervision (Let-it-crash) ✅
 
 > Hibakezelés supervisor stratégiákkal, actor hierarchia.
 

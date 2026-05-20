@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Symphact** — capability-based actor runtime for .NET, co-designed with the Cognitive Fabric Processing Unit (CFPU). Today a reference runtime on any .NET host; tomorrow runs natively on CFPU silicon where every actor runs on a dedicated core with private SRAM and hardware mailbox FIFOs. Apache-2.0.
 
-Version: **0.1 (pre-alpha)** — the actor core (mailbox / ref / actor / system), supervision (M0.3), and the scheduler API with per-actor parallelism (M0.4 — `IScheduler`, `TInlineScheduler`, `TDedicatedThreadScheduler`) are complete; persistence and distribution are deferred milestones.
+Version: **0.5 (pre-alpha)** — the actor core (mailbox / ref / actor / system), supervision (M0.3), scheduler API with per-actor parallelism (M0.4 — `IScheduler`, `TInlineScheduler`, `TDedicatedThreadScheduler`), and persistence BCL-only slices (M0.5 — `IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) are complete. **186 green xUnit tests** (120 Core + 22 Platform.DotNet + 44 Persistence). Content-addressed persistence (`TCasJournal`, `TCasSnapshotStore`) and distribution are next milestones.
 
 Sister repo: [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) (CFPU hardware, CERN-OHL-S). OS → HW feedback flows via `docs/osreq-to-cfpu/` and the `osreq-for-cfpu` issue template.
 
@@ -67,8 +67,10 @@ Three primitives form the core; understanding their contracts is enough to navig
 src/Symphact.Core/              runtime + HAL interfaces (IScheduler, IMailboxSignal, supervision, ...)
 src/Symphact.Platform.DotNet/   .NET reference platform (ConcurrentQueue mailbox, AutoResetEvent signal)
 src/Symphact.Platform.Cfpu/     CLI-CPU simulator bridge (stub — awaiting F4 multi-core)
+src/Symphact.Persistence/       IJournal, ISnapshotStore + BCL-only in-memory reference impls
 tests/Symphact.Core.Tests/      xUnit, mirrors src/ structure (scheduler + concurrency + stress)
 tests/Symphact.Platform.DotNet.Tests/  TMailbox + TDotNetMailboxSignal tests
+tests/Symphact.Persistence.Tests/      TInMemoryJournal + TInMemorySnapshotStore tests
 samples/                        (empty — CounterActor demo is the first target)
 docs/osreq-to-cfpu/             OS→HW requirements feeding CLI-CPU
 .github/workflows/ci.yml        multi-OS build+test
