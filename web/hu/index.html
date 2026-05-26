@@ -227,7 +227,7 @@
     <div class="tagline">
       Minden entitás aktor. A kommunikáció kizárólag üzenetküldéssel történik. Hardveresen kikényszerített izoláció, formális verifikálhatóság, és közös fejlődés a nyílt szilíciummal.
     </div>
-    <div class="status-badge">v0.1 pre-alfa — 29 teszt zöld</div>
+    <div class="status-badge">v0.5 pre-alfa — 186 teszt zöld</div>
   </div>
 </header>
 
@@ -255,13 +255,15 @@
     <div class="codesign">
       <h2>// hw/os co-design</h2>
       <p>
-        Az Apple M-sorozata azért éri el ennyire szoros OS/szilícium integrációt, mert <strong>konkrét
-        szoftver-mechanizmusok konkrét hardver-egységeket alakítottak</strong>: a macOS QoS osztályok a
-        P-core/E-core aszimmetriát, a Core ML a Neural Engine-t, a Keychain a Secure Enclave-et, az x86
-        emuláció (Rosetta&nbsp;2) pedig a TSO memory-ordering módot. A Symphact ezt a kétirányú hurkot
-        alkalmazza nyílt forráskódú szilíciumra: már a nulladik naptól szimulátoron fut, így felfedezi a CFPU
-        követelményeit (mailbox mélység, capability token szélesség, kontextus méret, interrupt modell)
-        <em>még azelőtt</em>, hogy a hardver véglegesülne. A visszacsatolás az
+        Három dokumentált történelmi precedens mutatja, hogy a kétirányú OS/szilícium közös tervezés
+        működik: az <strong>Inmos Transputer + Occam</strong> (~1984, HW mailbox csatornák és az Occam
+        <code>chan</code> primitív párosítása), a <strong>Symbolics Lisp Machine</strong> (1985, tagged
+        pointer és GC-hardver a Lisp runtime-mal közösen tervezve), valamint a <strong>Google TPU +
+        TensorFlow</strong> (2017, publikált co-design, ahol a workload-igények mérhetően alakították
+        a chip mikroarchitektúráját). A Symphact ezt a kétirányú hurkot alkalmazza nyílt forráskódú
+        szilíciumra: már a nulladik naptól szimulátoron fut, így felfedezi a CFPU követelményeit
+        (mailbox mélység, capability token szélesség, kontextus méret, interrupt modell) <em>még azelőtt</em>,
+        hogy a hardver véglegesülne. A visszacsatolás az
         <a href="https://github.com/FenySoft/Symphact/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
         workflow-n át történik.
       </p>

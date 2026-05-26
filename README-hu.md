@@ -32,7 +32,21 @@ git clone https://github.com/FenySoft/Symphact.git
 cd Symphact
 dotnet build Symphact.sln -c Debug
 dotnet test
+
+# Minimális end-to-end aktor-demó futtatása (CounterActor):
+dotnet run --project samples/CounterActor/CounterActor.csproj
 ```
+
+Várható kimenet:
+
+```
+Symphact CounterActor sample — sending 5 Increment + 2 Decrement + 1 Query
+
+Query reply received: counter = 3
+Final state via GetState<int>: 3
+```
+
+A demó bemutatja: `TActorSystem` létrehozás, `Spawn`, `Send`, `Drain`, `GetState`, és a capability-token-stílusú reply (lásd [`samples/CounterActor/README.md`](samples/CounterActor/README.md)).
 
 A CI Ubuntu / Windows / macOS-en fut a **.NET 10 SDK** ellen. A `Directory.Build.props` beállítja a `TreatWarningsAsErrors=true` és `GenerateDocumentationFile=true` opciókat — minden warning build-törő, és minden public tagnak kell XML doksi.
 
@@ -94,7 +108,7 @@ tests/Symphact.Core.Tests/                  xUnit (120 teszt)
 tests/Symphact.Platform.DotNet.Tests/       xUnit (22 teszt)
 tests/Symphact.Persistence.Tests/           xUnit (44 teszt)
 docs/                            architektúra, roadmap, trust model, NLnet pályázati draft, osreq-to-cfpu/
-samples/                         (üres — a CounterActor demó az első cél)
+samples/CounterActor/            minimális futtatható end-to-end demó (Increment / Decrement / Query capability-tokennel)
 .github/workflows/ci.yml         multi-OS build + test
 Directory.Build.props            net10.0, warnings-as-errors, docs on
 ```

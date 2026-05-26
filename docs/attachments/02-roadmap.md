@@ -30,7 +30,7 @@
 | M0.5 Persistence — content-addressed | 🚧 | — | ~16–24 | `TCasJournal` + `TCasSnapshotStore` (SHA-256), supervision lifecycle integration |
 | M0.6 Remoting / Distribution | ⏳ | — | ~28–36 | `ITransport` + `TTcpTransport`, serialization, location-transparent `Send` |
 | M0.7 CFPU Hardware Integration | ⏳ | — | ~30–50 | `TMmioMailbox`, end-to-end demo over `FenySoft.CilCpu.Sim` |
-| M1.0 Samples + Stabilization | ⏳ | — | ~12–16 | CounterActor, ChatRoom, API reference, benchmarks |
+| M1.0 Samples + Stabilization | 🚧 (CounterActor ✅, többi tervezett) | sample futtatható | ~12–16 | CounterActor (✅ leszállítva mint runnable sample, `samples/CounterActor/`), ChatRoom, API reference, benchmarks |
 
 **Total green tests at grant submission: 186** (120 Core + 22 Platform.DotNet + 44 Persistence).
 

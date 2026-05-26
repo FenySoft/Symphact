@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Symphact.Samples.CounterActor</RootNamespace>
+    <AssemblyName>Symphact.Samples.CounterActor</AssemblyName>
+    <Description>Minimal runnable Symphact demo — a counter actor receiving Increment / Decrement / Query messages.</Description>
+    <!-- A samples nem publikus könyvtár — nincs NuGet package, és nem kell XML doc minden tagra. -->
+    <IsPackable>false</IsPackable>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Symphact.Core\Symphact.Core.csproj" />
+    <ProjectReference Include="..\..\src\Symphact.Platform.DotNet\Symphact.Platform.DotNet.csproj" />
+  </ItemGroup>
+
+</Project>

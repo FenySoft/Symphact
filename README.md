@@ -32,7 +32,21 @@ git clone https://github.com/FenySoft/Symphact.git
 cd Symphact
 dotnet build Symphact.sln -c Debug
 dotnet test
+
+# Run the minimal end-to-end actor demo (CounterActor):
+dotnet run --project samples/CounterActor/CounterActor.csproj
 ```
+
+Expected demo output:
+
+```
+Symphact CounterActor sample — sending 5 Increment + 2 Decrement + 1 Query
+
+Query reply received: counter = 3
+Final state via GetState<int>: 3
+```
+
+See [`samples/CounterActor/README.md`](samples/CounterActor/README.md) for what the demo shows.
 
 CI runs on Ubuntu / Windows / macOS against **.NET 10 SDK**. `Directory.Build.props` sets `TreatWarningsAsErrors=true` and `GenerateDocumentationFile=true` — all warnings are build-breaking and all public members need XML docs.
 
@@ -94,7 +108,7 @@ tests/Symphact.Core.Tests/                  xUnit (120 tests)
 tests/Symphact.Platform.DotNet.Tests/       xUnit (22 tests)
 tests/Symphact.Persistence.Tests/           xUnit (44 tests)
 docs/                            architecture, roadmap, trust model, NLnet application draft, osreq-to-cfpu/
-samples/                         (empty — CounterActor demo is the first target)
+samples/CounterActor/            minimal runnable end-to-end demo (Increment / Decrement / Query via capability token)
 .github/workflows/ci.yml         multi-OS build + test
 Directory.Build.props            net10.0, warnings-as-errors, docs on
 ```

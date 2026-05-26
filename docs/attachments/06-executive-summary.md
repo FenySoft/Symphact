@@ -1,10 +1,10 @@
 # Attachment 6 — Executive Summary
 
-> **Symphact — actor substrate for the post-Dennard era.** NLnet NGI Zero Commons Fund, 13th open call, deadline 2026-06-01. Requested: **€30 000**, 12 months, Apache-2.0. Repo: <https://github.com/FenySoft/Symphact>.
+> **Symphact — actor-based operating system co-designed with the CFPU.** NLnet NGI Zero Commons Fund, 13th open call, deadline 2026-06-01. Requested: **€30 000**, 12 months, Apache-2.0. Repo: <https://github.com/FenySoft/Symphact>.
 
 **Problem.** The current computing stack (Linux + GPU + cache coherence) operates at the edge of physical limits. Dennard scaling stalled in the mid-2000s; coherent shared memory scales poorly past a few hundred cores ("dark silicon"); AI training energy keeps growing. The next 15–20 years likely require a share-nothing, message-passing paradigm with one homogeneous primitive on a dedicated-core-per-actor grid — the only route around the physical limits.
 
-**Approach.** Symphact is the first openly documented prototype of this paradigm. A single primitive `TActor<TState>` serves four roles on a homogeneous core grid: classical OS process, hardware driver (MMIO), AI agent (LLM-driven), and LIF / Izhikevich "smart neuron". Co-designed with CFPU open silicon ([`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU), CERN-OHL-S-2.0); feedback runs through the public `osreq-to-cfpu` template. **At submission (2026-05-19): 186 green xUnit tests** cover M0.1–M0.4 + M0.5 BCL-only slices (actor core, supervision with let-it-crash + lifecycle hooks, per-actor parallel scheduler simulating CFPU dedicated-core-per-actor, BCL-only journal + snapshot store). ~65 hours self-funded TDD; out of grant scope.
+**Approach.** Symphact is the first openly documented prototype of this paradigm. A single primitive `TActor<TState>` serves four roles on a homogeneous core grid: classical OS process, hardware driver (MMIO), AI agent (LLM-driven), and LIF / Izhikevich "smart neuron". Co-designed with CFPU open silicon ([`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU), CERN-OHL-S-2.0); feedback runs through the public `osreq-to-cfpu` template. **At submission (2026-05-23): 186 green xUnit tests** cover M0.1–M0.4 + M0.5 BCL-only slices (actor core, supervision with let-it-crash + lifecycle hooks, per-actor parallel scheduler simulating CFPU dedicated-core-per-actor, BCL-only journal + snapshot store). ~65 hours self-funded TDD; out of grant scope.
 
 **Grant deliverables (12 months, €30 000):**
 

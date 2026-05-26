@@ -96,7 +96,7 @@ The osreq-to-cfpu directory README cites three documented precedents:
 | **Symbolics Lisp Machine** | 1985 (Moon: "Architecture of the Symbolics 3600") | Tagged pointer ISA and GC hardware support, co-designed with the Lisp runtime |
 | **Google TPU + TensorFlow** | 2017 (Jouppi et al., ISCA) | Published co-design where workload requirements measurably shaped chip microarchitecture |
 
-Apple's M-series chips are vertically integrated, but the **concrete co-design process between HW and OS is not publicly documented**. Open-source Symphact + CFPU aims to **break that opacity**: every feedback decision is public under Apache-2.0 / CERN-OHL-S, reproducible, and tracked as an `osreq-to-cfpu` issue.
+Symphact + CFPU adds an **openly documented** fourth entry to this short list: every feedback decision lives under Apache-2.0 / CERN-OHL-S, is reproducible, and is tracked as an `osreq-to-cfpu` issue. The three precedents above show the pattern works (Transputer's HW channels + Occam, Symbolics tagged pointers + Lisp, TPU's matrix unit + TensorFlow); Symphact + CFPU is the modern, fully-open instance.
 
 ## 6. Why this matters for NGI
 

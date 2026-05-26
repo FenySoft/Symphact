@@ -227,7 +227,7 @@
     <div class="tagline">
       Every entity is an actor. Communication is exclusively by message. Hardware-enforced isolation, formal verifiability, and co-evolution with open silicon.
     </div>
-    <div class="status-badge">v0.1 pre-alpha — 29 tests green</div>
+    <div class="status-badge">v0.5 pre-alpha — 186 tests green</div>
   </div>
 </header>
 
@@ -254,13 +254,14 @@
     <div class="codesign">
       <h2>// hw/os co-design</h2>
       <p>
-        Apple&rsquo;s M-series achieves tight OS/silicon integration because <strong>specific software
-        mechanisms shaped specific hardware features</strong>: macOS QoS classes shaped the P-core/E-core
-        asymmetry, Core ML shaped the Neural Engine, Keychain shaped the Secure Enclave, and x86 emulation
-        (Rosetta&nbsp;2) shaped the TSO memory-ordering mode. Symphact applies this bidirectional loop to
-        open-source silicon: by running on a simulator from day one, it discovers CFPU requirements
-        (mailbox depth, capability token width, context size, interrupt model) <em>before</em> the hardware
-        is fixed. The feedback flows through the
+        Three documented historical precedents show that bidirectional OS/silicon co-design works:
+        the <strong>Inmos Transputer + Occam</strong> (~1984, HW mailbox channels paired with the
+        Occam <code>chan</code> primitive), the <strong>Symbolics Lisp Machine</strong> (1985, tagged
+        pointers and GC hardware co-designed with the Lisp runtime), and <strong>Google TPU + TensorFlow</strong>
+        (2017, published co-design where workload requirements measurably shaped chip microarchitecture).
+        Symphact applies the same bidirectional loop to open-source silicon: by running on a simulator
+        from day one, it discovers CFPU requirements (mailbox depth, capability token width, context size,
+        interrupt model) <em>before</em> the hardware is fixed. The feedback flows through the
         <a href="https://github.com/FenySoft/Symphact/tree/main/docs/osreq-to-cfpu"><code>osreq-to-cfpu</code></a>
         workflow.
       </p>

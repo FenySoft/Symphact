@@ -1,7 +1,7 @@
 # Attachment 3 — Current Status Snapshot
 
 > NLnet NGI Zero Commons Fund — Symphact application, 13th open call (deadline 2026-06-01).
-> Snapshot date: **2026-05-19**. Repo: <https://github.com/FenySoft/Symphact>. Branch: `main`.
+> Snapshot date: **2026-05-23**. Repo: <https://github.com/FenySoft/Symphact>. Branch: `main`.
 
 ## 1. Milestone status at submission
 
@@ -53,7 +53,7 @@ Build configuration (`Directory.Build.props`): `.NET 10`, `TreatWarningsAsErrors
 ## 4. Repository activity
 
 - **Project start:** 2026-04-16 (initial repo scaffolding)
-- **Snapshot date:** 2026-05-19
+- **Snapshot date:** 2026-05-23
 - **Calendar weeks:** ~5 weeks
 - **Total commits:** 38
 - **Focused TDD hours:** ~65 hours
@@ -105,6 +105,8 @@ $ dotnet build Symphact.sln -c Debug
   Symphact.Core            -> bin/Debug/net10.0/Symphact.Core.dll
   Symphact.Persistence     -> bin/Debug/net10.0/Symphact.Persistence.dll
   Symphact.Platform.DotNet -> bin/Debug/net10.0/Symphact.Platform.DotNet.dll
+  Symphact.Platform.Cfpu   -> bin/Debug/net10.0/Symphact.Platform.Cfpu.dll
+  CounterActor             -> samples/CounterActor/bin/Debug/net10.0/Symphact.Samples.CounterActor.dll
   Symphact.Core.Tests            -> bin/Debug/net10.0/Symphact.Core.Tests.dll
   Symphact.Persistence.Tests     -> bin/Debug/net10.0/Symphact.Persistence.Tests.dll
   Symphact.Platform.DotNet.Tests -> bin/Debug/net10.0/Symphact.Platform.DotNet.Tests.dll
@@ -114,6 +116,21 @@ $ dotnet build Symphact.sln -c Debug
 ```
 
 Zero warnings on a `TreatWarningsAsErrors=true` build with `GenerateDocumentationFile=true` — every public member is documented bilingually (`hu:` / `en:`) per repo convention.
+
+## 6.1 Runnable end-to-end demo
+
+```
+$ dotnet run --project samples/CounterActor/CounterActor.csproj
+Symphact CounterActor sample — sending 5 Increment + 2 Decrement + 1 Query
+
+Query reply received: counter = 3
+Final state via GetState<int>: 3
+```
+
+The `samples/CounterActor/` project (~80 lines, `Symphact.Samples.CounterActor`) demonstrates the
+full actor lifecycle: `TActorSystem(IPlatform)` creation, `Spawn<TActorType, TState>()`, `Send`,
+`IActorContext.Send` (capability-token-style reply), `Drain()`, and `GetState<TState>()`. See
+[`samples/CounterActor/README.md`](../../samples/CounterActor/README.md) for the bilingual walkthrough.
 
 ## 7. Documentation state
 

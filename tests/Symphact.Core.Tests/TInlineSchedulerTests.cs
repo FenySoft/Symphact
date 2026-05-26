@@ -15,44 +15,68 @@ namespace Symphact.Core.Tests;
 public sealed class TInlineSchedulerTests
 {
     [Fact]
-    public void Constructor_DoesNotThrow()
+    public void Constructor_CreatesUsableScheduler()
     {
         using var scheduler = new TInlineScheduler();
 
+        // Newly constructed scheduler must be in a state that accepts Attach + Signal.
         Assert.NotNull(scheduler);
+        Assert.IsAssignableFrom<IScheduler>(scheduler);
     }
 
     [Fact]
-    public void Dispose_CalledTwice_DoesNotThrow()
+    public void Dispose_IsIdempotent()
     {
         var scheduler = new TInlineScheduler();
 
         scheduler.Dispose();
         scheduler.Dispose();
+
+        // Second Dispose did not throw; behavior contract: idempotency.
+        // Post-Dispose Signal raises ObjectDisposedException — see Signal_AfterDispose_Throws.
+        Assert.Throws<ObjectDisposedException>(() => scheduler.Signal(new TActorRef(1)));
     }
 
     [Fact]
-    public void Signal_BeforeAttach_DoesNotThrow()
+    public async Task Signal_BeforeAttach_DefersUntilAttach()
     {
         using var scheduler = new TInlineScheduler();
+        var host = new FakeSchedulerHost();
 
-        scheduler.Signal(new TActorRef(1));
+        // Signal arrives before any host is attached — must not throw; the wakeup is
+        // expected to be deferred and replayed at the first Quiesce after Attach.
+        scheduler.Signal(new TActorRef(7));
+        scheduler.Attach(host);
+        await scheduler.QuiesceAsync(TimeSpan.FromSeconds(1));
+
+        // Behavior contract: the pre-Attach Signal IS observed after Attach.
+        Assert.Equal(1, host.GetRunOneSliceCount(new TActorRef(7)));
     }
 
     [Fact]
-    public void Register_BeforeAttach_DoesNotThrow()
+    public void Register_BeforeAttach_IsAccepted()
     {
         using var scheduler = new TInlineScheduler();
         var mailbox = new FakeMailbox();
 
+        // Register before Attach must be a legal lifecycle ordering — the scheduler
+        // accepts it and stores the mailbox association for future RunOneSlice calls.
         scheduler.Register(new TActorRef(1), mailbox);
+
+        // Following Unregister of the same ref also succeeds (round-trip).
+        scheduler.Unregister(new TActorRef(1));
     }
 
     [Fact]
-    public void Unregister_NotRegistered_DoesNotThrow()
+    public void Unregister_UnknownActor_IsNoOp()
     {
         using var scheduler = new TInlineScheduler();
 
+        // Unregister of a never-registered ref is a silent no-op (the contract makes
+        // the caller's life easier on actor stop racing against pending signals).
+        scheduler.Unregister(new TActorRef(42));
+
+        // Scheduler remains usable afterwards.
         scheduler.Unregister(new TActorRef(42));
     }
 
@@ -60,17 +84,32 @@ public sealed class TInlineSchedulerTests
     public async Task QuiesceAsync_NoWork_ReturnsImmediately()
     {
         using var scheduler = new TInlineScheduler();
+        var host = new FakeSchedulerHost();
+        scheduler.Attach(host);
 
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         await scheduler.QuiesceAsync(TimeSpan.FromSeconds(1));
+        stopwatch.Stop();
+
+        // Empty queue must return promptly — not spin until the timeout.
+        Assert.True(
+            stopwatch.ElapsedMilliseconds < 200,
+            $"QuiesceAsync on empty queue took {stopwatch.ElapsedMilliseconds} ms (expected < 200 ms)");
+        Assert.Equal(0, host.GetRunOneSliceCount(new TActorRef(1)));
     }
 
     [Fact]
-    public void Attach_StoresHost_DoesNotThrow()
+    public void Attach_StoresHostForLaterCallbacks()
     {
         using var scheduler = new TInlineScheduler();
         var host = new FakeSchedulerHost();
 
         scheduler.Attach(host);
+
+        // Behavior contract: a Signal after Attach must reach the host. (Detailed
+        // round-trip in Signal_AfterAttach_QuiesceCallsRunOneSlice.) Here we just
+        // ensure Attach + Signal does not throw on the happy path.
+        scheduler.Signal(new TActorRef(1));
     }
 
     [Fact]
