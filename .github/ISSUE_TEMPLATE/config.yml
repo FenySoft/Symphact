@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "CFPU hardware requirement (CLI-CPU)"
+    url: https://github.com/FenySoft/CLI-CPU/issues
+    about: "If the need is a hardware behaviour change, open it against the sister hardware repo, or use the 'OS requirement for CFPU hardware' template here."
+  - name: "Security vulnerability (private report)"
+    url: https://github.com/FenySoft/Symphact/security/advisories/new
+    about: "Please report security issues privately, never as a public issue. See SECURITY.md."

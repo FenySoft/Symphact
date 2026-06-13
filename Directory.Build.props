@@ -6,8 +6,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- hu: A publikus API dokumentációja kötelező: CS1591 (hiányzó XML doc) build-törő.
+             A teszt- és sample-projektek GenerateDocumentationFile=false-t állítanak, így rájuk a CS1591 nem vonatkozik.
+         en: Public API documentation is mandatory: CS1591 (missing XML doc) is build-breaking.
+             Test and sample projects set GenerateDocumentationFile=false, so CS1591 does not apply to them. -->
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <InvariantGlobalization>true</InvariantGlobalization>
   </PropertyGroup>
 
@@ -15,7 +18,7 @@
     <Company>FenySoft</Company>
     <Authors>FenySoft</Authors>
     <Copyright>Copyright © 2026 FenySoft. Licensed under the Apache License, Version 2.0.</Copyright>
-    <Version>0.1.0</Version>
+    <Version>0.5.0</Version>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/FenySoft/Symphact</PackageProjectUrl>
     <RepositoryUrl>https://github.com/FenySoft/Symphact</RepositoryUrl>

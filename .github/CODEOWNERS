@@ -1,0 +1,3 @@
+# hu: Alapértelmezett kód-tulajdonos minden fájlra — automatikus review-kijelölés minden PR-nél.
+# en: Default code owner for everything — automatic review assignment on every PR.
+* @Hocza-Jozsef-Szabolcs

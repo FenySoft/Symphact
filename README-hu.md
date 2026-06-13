@@ -1,5 +1,10 @@
 # Symphact
 
+[![CI](https://github.com/FenySoft/Symphact/actions/workflows/ci.yml/badge.svg)](https://github.com/FenySoft/Symphact/actions/workflows/ci.yml)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4.svg)](https://dotnet.microsoft.com/)
+[![Status](https://img.shields.io/badge/status-v0.5_pre--alpha-orange.svg)](docs/roadmap-hu.md)
+
 > **Capability-alapú aktor runtime biztonságos .NET számításhoz — co-designed a Cognitive Fabric Processing Unit (CFPU) hardverrel.**
 > Minden entitás aktor. A kommunikáció kizárólag üzenetküldéssel történik. .NET hoszton szoftveres, CFPU-n hardveres izoláció. Formális verifikálhatóság, és közös fejlődés a nyílt szilíciummal.
 
@@ -126,7 +131,7 @@ Az OS-ből a hardver felé kommunikált követelményeket a [`osreq-to-cfpu`](.g
 
 ## Finanszírozás
 
-Az **NLnet NGI Zero Commons Fund** (13. nyílt kör, deadline 2026-06-01) felé €30 000 értékű pályázat lett előkészítve az M0.5 (content-addressed perzisztencia) → M0.7 (CFPU integrációs demó) mérföldkövek, plusz a formális verifikációs alapozás, NuGet publikáció, kétnyelvű dokumentáció és outreach finanszírozására. Lásd: [`docs/nlnet-application-draft-hu.md`](docs/nlnet-application-draft-hu.md).
+Az **NLnet NGI Zero Commons Fund** (13. nyílt kör, deadline 2026-06-01) felé €30 000 értékű pályázat lett benyújtva az M0.5 (content-addressed perzisztencia) → M0.7 (CFPU integrációs demó) mérföldkövek, plusz a formális verifikációs alapozás, NuGet publikáció, kétnyelvű dokumentáció és outreach finanszírozására. Lásd: [`docs/nlnet-application-draft-hu.md`](docs/nlnet-application-draft-hu.md).
 
 ## Licenc
 

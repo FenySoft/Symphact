@@ -87,7 +87,7 @@ If you touch existing untested code, add the tests before modifying.
 
 Most global conventions (naming `T/I/A/F`, bilingual XML docs, blank lines around control structures, commit prefix types) are listed in the user's global `~/.claude/CLAUDE.md` and this repo's `CONTRIBUTING.md`. Project-specific notes:
 
-- **`TreatWarningsAsErrors=true`** is repo-wide — a missing XML doc on a public member will fail the build (`CS1591` is explicitly un-suppressed for public API; currently only suppressed via `NoWarn` where you see it, so: document public members).
+- **`TreatWarningsAsErrors=true`** is repo-wide — a missing XML doc on a public member of a `src/` library project fails the build (`CS1591` is **not** suppressed for the public API; `Directory.Build.props` carries no `NoWarn` for it). Test and sample projects opt out via `GenerateDocumentationFile=false`, so the rule is: document every public member of the runtime libraries.
 - **Actor-specific rule:** there is currently no `ActorContext` — handlers receive `(state, message)` only. Do not sneak in cross-actor calls via captured fields; wait for the context parameter to be introduced as a deliberate API step.
 - **`TActorSystem.GetState` is test-only.** Production code must not read another actor's state directly — use a message round-trip.
 - **Every new runtime type belongs behind an interface if it has a hardware-backed future variant** (mailbox is the template: `IMailbox` + `TMailbox`). This keeps the CFPU drop-in path clean.
