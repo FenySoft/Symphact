@@ -129,10 +129,6 @@ Symphact runs on **any** CIL host. For hardware co-design purposes, we additiona
 
 OS-to-hardware requirements are tracked via the [`osreq-to-cfpu`](.github/ISSUE_TEMPLATE/osreq-for-cfpu.md) issue template and the [`docs/osreq-to-cfpu/`](docs/osreq-to-cfpu/) directory (osreq-001 … osreq-006 are active; osreq-007 was superseded by the CST model).
 
-## Funding
-
-A grant application has been submitted to the **NLnet NGI Zero Commons Fund** (13th open call, deadline 2026-06-01) requesting €30,000 to fund M0.5 (content-addressed persistence) → M0.7 (CFPU integration demo) plus formal-verification groundwork, NuGet publication, bilingual documentation, and outreach. See [`docs/nlnet-application-draft-en.md`](docs/nlnet-application-draft-en.md).
-
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE) and [NOTICE](NOTICE).

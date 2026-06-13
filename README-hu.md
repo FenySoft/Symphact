@@ -129,10 +129,6 @@ A Symphact **bármely** CIL hoszton fut. A hardveres co-design céljából **kie
 
 Az OS-ből a hardver felé kommunikált követelményeket a [`osreq-to-cfpu`](.github/ISSUE_TEMPLATE/osreq-for-cfpu.md) issue template és a [`docs/osreq-to-cfpu/`](docs/osreq-to-cfpu/) könyvtár követi nyomon (osreq-001 … osreq-006 aktív; az osreq-007 elavult, a CST modell váltotta le).
 
-## Finanszírozás
-
-Az **NLnet NGI Zero Commons Fund** (13. nyílt kör, deadline 2026-06-01) felé €30 000 értékű pályázat lett benyújtva az M0.5 (content-addressed perzisztencia) → M0.7 (CFPU integrációs demó) mérföldkövek, plusz a formális verifikációs alapozás, NuGet publikáció, kétnyelvű dokumentáció és outreach finanszírozására. Lásd: [`docs/nlnet-application-draft-hu.md`](docs/nlnet-application-draft-hu.md).
-
 ## Licenc
 
 Apache License 2.0 — lásd [LICENSE](LICENSE) és [NOTICE](NOTICE).
