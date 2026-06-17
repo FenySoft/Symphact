@@ -102,6 +102,10 @@ Supervision (M0.3) provides `ISupervisorStrategy`, OneForOne / AllForOne strateg
 
 Persistence (M0.5, in progress) provides `IJournal` / `ISnapshotStore` — the BCL-only in-memory reference implementations are complete; the content-addressed production-grade variant (`TCasJournal`, `TCasSnapshotStore`) is next.
 
+## Validation in practice
+
+The actor model principles in Symphact are not theoretical — they are proven in industry practice. In [*Agents Are Actors*](https://www.youtube.com/watch?v=zdrg987i3vI) (Akka.NET Community Standup, June 2026), the **Netclaw** case study demonstrates that these foundations are sufficient for real-world AI agent workloads: 800 million tokens of durable agent work, event-sourced memory, supervised child actors, parallel tool execution, and recovery from crashes without re-running completed work. The design patterns in Symphact (immutable messages, supervision hierarchy, journaling, capability-based isolation) enable durable, verifiable systems at scale. This convergence with established practice validates that capability-based actors are the right foundation for both software and hardware co-design.
+
 ## Project layout
 
 ```
