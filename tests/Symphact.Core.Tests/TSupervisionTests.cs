@@ -154,6 +154,56 @@ public sealed class TSupervisionTests
         }
     }
 
+    // AllForOne supervisor actors — strategy is hardcoded per directive type
+    // because Spawn<T> requires a parameterless constructor.
+
+    private sealed class TAllForOneRestartSupervisor : TActor<int>
+    {
+        public override ISupervisorStrategy? SupervisorStrategy => new TAllForOneStrategy();
+
+        public override int Init() => 0;
+
+        public override int Handle(int AState, object AMessage, IActorContext AContext)
+        {
+            if (AMessage is "spawn-child")
+                AContext.Spawn<TFailingActor, int>();
+
+            return AState;
+        }
+    }
+
+    private sealed class TAllForOneStopSupervisor : TActor<int>
+    {
+        public override ISupervisorStrategy? SupervisorStrategy =>
+            new TAllForOneStrategy(_ => ESupervisorDirective.Stop);
+
+        public override int Init() => 0;
+
+        public override int Handle(int AState, object AMessage, IActorContext AContext)
+        {
+            if (AMessage is "spawn-child")
+                AContext.Spawn<TFailingActor, int>();
+
+            return AState;
+        }
+    }
+
+    private sealed class TAllForOneResumeSupervisor : TActor<int>
+    {
+        public override ISupervisorStrategy? SupervisorStrategy =>
+            new TAllForOneStrategy(_ => ESupervisorDirective.Resume);
+
+        public override int Init() => 0;
+
+        public override int Handle(int AState, object AMessage, IActorContext AContext)
+        {
+            if (AMessage is "spawn-child")
+                AContext.Spawn<TFailingActor, int>();
+
+            return AState;
+        }
+    }
+
     #endregion
 
     #region Restart
@@ -311,6 +361,124 @@ public sealed class TSupervisionTests
 
         // Escalate from root-level supervisor → exception escapes DrainAsync
         Assert.Throws<InvalidOperationException>(() => system.Drain());
+    }
+
+    #endregion
+
+    #region AllForOne — Restart
+
+    [Fact]
+    public void AllForOne_Restart_OneChildFails_AllSiblingsAlsoRestart()
+    {
+        using var system = new TActorSystem(new TDotNetPlatform());
+        var supervisorRef = system.Spawn<TAllForOneRestartSupervisor, int>();
+
+        system.Send(supervisorRef, "spawn-child");
+        system.Send(supervisorRef, "spawn-child");
+        system.Drain();
+
+        var children = system.GetChildren(supervisorRef);
+        Assert.Equal(2, children.Count);
+
+        // Build up state in both children
+        system.Send(children[0], "increment");
+        system.Send(children[1], "increment");
+        system.Send(children[1], "increment");
+        system.Drain();
+
+        Assert.Equal(1, system.GetState<int>(children[0]));
+        Assert.Equal(2, system.GetState<int>(children[1]));
+
+        // Fail children[0] — AllForOne: both children must restart (state = 0)
+        system.Send(children[0], "fail");
+        system.Drain();
+
+        Assert.Equal(0, system.GetState<int>(children[0]));
+        Assert.Equal(0, system.GetState<int>(children[1]));
+        Assert.False(system.IsStopped(children[0]));
+        Assert.False(system.IsStopped(children[1]));
+    }
+
+    [Fact]
+    public void AllForOne_Restart_SiblingCanReceiveMessagesAfterRestart()
+    {
+        using var system = new TActorSystem(new TDotNetPlatform());
+        var supervisorRef = system.Spawn<TAllForOneRestartSupervisor, int>();
+
+        system.Send(supervisorRef, "spawn-child");
+        system.Send(supervisorRef, "spawn-child");
+        system.Drain();
+
+        var children = system.GetChildren(supervisorRef);
+
+        // Fail children[0]
+        system.Send(children[0], "fail");
+        system.Drain();
+
+        // children[1] was restarted by AllForOne — must still accept messages
+        system.Send(children[1], "increment");
+        system.Drain();
+
+        Assert.Equal(1, system.GetState<int>(children[1]));
+    }
+
+    #endregion
+
+    #region AllForOne — Stop
+
+    [Fact]
+    public void AllForOne_Stop_OneChildFails_AllSiblingsStopped()
+    {
+        using var system = new TActorSystem(new TDotNetPlatform());
+        var supervisorRef = system.Spawn<TAllForOneStopSupervisor, int>();
+
+        system.Send(supervisorRef, "spawn-child");
+        system.Send(supervisorRef, "spawn-child");
+        system.Drain();
+
+        var children = system.GetChildren(supervisorRef);
+        Assert.Equal(2, children.Count);
+
+        // Fail children[0] — AllForOne: both must stop
+        system.Send(children[0], "fail");
+        system.Drain();
+
+        Assert.True(system.IsStopped(children[0]));
+        Assert.True(system.IsStopped(children[1]));
+    }
+
+    #endregion
+
+    #region AllForOne — Resume
+
+    [Fact]
+    public void AllForOne_Resume_OneChildFails_SiblingsStillRunning()
+    {
+        using var system = new TActorSystem(new TDotNetPlatform());
+        var supervisorRef = system.Spawn<TAllForOneResumeSupervisor, int>();
+
+        system.Send(supervisorRef, "spawn-child");
+        system.Send(supervisorRef, "spawn-child");
+        system.Drain();
+
+        var children = system.GetChildren(supervisorRef);
+
+        // Build up state
+        system.Send(children[1], "increment");
+        system.Send(children[1], "increment");
+        system.Drain();
+
+        Assert.Equal(2, system.GetState<int>(children[1]));
+
+        // Fail children[0] — AllForOne + Resume: siblings continue running, state preserved
+        system.Send(children[0], "fail");
+        system.Drain();
+
+        Assert.False(system.IsStopped(children[0]));
+        Assert.False(system.IsStopped(children[1]));
+
+        // children[1] state must be preserved (Resume is a no-op for non-failing siblings)
+        Assert.Equal(2, system.GetState<int>(children[1]));
     }
 
     #endregion

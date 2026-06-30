@@ -34,4 +34,14 @@ public interface ISupervisorStrategy
     /// en: The directive to apply.
     /// </returns>
     ESupervisorDirective Decide(TActorRef AChild, Exception AException);
+
+    /// <summary>
+    /// hu: Ha igaz, a direktíva a hibázó gyereken kívül annak összes testvérére is érvényes
+    /// (AllForOne szemantika). Ha hamis, csak a hibázó gyerek érintett (OneForOne szemantika).
+    /// <br />
+    /// en: If true, the directive applies to all siblings of the failed child in addition to
+    /// the failed child itself (AllForOne semantics). If false, only the failed child is
+    /// affected (OneForOne semantics).
+    /// </summary>
+    bool AffectsAllSiblings { get; }
 }

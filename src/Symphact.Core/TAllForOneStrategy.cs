@@ -1,15 +1,17 @@
 namespace Symphact.Core;
 
 /// <summary>
-/// hu: One-for-one supervisor stratégia: csak a hibázó gyerek aktort érinti a döntés,
-/// a testvérei zavartalanul futnak tovább. Egy opcionális decider függvénnyel konfigurálható,
-/// ami exception típus alapján dönt. Ha nincs megadva decider, az alapértelmezett döntés: Restart.
+/// hu: All-for-one supervisor stratégia: ha bármelyik gyerek aktor hibázik, a direktíva az
+/// összes testvérre is érvényes (a hibázó gyerekkel együtt). Egy opcionális decider
+/// függvénnyel konfigurálható, ami exception típus alapján dönt. Ha nincs megadva decider,
+/// az alapértelmezett döntés: Restart.
 /// <br />
-/// en: One-for-one supervisor strategy: only the failed child actor is affected by the decision,
-/// its siblings continue undisturbed. Configurable with an optional decider function that decides
-/// based on exception type. If no decider is provided, the default decision is: Restart.
+/// en: All-for-one supervisor strategy: when any child actor fails, the directive applies to
+/// all siblings as well (including the failed child). Configurable with an optional decider
+/// function that decides based on exception type. If no decider is provided, the default
+/// decision is: Restart.
 /// </summary>
-public sealed class TOneForOneStrategy : ISupervisorStrategy
+public sealed class TAllForOneStrategy : ISupervisorStrategy
 {
     private readonly Func<Exception, ESupervisorDirective> FDecider;
 
@@ -18,7 +20,7 @@ public sealed class TOneForOneStrategy : ISupervisorStrategy
     /// <br />
     /// en: Create with default decider (always Restart).
     /// </summary>
-    public TOneForOneStrategy()
+    public TAllForOneStrategy()
     {
         FDecider = _ => ESupervisorDirective.Restart;
     }
@@ -38,14 +40,14 @@ public sealed class TOneForOneStrategy : ISupervisorStrategy
     /// <br />
     /// en: If ADecider is null.
     /// </exception>
-    public TOneForOneStrategy(Func<Exception, ESupervisorDirective> ADecider)
+    public TAllForOneStrategy(Func<Exception, ESupervisorDirective> ADecider)
     {
         ArgumentNullException.ThrowIfNull(ADecider);
         FDecider = ADecider;
     }
 
     /// <inheritdoc />
-    public bool AffectsAllSiblings => false;
+    public bool AffectsAllSiblings => true;
 
     /// <inheritdoc />
     public ESupervisorDirective Decide(TActorRef AChild, Exception AException)

@@ -214,18 +214,61 @@ public sealed class TActorSystem : IDisposable, ISchedulerHost
 
             case ESupervisorDirective.Restart:
                 RestartActor(AChildEntry, AException);
+
+                if (strategy.AffectsAllSiblings)
+                    ApplyDirectiveToSiblings(parentEntry, AChildRef, directive, AException);
+
                 break;
 
             case ESupervisorDirective.Stop:
                 StopActor(AChildEntry);
+
+                if (strategy.AffectsAllSiblings)
+                    ApplyDirectiveToSiblings(parentEntry, AChildRef, directive, AException);
+
                 break;
 
             case ESupervisorDirective.Escalate:
-                // Re-throw as if the parent itself failed
+                // Re-throw as if the parent itself failed — sibling scope does not apply
                 throw AException;
 
             default:
                 throw new InvalidOperationException($"Unknown supervisor directive: {directive}");
+        }
+    }
+
+    private void ApplyDirectiveToSiblings(
+        TActorEntry AParentEntry,
+        TActorRef AFailedChild,
+        ESupervisorDirective ADirective,
+        Exception AException)
+    {
+        TActorRef[] siblings;
+
+        lock (AParentEntry.ChildrenLock)
+        {
+            siblings = AParentEntry.Children
+                .Where(ARef => ARef != AFailedChild)
+                .ToArray();
+        }
+
+        foreach (var siblingRef in siblings)
+        {
+            var siblingEntry = GetEntry(siblingRef);
+
+            if (siblingEntry is null || siblingEntry.Stopped)
+                continue;
+
+            switch (ADirective)
+            {
+                case ESupervisorDirective.Restart:
+                    RestartActor(siblingEntry, AException);
+                    break;
+
+                case ESupervisorDirective.Stop:
+                    StopActor(siblingEntry);
+                    break;
+            }
         }
     }
 

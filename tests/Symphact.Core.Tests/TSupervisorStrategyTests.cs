@@ -104,4 +104,98 @@ public sealed class TSupervisorStrategyTests
     }
 
     #endregion
+
+    #region TOneForOneStrategy — AffectsAllSiblings
+
+    [Fact]
+    public void OneForOne_AffectsAllSiblings_IsFalse()
+    {
+        var strategy = new TOneForOneStrategy();
+
+        Assert.False(strategy.AffectsAllSiblings);
+    }
+
+    #endregion
+
+    #region TAllForOneStrategy — AffectsAllSiblings
+
+    [Fact]
+    public void AllForOne_AffectsAllSiblings_IsTrue()
+    {
+        var strategy = new TAllForOneStrategy();
+
+        Assert.True(strategy.AffectsAllSiblings);
+    }
+
+    #endregion
+
+    #region TAllForOneStrategy — default decider
+
+    [Fact]
+    public void AllForOne_DefaultDecider_ReturnsRestart()
+    {
+        var strategy = new TAllForOneStrategy();
+        var childRef = new TActorRef(1);
+
+        var directive = strategy.Decide(childRef, new InvalidOperationException("test"));
+
+        Assert.Equal(ESupervisorDirective.Restart, directive);
+    }
+
+    [Fact]
+    public void AllForOne_DefaultDecider_ReturnsRestart_ForAnyException()
+    {
+        var strategy = new TAllForOneStrategy();
+        var childRef = new TActorRef(42);
+
+        Assert.Equal(ESupervisorDirective.Restart, strategy.Decide(childRef, new ArgumentException("arg")));
+        Assert.Equal(ESupervisorDirective.Restart, strategy.Decide(childRef, new NullReferenceException()));
+        Assert.Equal(ESupervisorDirective.Restart, strategy.Decide(childRef, new TimeoutException()));
+    }
+
+    #endregion
+
+    #region TAllForOneStrategy — custom decider
+
+    [Fact]
+    public void AllForOne_CustomDecider_ReturnsStop_ForArgumentException()
+    {
+        var strategy = new TAllForOneStrategy(AException =>
+            AException is ArgumentException ? ESupervisorDirective.Stop : ESupervisorDirective.Restart);
+
+        var childRef = new TActorRef(1);
+
+        Assert.Equal(ESupervisorDirective.Stop, strategy.Decide(childRef, new ArgumentException("bad")));
+        Assert.Equal(ESupervisorDirective.Restart, strategy.Decide(childRef, new InvalidOperationException("other")));
+    }
+
+    [Fact]
+    public void AllForOne_CustomDecider_CanReturnEscalate()
+    {
+        var strategy = new TAllForOneStrategy(_ => ESupervisorDirective.Escalate);
+        var childRef = new TActorRef(5);
+
+        Assert.Equal(ESupervisorDirective.Escalate, strategy.Decide(childRef, new Exception("fatal")));
+    }
+
+    [Fact]
+    public void AllForOne_CustomDecider_CanReturnResume()
+    {
+        var strategy = new TAllForOneStrategy(_ => ESupervisorDirective.Resume);
+        var childRef = new TActorRef(3);
+
+        Assert.Equal(ESupervisorDirective.Resume, strategy.Decide(childRef, new Exception("minor")));
+    }
+
+    #endregion
+
+    #region TAllForOneStrategy — null decider
+
+    [Fact]
+    public void AllForOne_NullDecider_Throws()
+    {
+        Assert.Throws<ArgumentNullException>(() => new TAllForOneStrategy(null!));
+    }
+
+    #endregion
 }
