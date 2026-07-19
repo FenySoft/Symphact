@@ -2,7 +2,7 @@
 
 > Magyar verzió: [osreq-006-interchip-link-hu.md](osreq-006-interchip-link-hu.md)
 
-> Version: 1.0
+> Version: 1.1
 
 > **Status:** Draft — awaiting hardware feedback
 >
@@ -62,13 +62,14 @@ The inter-chip message must contain:
 
 ### Routing decision (related to OSREQ-001)
 
+`TActorRef` remains chip-local (`actor-ref-scaling-en.md` §1.c/§3.c) — it does not carry a chip-id field. Addressing beyond the chip boundary uses the **proxy-actor pattern**: the sender sends to a local `remote_proxy` actor (a regular, chip-local CST index), and the proxy's internal state holds the actual target chip/cluster/core data.
+
 ```
-Send(ref, msg):
-  chip_id = ref.ChipId
-  if chip_id = own → intra-chip routing (OSREQ-001 tree)
-  if chip_id ≠ own → inter-chip bridge:
+Send(ref, msg):                                ← ref: local, chip-local CST index
+  if ref points to an application actor  → intra-chip routing (OSREQ-001 tree)
+  if ref points to a remote_proxy actor   → proxy actor:
     1. Message serialize (SRAM → link buffer)
-    2. Add header (src/dst chip+cluster+core)
+    2. Add header from the proxy's internal state (src/dst chip+cluster+core)
     3. Link transmit (HW)
     4. Target chip: link receive → deserialize → dst mailbox FIFO
 ```
@@ -85,7 +86,7 @@ Send(ref, msg):
 
 | OS component | Change |
 |-------------|--------|
-| `TActorRef` | Add `chip-id` field (8 bit → 256 chips max) |
+| `TActorRef` | ~~Add `chip-id` field~~ — **REJECTED**: per the `actor-ref-scaling-en.md` §3.b decision, `TActorRef` remains chip-local (32-bit opaque CST index); addressing beyond the chip boundary uses the proxy-actor pattern (§3.c) |
 | `TRouter` | Inter-chip routing: chip-id lookup → link buffer |
 | `TSerializer` | Message serialize/deserialize for inter-chip transfer |
 | `TDistributionSupervisor` | Link health monitoring, actor migration |
@@ -113,4 +114,5 @@ Send(ref, msg):
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.1 | 2026-07-19 | "Impact on Symphact" table: `TActorRef` chip-id field proposal marked REJECTED (`actor-ref-scaling-en.md` §3.b); routing decision pseudocode fixed to the proxy-actor pattern |
 | 1.0 | 2026-04-20 | Initial release |

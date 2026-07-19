@@ -10,7 +10,7 @@
 
 > English version: [vision-en.md](vision-en.md)
 
-> Version: 1.4
+> Version: 1.5
 
 ## Filozófia — az Unix örökség leváltása, az Erlang vízió megvalósítása
 
@@ -353,7 +353,9 @@ A mailbox alapértelmezésben **FIFO** — az üzenetek érkezési sorrendben do
 
 ### Backpressure
 
-Ha egy mailbox telítődik (a hardveres FIFO 8 mélységű F3-ban, ~64 mélységű F6-ban), a küldő **blokkolódik** (vagy `SendError` trap-et kap, ha `try_send`-et használt). Ez **természetes flow control**, nincs szükség explicit rate limit-re.
+Ha egy mailbox közel telítődik (a hardveres FIFO 8 mélységű F3-ban, ~64 mélységű F6-ban), a credit-based flow control **természetes flow control**-lal rövid ideig lassítja a küldőt — nincs szükség explicit rate limit-re.
+
+A NoC ugyanakkor **best-effort**: nem garantálja egyetlen cella kézbesítését sem, és a küldő **sosem blokkolódik korlátlan ideig**. Ha a torlódás vagy egy útközbeni link-hiba a credit-timeout ablakon (+ CRC-8/16 integritás-ellenőrzésen) túl is fennáll, a cella **timeout-drop**-pal távozik a hálózatból — ez előzi meg a backpressure-kaszkád szétterjedését a fabricban. A küldő ezt `SendError` trap-ként érzékeli, ha `try_send`-et használt; alapértelmezett `send` esetén a hiányzó válasz a **supervision hierarchián** keresztül old fel: a supervisor timeout-ot észlel, és a stratégiájának megfelelően újraküld, újraindítja a küldő/fogadó actort, vagy eszkalál (lásd „Let it crash — strukturált fault tolerance" fent). A megbízhatóságot tehát az **actor-protokoll** adja, nem a hálózati réteg — ugyanez az elv érvényes a CFPU NoC szintjén is (lásd [CLI-CPU/docs/interconnect-hu.md](https://github.com/FenySoft/CLI-CPU/blob/main/docs/interconnect-hu.md), „NoC-szintű link-hiba és backpressure szemantika").
 
 ## Memóriakezelés
 
@@ -1063,6 +1065,7 @@ Ez a CLI-CPU projekt legtávolabbi, **legértékesebb** horizontja, és **ez a v
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
+| 1.5 | 2026-07-19 | **Backpressure szekció javítva: blokkoló-FIFO szemantika → best-effort NoC.** A korábbi „a küldő blokkolódik" leírás nem tükrözte a 2026-07-07-i CFPU NoC fault-policy döntést. Frissítve: credit-based flow control marad a normál torlódásra (rövid, természetes lassítás), de a NoC nem garantál kézbesítést — credit-timeout + CRC-8/16 detekció után timeout-drop, helyreállítás a supervision hierarchián keresztül. Kaszkád a CLI-CPU `interconnect-hu.md` v3.7 új „NoC-szintű link-hiba és backpressure szemantika" szakaszából; hu/en párokkal szinkronizálva. |
 | 1.4 | 2026-04-28 | **TActorRef: 64-bit → 32-bit CST index** (`TActorRef(int SlotIndex)`). HMAC/SipHash referenciák törölve — HW-managed CST modell. Perms a CST-ben, nem a header-ben. Interconnect header v3.0. osreq-007 OBSOLETE. |
 | 1.3 | 2026-04-17 | **Átköltözés a Symphact repóba** (korábban `CLI-CPU/docs/symphact-hu.md`). A CLI-CPU-ban most stub marad a történelmi linkekhez. Bevezető boxok frissítve (most már ebben a repóban van az implementáció is). |
 | 1.0 | 2026-04-14 | Kezdeti verziózott kiadás |

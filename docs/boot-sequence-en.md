@@ -4,7 +4,7 @@
 
 > The Symphact startup process — **after** the hardware boot, up to the first application actor.
 
-> Version: 1.0
+> Version: 1.1
 
 ---
 
@@ -105,8 +105,8 @@ MMIO register details: [CLI-CPU/docs/hw-boot-hu.md §MMIO](https://github.com/Fe
 | The Rich core's **own mailbox FIFO is activated**: | MMIO write: `Mmio.Write(0xF0000300 + rich_core_id * 4, MAILBOX_ENABLE)` |
 | From now on, the root supervisor can receive messages. | The HW mailbox FIFO is active — incoming messages generate interrupts. |
 | | |
-| The root supervisor **receives a TActorRef capability**: | The capability derives from the boot trust. |
-| `[core-id: Rich][offset: 0][perms: Admin]` | The `TCapabilityRegistry` (step 6d) will manage runtime capabilities. |
+| The root supervisor **receives a CST entry with Admin-level rights**: | The CST entry derives from the boot trust, held in SEAL-protected QSRAM. |
+| On the software side this is an opaque `TActorRef(SlotIndex)` — the `dst`/`perms` fields are not visible to software (see `actor-ref-scaling-en.md` §2.b). | The `TCapabilityRegistry` (step 6d) will manage runtime capabilities. |
 | | |
 | This is the **only** actor with Admin capability. | |
 | Every other actor **receives rights from this one** (capability delegation). | |
@@ -225,4 +225,5 @@ The boot sequence described above refers to the **CFPU hardware**. The .NET refe
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.1 | 2026-07-19 | Step 5: fixed outdated `[core-id][offset][perms]` bit-field capability description to the CST model (`actor-ref-scaling-en.md` §2.b) |
 | 1.0 | 2026-04-18 | Initial release |

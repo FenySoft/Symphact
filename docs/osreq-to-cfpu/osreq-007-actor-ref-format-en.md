@@ -2,11 +2,23 @@
 
 > Magyar verzió: [osreq-007-actor-ref-format-hu.md](osreq-007-actor-ref-format-hu.md)
 
-> Version: 1.0
+> Version: 1.1
 
-> **Status:** Draft — awaiting hardware feedback
+> **Status:** Obsolete — see banner below
 >
 > **Affected CFPU phase:** F6 (silicon, ChipIgnite tape-out), F6.5 (Secure Edition optional hardening)
+
+---
+
+> ## ⚠️ OBSOLETE
+>
+> This document is **obsolete**. The HMAC-based defense model described here (interconnect header v2.5, `src_actor`/`dst_actor` reduced to 8 bits, mailbox-edge HMAC verify HW unit, per-chip bad-HMAC counter, AuthCode quarantine integration) has been superseded by the **CST (Capability Slot Table) model** — see [`actor-ref-scaling-en.md`](../actor-ref-scaling-en.md) v3.0. `TActorRef` is now a 32-bit opaque CST index (`TActorRef(int SlotIndex)`) instead of the earlier 64-bit HMAC-based layout; permission checking is a HW-managed CST QSRAM lookup (1 cycle), not a cryptographic HMAC verify.
+>
+> **Exception — Requirement 5 (Trust anchor hardening) remains IN FORCE**, just relocated to its own document: the OTP `eFuse.CaRootHash` single slot, and the ban on multi-root arrays / Open-mode bit / deployment-mode toggle — see [`trust-model-en.md`](../trust-model-en.md) "Locking down the eFuse OTP configuration" section.
+>
+> The document below remains in its **original, obsolete state** as an archive.
+
+---
 
 ## Summary
 
@@ -259,4 +271,5 @@ The FenySoft product line **mandatorily** uses this strict configuration (see `d
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.1 | 2026-07-19 | **Added OBSOLETE banner** — the HMAC-based model was superseded by the CST model (`actor-ref-scaling-en.md` v3.0); Requirement 5 (trust anchor hardening) lives on, in force, in `trust-model-en.md`. Document body unchanged, kept as archive. |
 | 1.0 | 2026-04-25 | Initial: header v2.5, mailbox-edge HMAC verify unit, fail-stop, counter, AuthCode quarantine integration, trust anchor hardening |

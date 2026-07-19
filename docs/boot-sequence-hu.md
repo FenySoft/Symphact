@@ -4,7 +4,7 @@
 
 > A Symphact indulási folyamata — a hardveres boot **után**, az első alkalmazás actor-ig.
 
-> Version: 1.0
+> Version: 1.1
 
 ---
 
@@ -105,8 +105,8 @@ MMIO regiszterek részletes leírása: [CLI-CPU/docs/hw-boot-hu.md §MMIO](https
 | A Rich core **saját mailbox FIFO-ja aktiválódik**: | MMIO write: `Mmio.Write(0xF0000300 + rich_core_id * 4, MAILBOX_ENABLE)` |
 | Innentől a root supervisor üzeneteket fogadhat. | A HW mailbox FIFO aktív — bejövő üzenetek interrupt-ot generálnak. |
 | | |
-| A root supervisor **TActorRef capability-t kap**: | A capability a boot trust-ből származik. |
-| `[core-id: Rich][offset: 0][perms: Admin]` | A `TCapabilityRegistry` (6d lépés) fogja kezelni a runtime capability-ket. |
+| A root supervisor **CST bejegyzést kap Admin-szintű jogosultsággal**: | A CST bejegyzés a boot trust-ből származik, SEAL-védett QSRAM-ban él. |
+| Szoftver oldalon opaque `TActorRef(SlotIndex)` — a `dst`/`perms` mezőket a szoftver nem látja (`actor-ref-scaling-hu.md` §2.b). | A `TCapabilityRegistry` (6d lépés) fogja kezelni a runtime capability-ket. |
 | | |
 | Ez az **egyetlen** actor akinek Admin capability-je van. | |
 | Minden más actor **ettől kap jogot** (capability delegation). | |
@@ -225,4 +225,5 @@ A boot sequence fenti leírása a **CFPU hardverre** vonatkozik. A .NET referenc
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
+| 1.1 | 2026-07-19 | 5. lépés: elavult `[core-id][offset][perms]` bit-mezős capability-leírás javítva CST-modellre (`actor-ref-scaling-hu.md` §2.b) |
 | 1.0 | 2026-04-18 | Kezdeti kiadás |

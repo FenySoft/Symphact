@@ -2,7 +2,7 @@
 
 > Az aktor-runtime fejlesztési mérföldkövei — a CFPU hardverrel együtt-tervezve.
 
-> Version: 1.0
+> Version: 1.1
 
 ## Összesítés
 
@@ -27,7 +27,7 @@
 | M0.2 | ✅ | ~8 (tény) | Közepes |
 | M0.3 | ✅ | ~24-32 | Magas |
 | M0.4 | ✅ | ~24-32 | Magas |
-| M0.5 | Tervezett | ~16-24 | Közepes-magas |
+| M0.5 | 🚧 Részben kész (BCL-only szeletek ✅, content-addressed folyamatban) | ~16-24 | Közepes-magas |
 | M0.6 | Tervezett | ~28-36 | Magas |
 | M0.7 | Tervezett | ~30-50 | Nagyon magas |
 | M1.0 | Tervezett | ~12-16 | Közepes |
@@ -118,15 +118,23 @@
 
 ---
 
-## M0.5 — Persistence (Event Sourcing)
+## M0.5 — Persistence (Event Sourcing) 🚧
 
 > Actor state túléli a restart-ot.
 
+**BCL-only szeletek — ✅ leszállítva (+44 teszt):**
+
 | Elem | Leírás |
 |---|---|
-| `IPersistenceProvider` | Journal absztrakció. |
-| `TInMemoryJournal` | Teszt implementáció. |
-| `TSqliteJournal` | Referencia implementáció. |
+| `IJournal` / `TInMemoryJournal` | Journal absztrakció + BCL-only in-memory referencia implementáció. |
+| `ISnapshotStore` / `TInMemorySnapshotStore` | Snapshot-absztrakció + BCL-only in-memory referencia implementáció. |
+
+**Content-addressed szint — 🚧 folyamatban:**
+
+| Elem | Leírás |
+|---|---|
+| `TCasJournal` | Content-addressed, SHA-256 alapú produkciós szintű journal implementáció (BCL-only, nincs külső NuGet-függőség). |
+| `TCasSnapshotStore` | Content-addressed snapshot store, ugyanazon SHA-256 sémával. |
 | Snapshot + Replay | Állapot-pillanatképek és visszajátszás. |
 
 **CFPU:** Core SRAM volatile — tápelvesztésnél elveszik. Persistence = DMA kiírás külső DRAM/flash-re. A journal interfésznek aszinkron, nem-blokkoló kiírást kell támogatnia.
@@ -134,7 +142,7 @@
 **Lehetséges HW kérés:** DMA engine hozzáférés core-onként: saját DMA vagy központi controller?
 
 **Becsült óra:** ~16-24
-> Új projekt lehetséges (Symphact.Persistence). Külső függőség (SQLite). Snapshot + replay logika. Integráció M0.3 supervision-nel (recovery restart után). ~4-5 új fájl, ~300-400 sor runtime, ~400-500 sor teszt.
+> A BCL-only szeletek (Symphact.Persistence) leszállítva, külső függőség nélkül. A content-addressed szint (`TCasJournal`/`TCasSnapshotStore`, SHA-256) folyamatban, szintén BCL-only — a korábban tervezett SQLite-alapú `TSqliteJournal` referencia-implementáció elvetve. Integráció M0.3 supervision-nel (recovery restart után). ~4-5 új fájl, ~300-400 sor runtime, ~400-500 sor teszt.
 
 ---
 
@@ -650,4 +658,5 @@ API reference site (DocFX vagy hasonló).
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
+| 1.1 | 2026-07-18 | M0.5 státusz frissítve (BCL-only szeletek ✅ leszállítva, content-addressed folyamatban); `TSqliteJournal`/SQLite-terv törölve, `TCasJournal` (SHA-256, BCL-only) a hatályos irány |
 | 1.0 | 2026-04-18 | Kezdeti kiadás |

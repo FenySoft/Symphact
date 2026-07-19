@@ -2,11 +2,27 @@
 
 > Magyar verzió: [osreq-001-tree-interconnect-hu.md](osreq-001-tree-interconnect-hu.md)
 
-> Version: 1.0
+> Version: 1.2
 
-> **Status:** Draft — awaiting hardware feedback
+> **Status:** Resolved — see banner below
 >
 > **Affected CFPU phase:** F4 (multi-core FPGA), F5 (heterogeneous), F6 (silicon)
+
+---
+
+> ## ✅ RESOLVED
+>
+> The CLI-CPU team has **decided** this topology requirement — not with the pure tree (fat tree) topology proposed below, but with a **4-level hierarchical mesh + crossbar** architecture that satisfies the same underlying need (locality-aware, hierarchical, O(1)-routing interconnect aligned with the supervisor tree). Canonical, authoritative specification: [CLI-CPU/docs/interconnect-en.md](https://github.com/FenySoft/CLI-CPU/blob/main/docs/interconnect-en.md) v3.8.
+>
+> **The pure fat tree was explicitly excluded** by CLI-CPU (see the "Excluded alternatives" table): *"Root bottleneck and SPOF; converges to the hierarchical mesh once horizontal links are added."* — in other words, a fat tree augmented with horizontal (redundant) links converges exactly to the hierarchical mesh+crossbar construction described below.
+>
+> **Adopted topology:** L0 Cluster (4×4 mesh, XY dimension-order routing, wormhole switching, 16 cores) → L1 Tile (8×8 crossbar) → L2 Region (8×8 crossbar) → L3 Chip (star topology, Seal Core at the geometric center). Every L1–L3 crossbar is **always 1 deterministic hop** at its own level, using Virtual Cut-Through (VCT) switching. Arbitration: iSLIP (1 cycle/decision). Flow control: credit-based (4 credits/channel) + Virtual Output Queueing (VOQ, a separate queue per input toward every output port). Traffic isolation: 2 Virtual Networks (VN0 = control/supervisor, VN1 = actor). Deadlock freedom: XY routing (acyclic channel ordering, Dally & Seitz 1987) + VCT + VOQ + credit-based flow control.
+>
+> **The "Routing hierarchy" table and hop/latency estimates below (Level 0–3, ~2-4/~6-10/~4-8/~50-200 cycles) are outdated** — they assumed a 2-level (cluster/inter-cluster) model; the actual architecture has 4 levels (cluster/tile/region/chip) with a different hop structure. For the canonical hop count and cycle latency, see the "Hop count and latency summary" section in `interconnect-en.md`: neighbor core 1 hop (~5-10 cycles), cross-cluster same tile 13 hops (~39-59 cycles), cross-tile same region 15 hops (~63-109 cycles), cross-region 18 hops (~93-171 cycles). Inter-chip (multi-chip fabric) latency is an F6+ topic — it is not yet closed on the CLI-CPU side either, and remains an open question.
+>
+> The document below remains in its **original, Draft-era** state as an archive.
+
+---
 
 ## Summary
 
@@ -80,7 +96,7 @@ Within the same cluster (N0 → N2): **1 hop** (stays within the cluster router)
        Cl0 Cl1..  Cl0 Cl1..  Cl0 Cl1..
 ```
 
-The `TActorRef` format (`[chip-id:8][core-id:16][offset:16][HMAC:16][perms:8]`) encodes this tree addressing. The router resolves the target by traversing up and down the hierarchy.
+The tree addressing is encoded in the HW routing address (`[chip-id][cluster-id][core-offset]`), which the router resolves by traversing up and down the hierarchy. `TActorRef` itself remains a chip-local, opaque 32-bit CST index (see `actor-ref-scaling-en.md` §1.c) — addressing beyond the chip boundary uses the proxy-actor pattern (§3.c), not an embedded chip-id field.
 
 ## Current software workaround
 
@@ -141,6 +157,16 @@ This is O(1) routing, not O(N) lookup.
 | **2D Mesh** | Good for GPUs (uniform workload) | Does not match supervisor hierarchy; uniform routing is wasteful when communication is local |
 | **Tree (fat tree)** | O(log N) wiring; natural hierarchy | Root bottleneck — but fat tree mitigates it, and the supervisor tree is a tree anyway |
 
+## Impact on Symphact
+
+| OS component | Change |
+|-------------|--------|
+| `TRouter` | Routing table becomes tree-based (hierarchical address lookup, not a flat hash map) |
+| `TScheduler` | Actor placement takes tree locality into account (actors that communicate heavily are placed in the same cluster) |
+| `TMemoryManager` | Per-core SRAM budget + cluster-level aggregation |
+| `TActorRef` | Remains chip-local — 32-bit opaque CST index (`actor-ref-scaling-en.md` §1.c); addressing beyond the chip boundary uses the proxy-actor pattern (§3.c), not an extended ref |
+| Zero-copy | Only within the same core — inter-core is always a mailbox copy |
+
 ## Open questions (HW feedback needed)
 
 1. **Cluster size** — how many Nano cores per cluster? (4? 8? 16?)
@@ -152,6 +178,7 @@ This is O(1) routing, not O(N) lookup.
 
 ## Cross-references
 
+- **CLI-CPU interconnect (canonical, authoritative):** [`interconnect-en.md`](https://github.com/FenySoft/CLI-CPU/blob/main/docs/interconnect-en.md) v3.8 — the full specification of the 4-level hierarchical mesh + crossbar topology, routing, switching, and flow control
 - CLI-CPU issue: #TODO (osreq-from-os label)
 - Symphact roadmap: M2.3 (Router), M2.4 (Memory Manager)
 - Boot sequence: `docs/boot-sequence-hu.md` — step 8 (Nano Core Wake)
@@ -164,4 +191,6 @@ This is O(1) routing, not O(N) lookup.
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.2 | 2026-07-19 | **Status Draft → Resolved.** CLI-CPU rejected the pure fat tree topology request (root bottleneck + SPOF), adopting a 4-level hierarchical mesh + crossbar architecture instead (`interconnect-en.md` v3.8) — this satisfies the underlying need (locality-aware, hierarchical, supervisor-tree-aligned, O(1) routing). Banner added at the top of the document; the body remains unchanged as an archive. Cross-reference added |
+| 1.1 | 2026-07-19 | Fixed outdated HMAC-based `TActorRef` format reference to the CST model (§4 Multi-chip section); added missing "Impact on Symphact" section to restore hu/en parity, aligned with `actor-ref-scaling-en.md` v3.0 |
 | 1.0 | 2026-04-20 | Initial release |

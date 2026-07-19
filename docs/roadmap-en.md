@@ -2,7 +2,7 @@
 
 > Actor-runtime development milestones — co-designed with the CFPU hardware.
 
-> Version: 1.0
+> Version: 1.1
 
 ## Summary
 
@@ -25,7 +25,7 @@
 | M0.2 | ✅ | ~8 (actual) | Medium |
 | M0.3 | ✅ | ~24-32 | High |
 | M0.4 | ✅ | ~24-32 | High |
-| M0.5 | Planned | ~16-24 | Medium-high |
+| M0.5 | 🚧 Partially complete (BCL-only slices ✅, content-addressed in progress) | ~16-24 | Medium-high |
 | M0.6 | Planned | ~28-36 | High |
 | M0.7 | Planned | ~30-50 | Very high |
 | M1.0 | Planned | ~12-16 | Medium |
@@ -124,15 +124,23 @@
 
 ---
 
-## M0.5 — Persistence (Event Sourcing)
+## M0.5 — Persistence (Event Sourcing) 🚧
 
 > Actor state survives restarts.
 
+**BCL-only slices — ✅ shipped (+44 tests):**
+
 | Item | Description |
 |---|---|
-| `IPersistenceProvider` | Journal abstraction. |
-| `TInMemoryJournal` | Test implementation. |
-| `TSqliteJournal` | Reference implementation. |
+| `IJournal` / `TInMemoryJournal` | Journal abstraction + BCL-only in-memory reference implementation. |
+| `ISnapshotStore` / `TInMemorySnapshotStore` | Snapshot abstraction + BCL-only in-memory reference implementation. |
+
+**Content-addressed tier — 🚧 in progress:**
+
+| Item | Description |
+|---|---|
+| `TCasJournal` | Content-addressed, SHA-256-based production-grade journal implementation (BCL-only, no external NuGet dependency). |
+| `TCasSnapshotStore` | Content-addressed snapshot store, same SHA-256 scheme. |
 | Snapshot + Replay | State snapshots and replay. |
 
 **CFPU:** Core SRAM is volatile — lost on power loss. Persistence = DMA write to external DRAM/flash. Journal interface must support async, non-blocking writes.
@@ -140,7 +148,7 @@
 **Potential HW request:** Per-core DMA engine access: dedicated DMA or central controller?
 
 **Est. hours:** ~16-24
-> Possible new project (Symphact.Persistence). External dependency (SQLite). Snapshot + replay logic.
+> The BCL-only slices (Symphact.Persistence) have shipped, with no external dependency. The content-addressed tier (`TCasJournal`/`TCasSnapshotStore`, SHA-256) is in progress, also BCL-only — the previously planned SQLite-based `TSqliteJournal` reference implementation has been dropped.
 > Integration with M0.3 supervision (recovery after restart). ~4-5 new files, ~300-400 lines runtime, ~400-500 lines test.
 
 ---
@@ -747,4 +755,5 @@ API reference site (generated with DocFX or similar).
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.1 | 2026-07-18 | M0.5 status updated (BCL-only slices ✅ shipped, content-addressed in progress); dropped the `TSqliteJournal`/SQLite plan in favor of `TCasJournal` (SHA-256, BCL-only) |
 | 1.0 | 2026-04-18 | Initial release |

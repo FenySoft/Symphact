@@ -2,7 +2,7 @@
 
 > English version: [osreq-006-interchip-link-en.md](osreq-006-interchip-link-en.md)
 
-> Version: 1.0
+> Version: 1.1
 
 > **Állapot:** Draft — hardveres visszajelzésre vár
 >
@@ -62,13 +62,14 @@ Az inter-chip üzenetnek tartalmaznia kell:
 
 ### Routing döntés (OSREQ-001-gyel összefüggésben)
 
+A `TActorRef` chip-local marad (`actor-ref-scaling-hu.md` §1.c/§3.c) — nem hordoz chip-id mezőt. Chip-határon túli célzás **proxy-aktor mintával** történik: a küldő egy lokális `remote_proxy` aktorra küld (rendes, chip-local CST index), a proxy belső state-je tartalmazza a tényleges cél chip/cluster/core adatokat.
+
 ```
-Send(ref, msg):
-  chip_id = ref.ChipId
-  if chip_id = saját → intra-chip routing (OSREQ-001 fa)
-  if chip_id ≠ saját → inter-chip bridge:
+Send(ref, msg):                                ← ref: lokális, chip-local CST index
+  ha ref alkalmazás-aktorra mutat        → intra-chip routing (OSREQ-001 fa)
+  ha ref egy remote_proxy aktorra mutat  → proxy aktor:
     1. Üzenet serialize (SRAM → link buffer)
-    2. Header hozzáadás (src/dst chip+cluster+core)
+    2. Header hozzáadás a proxy belső state-jéből (src/dst chip+cluster+core)
     3. Link transmit (HW)
     4. Célchip: link receive → deserialize → dst mailbox FIFO
 ```
@@ -85,7 +86,7 @@ Send(ref, msg):
 
 | OS komponens | Változás |
 |-------------|---------|
-| `TActorRef` | `chip-id` mező hozzáadása (8 bit → 256 chip max) |
+| `TActorRef` | ~~`chip-id` mező hozzáadása~~ — **ELVETETT**: az `actor-ref-scaling-hu.md` §3.b döntése szerint a `TActorRef` chip-local marad (32-bit opaque CST index); chip-határon túli címzés proxy-aktor mintával történik (§3.c) |
 | `TRouter` | Inter-chip routing: chip-id lookup → link buffer |
 | `TSerializer` | Üzenet serialize/deserialize inter-chip átvitelhez |
 | `TDistributionSupervisor` | Link health monitoring, actor migration |
@@ -113,4 +114,5 @@ Send(ref, msg):
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
+| 1.1 | 2026-07-19 | „Hatás a Symphact-re" tábla: `TActorRef` chip-id mező javaslat jelölve ELVETETT-ként (`actor-ref-scaling-hu.md` §3.b); routing döntés pseudocode proxy-aktor mintára javítva |
 | 1.0 | 2026-04-20 | Kezdeti kiadás |

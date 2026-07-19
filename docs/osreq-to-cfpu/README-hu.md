@@ -2,7 +2,7 @@
 
 > English version: [README.md](README.md)
 
-> Version: 1.0
+> Version: 1.1
 
 Ez a könyvtár a Symphact fejlesztése során felszínre kerülő **OS-oldali követelményeket** gyűjti, amelyeket a CFPU hardvertervezésnél figyelembe kell venni (nyilvántartva a [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) repóban).
 
@@ -32,6 +32,7 @@ Dokumentált történelmi precedens az **Inmos Transputer** (Inmos technical pap
 | [OSREQ-004](osreq-004-dma-engine-hu.md) | DMA engine — nem-blokkoló persistence | F5, F6 | Draft |
 | [OSREQ-005](osreq-005-mailbox-interrupt-hu.md) | Mailbox interrupt vs polling — core értesítés | F4, F5, F6 | Draft |
 | [OSREQ-006](osreq-006-interchip-link-hu.md) | Inter-chip link protokoll — elosztott fabric | F6, F7 | Draft |
+| [OSREQ-007](osreq-007-actor-ref-format-hu.md#obsolete) | Aktor referencia formátum, HMAC verify HW unit, trust anchor szigorítás | F6, F6.5 | **Obsolete/Visszavonva** — a CST modell váltotta le (lásd a dokumentum tetején lévő banner); az 5. követelmény (trust anchor szigorítás) külön él tovább `trust-model-hu.md`-ben |
 
 ---
 
@@ -39,4 +40,5 @@ Dokumentált történelmi precedens az **Inmos Transputer** (Inmos technical pap
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
+| 1.1 | 2026-07-19 | OSREQ-007 felvéve az index-táblába, Obsolete/Visszavonva státusszal (a fájl fizikailag megvolt, de kimaradt az indexből) |
 | 1.0 | 2026-04-17 | Kezdeti kiadás |

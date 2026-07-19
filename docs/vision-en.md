@@ -10,7 +10,7 @@
 
 > Magyar verzió: [vision-hu.md](vision-hu.md)
 
-> Version: 1.4
+> Version: 1.5
 
 ## Philosophy -- replacing the Unix legacy, realizing the Erlang vision
 
@@ -355,7 +355,9 @@ The mailbox is **FIFO** by default -- messages are processed in arrival order. B
 
 ### Backpressure
 
-When a mailbox fills up (the hardware FIFO is 8 deep in F3, ~64 deep in F6), the sender **blocks** (or receives a `SendError` trap if it used `try_send`). This is **natural flow control** -- there is no need for explicit rate limiting.
+When a mailbox nears capacity (the hardware FIFO is 8 deep in F3, ~64 deep in F6), credit-based flow control briefly slows the sender as **natural flow control** -- there is no need for explicit rate limiting.
+
+The NoC, however, is **best-effort**: it does not guarantee delivery of any single cell, and the sender **never blocks indefinitely**. If congestion or an in-flight link failure persists beyond the credit-timeout window (plus CRC-8/16 integrity checking), the cell leaves the network via **timeout-drop** -- this prevents a backpressure cascade from spreading through the fabric. The sender observes this as a `SendError` trap if it used `try_send`; with the default `send`, the missing response is resolved through the **supervision hierarchy**: the supervisor detects the timeout and, per its strategy, resends, restarts the sending/receiving actor, or escalates (see "Let it crash -- structured fault tolerance" above). Reliability is therefore provided by the **actor protocol**, not the network layer -- the same principle applies at the CFPU NoC level (see [CLI-CPU/docs/interconnect-en.md](https://github.com/FenySoft/CLI-CPU/blob/main/docs/interconnect-en.md), "NoC-Wide Link-Failure and Backpressure Semantics").
 
 ## Memory management
 
@@ -1065,6 +1067,7 @@ This is the CLI-CPU project's most distant, **most valuable** horizon, and **thi
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.5 | 2026-07-19 | **Backpressure section corrected: blocking-FIFO semantics → best-effort NoC.** The previous "the sender blocks" description did not reflect the 2026-07-07 CFPU NoC fault-policy decision. Updated: credit-based flow control still handles normal congestion (brief, natural slowdown), but the NoC does not guarantee delivery -- after credit-timeout + CRC-8/16 detection, the cell is timeout-dropped, with recovery via the supervision hierarchy. Cascaded from CLI-CPU `interconnect-en.md` v3.7's new "NoC-Wide Link-Failure and Backpressure Semantics" section; synchronized with the hu/en pairs. |
 | 1.4 | 2026-04-28 | **TActorRef: 64-bit to 32-bit CST index** (`TActorRef(int SlotIndex)`). HMAC/SipHash references removed — HW-managed CST model. Perms stored in CST, not in header. Interconnect header v3.0. osreq-007 OBSOLETE. |
 | 1.3 | 2026-04-17 | **Moved to the Symphact repository** (previously `CLI-CPU/docs/symphact-en.md`). A short stub remains in CLI-CPU for historical links. Header boxes updated (the implementation now lives in this same repo). |
 | 1.0 | 2026-04-14 | Initial version, translated from Hungarian |

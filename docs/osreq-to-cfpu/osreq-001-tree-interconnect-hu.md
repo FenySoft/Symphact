@@ -2,11 +2,27 @@
 
 > English version: [osreq-001-tree-interconnect-en.md](osreq-001-tree-interconnect-en.md)
 
-> Version: 1.0
+> Version: 1.2
 
-> **Állapot:** Draft — hardveres visszajelzésre vár
+> **Állapot:** Resolved — lásd a lenti banner
 >
 > **Érintett CFPU fázis:** F4 (multi-core FPGA), F5 (heterogén), F6 (silicon)
+
+---
+
+> ## ✅ RESOLVED
+>
+> A CLI-CPU csapat ezt a topológia-igényt **eldöntötte** — de nem a lentebb javasolt tiszta fa (fat tree) topológiával, hanem egy **4-szintű hierarchikus mesh + crossbar** architektúrával, amely ugyanazt a mögöttes igényt (lokalitás-tudatos, hierarchikus, a supervisor tree-hez illeszkedő, O(1) routing-döntésű interconnect) elégíti ki. Kanonikus, hatályos specifikáció: [CLI-CPU/docs/interconnect-hu.md](https://github.com/FenySoft/CLI-CPU/blob/main/docs/interconnect-hu.md) v3.8.
+>
+> **A tiszta fat tree-t a CLI-CPU explicit kizárta** ("Kizárt alternatívák" táblázat): *"Bottleneck és SPOF a gyökéren; horizontális linkekkel konvergál a hierarchikus mesh-hez."* — vagyis egy fat tree horizontális (redundáns) linkekkel kiegészítve pont a lent leírt hierarchikus mesh+crossbar konstrukcióhoz konvergál.
+>
+> **Elfogadott topológia:** L0 Cluster (4×4 mesh, XY dimension-order routing, wormhole switching, 16 core) → L1 Tile (8×8 crossbar) → L2 Régió (8×8 crossbar) → L3 Chip (csillag topológia, Seal Core a geometriai középen). Az L1–L3 crossbar-ok mindegyike **mindig 1 determinisztikus hop** a saját szintjén, Virtual Cut-Through (VCT) switching-gel. Arbitráció: iSLIP (1 ciklus/döntés). Flow control: credit-based (4 credit/csatorna) + Virtual Output Queueing (VOQ, minden inputon minden kimenő port felé külön sor). Forgalom-izoláció: 2 Virtual Network (VN0 = control/supervisor, VN1 = actor). Deadlock-mentesség: XY routing (aciklikus csatorna-rendezés, Dally & Seitz 1987) + VCT + VOQ + credit flow control.
+>
+> **A lenti "Routing hierarchia" és hop/latencia becslések (Level 0–3, ~2-4/~6-10/~4-8/~50-200 ciklus) elavultak** — egy 2-szintű (cluster/inter-cluster) modellt feltételeztek; a tényleges architektúra 4 szintű (cluster/tile/régió/chip), eltérő hop-struktúrával. A kanonikus hop-számot és ciklus-latenciát lásd `interconnect-hu.md` "Hop-szám és latencia összefoglaló" szekció: szomszéd core 1 hop (~5-10 ciklus), cross-cluster azonos tile 13 hop (~39-59 ciklus), cross-tile azonos régió 15 hop (~63-109 ciklus), cross-régió 18 hop (~93-171 ciklus). Az inter-chip (multi-chip fabric) latencia F6+ témakör — jelenleg a CLI-CPU oldalon sincs lezárva, ez továbbra is nyitott kérdés.
+>
+> A dokumentum alább **eredeti, Draft állapotában** marad archívumként.
+
+---
 
 ## Összefoglaló
 
@@ -80,7 +96,7 @@ Ugyanazon cluster-en belül (N0 → N2): **1 hop** (cluster router-en belül mar
        Cl0 Cl1..  Cl0 Cl1..  Cl0 Cl1..
 ```
 
-A `TActorRef` formátum (`[chip-id:8][core-id:16][offset:16][HMAC:16][perms:8]`) a fa címzést kódolja. A router a hierarchiában felfelé-lefelé haladva oldja fel a célt.
+A fa címzést a HW routing cím (`[chip-id][cluster-id][core-offset]`) kódolja, amelyet a router a hierarchiában felfelé-lefelé haladva old fel. A `TActorRef` maga chip-local, opaque 32-bit CST index marad (lásd `actor-ref-scaling-hu.md` §1.c) — chip-határon túli címzés proxy-aktor mintával történik (§3.c), nem beágyazott chip-id mezővel.
 
 ## Jelenlegi szoftveres megoldás
 
@@ -155,7 +171,7 @@ A **fa topológia** azért természetes a CFPU-hoz, mert:
 | `TRouter` | Routing tábla fa-alapúvá válik (hierarchikus cím lookup, nem flat hash map) |
 | `TScheduler` | Actor placement figyelembe veszi a fa-lokalitást (sokat kommunikáló actor-ok azonos cluster-be) |
 | `TMemoryManager` | Per-core SRAM budget + cluster-szintű aggregáció |
-| `TActorRef` | Hierarchikus cím: `[chip-id].[cluster-id].[core-offset].[HMAC].[perms]` |
+| `TActorRef` | Chip-local marad — 32-bit opaque CST index (`actor-ref-scaling-hu.md` §1.c); chip-határon túli címzés proxy-aktor mintával (§3.c), nem a ref bővítésével |
 | Zero-copy | Csak azonos core-on belül — inter-core mindig mailbox copy |
 
 ## Nyitott kérdések (HW visszajelzés szükséges)
@@ -169,6 +185,7 @@ A **fa topológia** azért természetes a CFPU-hoz, mert:
 
 ## Kereszthivatkozások
 
+- **CLI-CPU interconnect (kanonikus, hatályos):** [`interconnect-hu.md`](https://github.com/FenySoft/CLI-CPU/blob/main/docs/interconnect-hu.md) v3.8 — a 4-szintű hierarchikus mesh + crossbar topológia, routing, switching és flow control teljes specifikációja
 - CLI-CPU issue: #TODO (osreq-from-os címkével)
 - Symphact roadmap: M2.3 (Router), M2.4 (Memory Manager)
 - Boot sequence: `docs/boot-sequence-hu.md` — 8. lépés (Nano Core-ok Wake)
@@ -181,4 +198,6 @@ A **fa topológia** azért természetes a CFPU-hoz, mert:
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
+| 1.2 | 2026-07-19 | **Állapot Draft → Resolved.** A CLI-CPU a tiszta fat tree topológia-igényt elvetette (gyökér bottleneck + SPOF), helyette 4-szintű hierarchikus mesh + crossbar architektúrát fogadott el (`interconnect-hu.md` v3.8) — ez elégíti ki a mögöttes igényt (lokalitás-tudatos, hierarchikus, supervisor-tree-hez illeszkedő, O(1) routing). Banner hozzáadva a dokumentum tetejére, a törzs változatlanul archívumként marad. Kereszthivatkozás hozzáadva |
+| 1.1 | 2026-07-19 | `TActorRef` elavult HMAC-alapú formátum-hivatkozás javítva CST-modellre (§4 Multi-chip szekció + „Hatás a Symphact-re" tábla), az `actor-ref-scaling-hu.md` v3.0 hatályos döntésével összhangban |
 | 1.0 | 2026-04-20 | Kezdeti kiadás |

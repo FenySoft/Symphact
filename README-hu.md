@@ -70,7 +70,9 @@ A CI Ubuntu / Windows / macOS-en fut a **.NET 10 SDK** ellen. A `Directory.Build
 
 **v0.5 — pre-alfa, aktív fejlesztés.** Az M0.1 → M0.4 mérföldkövek készen vannak; az M0.5 (perzisztencia) folyamatban — a BCL-only referencia szeletei már leszállítva.
 
-**Összes zöld xUnit teszt: 186** (120 Core + 22 Platform.DotNet + 44 Persistence).
+**Összes zöld xUnit teszt: 198** (132 Core + 22 Platform.DotNet + 44 Persistence; tényleges `dotnet test` eredmény, 2026-07-18).
+
+> Megjegyzés: az AllForOne szupervízió-stratégia (az M0.3 sor leírásában szereplő „OneForOne / AllForOne" második fele) 2026-06-30-án készült el, +12 teszttel — ez a fenti 198-as összesítőben már benne van, de az alábbi mérföldkő-táblázat soronkénti bontása ezt még nem tükrözi pontosan (felülvizsgálat alatt).
 
 | Mérföldkő | Státusz | Tesztek | Tartalom |
 |-----------|---------|---------|----------|
@@ -101,6 +103,10 @@ Az ütemezés az **`IScheduler`** (`src/Symphact.Core/IScheduler.cs`) interfész
 A supervision (M0.3) szolgáltatja az `ISupervisorStrategy`-t, az OneForOne / AllForOne stratégiákat, a lifecycle hookokat (`PreStart`, `PostStop`, `PreRestart`, `PostRestart`) és az aktor hierarchiát.
 
 A perzisztencia (M0.5, folyamatban) szolgáltatja az `IJournal` / `ISnapshotStore` interfészeket — a BCL-only in-memory referencia implementációk készen vannak; a content-addressed produkciós szintű változat (`TCasJournal`, `TCasSnapshotStore`) jön következőre.
+
+## Validáció a gyakorlatban
+
+A Symphact aktor-modell elvei nem elméletiek — az iparági gyakorlat igazolja őket. Az [*Agents Are Actors*](https://www.youtube.com/watch?v=zdrg987i3vI) előadásban (Akka.NET Community Standup, 2026. június) a **Netclaw** esettanulmány bemutatja, hogy ezek az alapok elegendőek valós AI-ügynök workloadokhoz: 800 millió token tartós ügynök-munka, event-sourced memória, felügyelt gyermek-aktorok, párhuzamos eszközhívás-végrehajtás, és felépülés összeomlásból a már elvégzett munka újrafuttatása nélkül. A Symphact tervezési mintái (immutable üzenetek, supervision-hierarchia, journaling, capability-alapú izoláció) tartós, verifikálható rendszereket tesznek lehetővé nagy méretekben is. Ez az egybeesés a bevált gyakorlattal megerősíti, hogy a capability-alapú aktorok a helyes alap mind a szoftver, mind a hardver co-design-jához.
 
 ## Projekt struktúra
 
@@ -143,5 +149,6 @@ Lásd [CONTRIBUTING-hu.md](CONTRIBUTING-hu.md). A projekt **szigorúan TDD** —
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
+| 0.5.1 | 2026-07-18 | Tesztszám frissítve a tényleges CI-eredményre: **198 zöld xUnit teszt** (132 Core + 22 Platform.DotNet + 44 Persistence). Pótolva a hiányzó „Validáció a gyakorlatban" szekció (hu/en szinkron). |
 | 0.5 | 2026-05-19 | M0.3 supervision, M0.4 scheduler + per-aktor parallelizmus és M0.5 BCL-only perzisztencia szeletek (`IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) mind leszállítva. **186 zöld xUnit teszt** (120 Core + 22 Platform.DotNet + 44 Persistence). NLnet pályázati draft elkészült. |
 | 0.1 | 2026-04-16 | Kezdeti repo csontváz. Apache-2.0 licensz, .NET projekt struktúra, első TDD iteráció célja. |

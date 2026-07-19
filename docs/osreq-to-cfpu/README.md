@@ -2,7 +2,7 @@
 
 > Magyar verzió: [README-hu.md](README-hu.md)
 
-> Version: 1.0
+> Version: 1.1
 
 This directory collects **OS-driven requirements** surfaced during Symphact development that should be considered in the CFPU hardware design (tracked in [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU)).
 
@@ -32,6 +32,7 @@ Documented historical precedents include the **Inmos Transputer** (Inmos technic
 | [OSREQ-004](osreq-004-dma-engine-en.md) | DMA engine — non-blocking persistence | F5, F6 | Draft |
 | [OSREQ-005](osreq-005-mailbox-interrupt-en.md) | Mailbox interrupt vs polling — core notification | F4, F5, F6 | Draft |
 | [OSREQ-006](osreq-006-interchip-link-en.md) | Inter-chip link protocol — distributed fabric | F6, F7 | Draft |
+| [OSREQ-007](osreq-007-actor-ref-format-en.md#obsolete) | Actor reference format, HMAC verify HW unit, trust anchor hardening | F6, F6.5 | **Obsolete/Withdrawn** — superseded by the CST model (see banner at the top of the document); Requirement 5 (trust anchor hardening) lives on separately in `trust-model-en.md` |
 
 ---
 
@@ -39,4 +40,5 @@ Documented historical precedents include the **Inmos Transputer** (Inmos technic
 
 | Version | Date | Summary |
 |---------|------|---------|
+| 1.1 | 2026-07-19 | Added OSREQ-007 to the index table with Obsolete/Withdrawn status (the file physically existed but was missing from the index) |
 | 1.0 | 2026-04-16 | Initial release |

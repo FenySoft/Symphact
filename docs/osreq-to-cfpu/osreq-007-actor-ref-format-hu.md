@@ -2,11 +2,23 @@
 
 > English version: [osreq-007-actor-ref-format-en.md](osreq-007-actor-ref-format-en.md)
 
-> Version: 1.0
+> Version: 1.1
 
-> **Állapot:** Draft — hardveres visszajelzésre vár
+> **Állapot:** Obsolete — lásd a lenti banner
 >
 > **Érintett CFPU fázis:** F6 (silicon, ChipIgnite tape-out), F6.5 (Secure Edition opcionális megerősítés)
+
+---
+
+> ## ⚠️ OBSOLETE
+>
+> Ez a dokumentum **elavult**. Az itt leírt HMAC-alapú védelmi modellt (interconnect header v2.5, `src_actor`/`dst_actor` 8 bitre csökkentés, mailbox-edge HMAC verify HW unit, per-chip hibás-HMAC counter, AuthCode quarantine integráció) a **CST (Capability Slot Table) modell** váltotta le — lásd [`actor-ref-scaling-hu.md`](../actor-ref-scaling-hu.md) v3.0. A `TActorRef` a korábbi 64 bites HMAC-alapú layout helyett 32 bites opaque CST index (`TActorRef(int SlotIndex)`); a jogosultság-ellenőrzés HW-managed CST QSRAM lookup (1 ciklus), nem kriptográfiai HMAC-verify.
+>
+> **Kivétel — az 5. követelmény (Trust anchor szigorítás) HATÁLYOS marad**, csak külön dokumentumba költözött: az OTP `eFuse.CaRootHash` egyetlen slot, multi-root array / Open-mode bit / deployment-mode toggle tiltása — lásd [`trust-model-hu.md`](../trust-model-hu.md) "Az eFuse OTP konfiguráció rögzítése" szekció.
+>
+> A dokumentum alább **eredeti, elavult állapotában** marad archívumként.
+
+---
 
 ## Összefoglaló
 
@@ -259,4 +271,5 @@ A FenySoft termékvonal **kötelezően** ezt a szigorú konfigurációt használ
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
+| 1.1 | 2026-07-19 | **OBSOLETE banner felvéve** — a HMAC-alapú modellt a CST modell váltotta le (`actor-ref-scaling-hu.md` v3.0); az 5. követelmény (trust anchor szigorítás) külön, hatályosan él `trust-model-hu.md`-ben. A dokumentum törzse változatlan archívum. |
 | 1.0 | 2026-04-25 | Első verzió: header v2.5, mailbox-edge HMAC verify unit, fail-stop, counter, AuthCode quarantine integráció, trust anchor szigorítás |
