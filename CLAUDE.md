@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Symphact** — capability-based actor runtime for .NET, co-designed with the Cognitive Fabric Processing Unit (CFPU). Today a reference runtime on any .NET host; tomorrow runs natively on CFPU silicon where every actor runs on a dedicated core with private SRAM and hardware mailbox FIFOs. Apache-2.0.
 
-Version: **0.5 (pre-alpha)** — the actor core (mailbox / ref / actor / system), supervision (M0.3), scheduler API with per-actor parallelism (M0.4 — `IScheduler`, `TInlineScheduler`, `TDedicatedThreadScheduler`), and persistence BCL-only slices (M0.5 — `IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) are complete. **186 green xUnit tests** (120 Core + 22 Platform.DotNet + 44 Persistence). Content-addressed persistence (`TCasJournal`, `TCasSnapshotStore`) and distribution are next milestones.
+Version: **0.5 (pre-alpha)** — the actor core (mailbox / ref / actor / system), supervision (M0.3), scheduler API with per-actor parallelism (M0.4 — `IScheduler`, `TInlineScheduler`, `TDedicatedThreadScheduler`), and persistence BCL-only slices (M0.5 — `IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) are complete. **198 green xUnit tests** (132 Core + 22 Platform.DotNet + 44 Persistence). Content-addressed persistence (`TCasJournal`, `TCasSnapshotStore`) and distribution are next milestones.
 
 Sister repo: [`FenySoft/CLI-CPU`](https://github.com/FenySoft/CLI-CPU) (CFPU hardware, CERN-OHL-S). OS → HW feedback flows via `docs/osreq-to-cfpu/` and the `osreq-for-cfpu` issue template.
 
