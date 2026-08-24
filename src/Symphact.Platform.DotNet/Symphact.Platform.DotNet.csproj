@@ -3,10 +3,19 @@
   <PropertyGroup>
     <RootNamespace>Symphact.Platform.DotNet</RootNamespace>
     <AssemblyName>Symphact.Platform.DotNet</AssemblyName>
-    <Description>DotNet platform implementation for the Symphact actor runtime. Fast, unconstrained mock for unit testing — uses ConcurrentQueue-based mailboxes with no hardware limits.</Description>
+    <Description>.NET host platform implementation for the Symphact actor runtime — required alongside FenySoft.Symphact.Core to run an actor system on Windows, Linux or macOS. Provides ConcurrentQueue-based mailboxes and AutoResetEvent signalling, without the mailbox depth and SRAM limits of the CFPU hardware platform.</Description>
     <PackageId>FenySoft.Symphact.Platform.DotNet</PackageId>
     <PackageTags>actor;runtime;symphact;platform;dotnet</PackageTags>
+    <!-- hu: A NuGet.org-on megjelenő csomag-leírás. Nem a repó README.md-je: az CI-jelvényeket,
+             projekt-elrendezést és mérföldkő-táblázatot tartalmaz, ami a csomag felhasználójának zaj.
+         en: The package description rendered on NuGet.org. Not the repository README.md: that one
+             carries CI badges, project layout and the milestone table, which is noise for a package consumer. -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="PACKAGE.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Symphact.Core\Symphact.Core.csproj" />

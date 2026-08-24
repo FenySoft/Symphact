@@ -115,7 +115,7 @@ src/Symphact.Core/              runtime + HAL interfészek (IScheduler, IMailbox
 src/Symphact.Platform.DotNet/   .NET referencia platform (ConcurrentQueue mailbox, AutoResetEvent signal)
 src/Symphact.Platform.Cfpu/     CLI-CPU szimulátor bridge (stub — várja a CFPU F4 multi-core-t)
 src/Symphact.Persistence/       IJournal, ISnapshotStore + in-memory referencia implek
-tests/Symphact.Core.Tests/                  xUnit (120 teszt)
+tests/Symphact.Core.Tests/                  xUnit (132 teszt)
 tests/Symphact.Platform.DotNet.Tests/       xUnit (22 teszt)
 tests/Symphact.Persistence.Tests/           xUnit (44 teszt)
 docs/                            architektúra, roadmap, trust model, NLnet pályázati draft, osreq-to-cfpu/

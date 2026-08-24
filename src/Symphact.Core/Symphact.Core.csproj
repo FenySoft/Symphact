@@ -6,6 +6,15 @@
     <Description>Capability-based actor runtime for .NET. Reference software implementation of the Symphact primitives (actors, mailboxes, supervisors, capabilities), co-designed with the Cognitive Fabric Processing Unit (CFPU).</Description>
     <PackageId>FenySoft.Symphact.Core</PackageId>
     <PackageTags>actor;runtime;supervision;capability;symphact;cfpu</PackageTags>
+    <!-- hu: A NuGet.org-on megjelenő csomag-leírás. Nem a repó README.md-je: az CI-jelvényeket,
+             projekt-elrendezést és mérföldkő-táblázatot tartalmaz, ami a csomag felhasználójának zaj.
+         en: The package description rendered on NuGet.org. Not the repository README.md: that one
+             carries CI badges, project layout and the milestone table, which is noise for a package consumer. -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="PACKAGE.md" Pack="true" PackagePath="README.md" />
+  </ItemGroup>
 
 </Project>

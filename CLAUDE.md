@@ -71,7 +71,7 @@ src/Symphact.Persistence/       IJournal, ISnapshotStore + BCL-only in-memory re
 tests/Symphact.Core.Tests/      xUnit, mirrors src/ structure (scheduler + concurrency + stress)
 tests/Symphact.Platform.DotNet.Tests/  TMailbox + TDotNetMailboxSignal tests
 tests/Symphact.Persistence.Tests/      TInMemoryJournal + TInMemorySnapshotStore tests
-samples/                        (empty — CounterActor demo is the first target)
+samples/CounterActor/           minimal runnable end-to-end demo (Increment / Decrement / Query)
 docs/osreq-to-cfpu/             OS→HW requirements feeding CLI-CPU
 .github/workflows/ci.yml        multi-OS build+test
 Directory.Build.props           net10.0, warnings-as-errors, docs on

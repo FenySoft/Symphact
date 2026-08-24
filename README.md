@@ -115,7 +115,7 @@ src/Symphact.Core/              runtime + HAL interfaces (IScheduler, IMailboxSi
 src/Symphact.Platform.DotNet/   .NET reference platform (ConcurrentQueue mailbox, AutoResetEvent signal)
 src/Symphact.Platform.Cfpu/     CLI-CPU simulator bridge (stub — awaiting CFPU F4 multi-core)
 src/Symphact.Persistence/       IJournal, ISnapshotStore + in-memory reference impls
-tests/Symphact.Core.Tests/                  xUnit (120 tests)
+tests/Symphact.Core.Tests/                  xUnit (132 tests)
 tests/Symphact.Platform.DotNet.Tests/       xUnit (22 tests)
 tests/Symphact.Persistence.Tests/           xUnit (44 tests)
 docs/                            architecture, roadmap, trust model, NLnet application draft, osreq-to-cfpu/
