@@ -128,7 +128,7 @@
 
 > Actor state survives restarts.
 
-**BCL-only slices — ✅ shipped (+44 tests):**
+**BCL-only slices — ✅ shipped:**
 
 | Item | Description |
 |---|---|

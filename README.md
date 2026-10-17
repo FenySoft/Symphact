@@ -70,9 +70,7 @@ CI runs on Ubuntu / Windows / macOS against **.NET 10 SDK**. `Directory.Build.pr
 
 **v0.5 — pre-alpha, active development.** Milestones M0.1 → M0.4 are complete; M0.5 (persistence) is in progress — the BCL-only reference slices have shipped.
 
-**Total green xUnit tests: 198** (132 Core + 22 Platform.DotNet + 44 Persistence; actual `dotnet test` result, 2026-07-18).
-
-> Note: the AllForOne supervision strategy (the second half of the M0.3 row's "OneForOne / AllForOne" description) was completed on 2026-06-30, +12 tests — already included in the 198 total above, but the per-milestone breakdown below does not yet reflect this precisely (under review).
+Test count: not stated here; measure it with `dotnet test`.
 
 | Milestone | Status | Tests | Highlights |
 |-----------|--------|-------|------------|
@@ -115,9 +113,9 @@ src/Symphact.Core/              runtime + HAL interfaces (IScheduler, IMailboxSi
 src/Symphact.Platform.DotNet/   .NET reference platform (ConcurrentQueue mailbox, AutoResetEvent signal)
 src/Symphact.Platform.Cfpu/     CLI-CPU simulator bridge (stub — awaiting CFPU F4 multi-core)
 src/Symphact.Persistence/       IJournal, ISnapshotStore + in-memory reference impls
-tests/Symphact.Core.Tests/                  xUnit (132 tests)
-tests/Symphact.Platform.DotNet.Tests/       xUnit (22 tests)
-tests/Symphact.Persistence.Tests/           xUnit (44 tests)
+tests/Symphact.Core.Tests/                  xUnit
+tests/Symphact.Platform.DotNet.Tests/       xUnit
+tests/Symphact.Persistence.Tests/           xUnit
 docs/                            architecture, roadmap, trust model, NLnet application draft, osreq-to-cfpu/
 samples/CounterActor/            minimal runnable end-to-end demo (Increment / Decrement / Query via capability token)
 .github/workflows/ci.yml         multi-OS build + test
@@ -149,6 +147,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). The project is **strictly TDD** — runt
 
 | Version | Date | Summary |
 |---------|------|---------|
-| 0.5.1 | 2026-07-18 | Test count updated to the actual CI result: **198 green xUnit tests** (132 Core + 22 Platform.DotNet + 44 Persistence). |
-| 0.5 | 2026-05-19 | M0.3 supervision, M0.4 scheduler + per-actor parallelism, and M0.5 BCL-only persistence slices (`IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) all delivered. **186 green xUnit tests** (120 Core + 22 Platform.DotNet + 44 Persistence). NLnet grant application drafted. |
+| 0.5 | 2026-05-19 | M0.3 supervision, M0.4 scheduler + per-actor parallelism, and M0.5 BCL-only persistence slices (`IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) all delivered. NLnet grant application drafted. |
 | 0.1 | 2026-04-16 | Initial repo scaffolding. Apache-2.0 license, .NET project structure, first TDD iteration target. |

@@ -122,7 +122,7 @@
 
 > Actor state túléli a restart-ot.
 
-**BCL-only szeletek — ✅ leszállítva (+44 teszt):**
+**BCL-only szeletek — ✅ leszállítva:**
 
 | Elem | Leírás |
 |---|---|

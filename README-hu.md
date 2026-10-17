@@ -70,9 +70,7 @@ A CI Ubuntu / Windows / macOS-en fut a **.NET 10 SDK** ellen. A `Directory.Build
 
 **v0.5 — pre-alfa, aktív fejlesztés.** Az M0.1 → M0.4 mérföldkövek készen vannak; az M0.5 (perzisztencia) folyamatban — a BCL-only referencia szeletei már leszállítva.
 
-**Összes zöld xUnit teszt: 198** (132 Core + 22 Platform.DotNet + 44 Persistence; tényleges `dotnet test` eredmény, 2026-07-18).
-
-> Megjegyzés: az AllForOne szupervízió-stratégia (az M0.3 sor leírásában szereplő „OneForOne / AllForOne" második fele) 2026-06-30-án készült el, +12 teszttel — ez a fenti 198-as összesítőben már benne van, de az alábbi mérföldkő-táblázat soronkénti bontása ezt még nem tükrözi pontosan (felülvizsgálat alatt).
+Tesztszám: itt nem szerepel, a `dotnet test` méri.
 
 | Mérföldkő | Státusz | Tesztek | Tartalom |
 |-----------|---------|---------|----------|
@@ -115,9 +113,9 @@ src/Symphact.Core/              runtime + HAL interfészek (IScheduler, IMailbox
 src/Symphact.Platform.DotNet/   .NET referencia platform (ConcurrentQueue mailbox, AutoResetEvent signal)
 src/Symphact.Platform.Cfpu/     CLI-CPU szimulátor bridge (stub — várja a CFPU F4 multi-core-t)
 src/Symphact.Persistence/       IJournal, ISnapshotStore + in-memory referencia implek
-tests/Symphact.Core.Tests/                  xUnit (132 teszt)
-tests/Symphact.Platform.DotNet.Tests/       xUnit (22 teszt)
-tests/Symphact.Persistence.Tests/           xUnit (44 teszt)
+tests/Symphact.Core.Tests/                  xUnit
+tests/Symphact.Platform.DotNet.Tests/       xUnit
+tests/Symphact.Persistence.Tests/           xUnit
 docs/                            architektúra, roadmap, trust model, NLnet pályázati draft, osreq-to-cfpu/
 samples/CounterActor/            minimális futtatható end-to-end demó (Increment / Decrement / Query capability-tokennel)
 .github/workflows/ci.yml         multi-OS build + test
@@ -149,6 +147,6 @@ Lásd [CONTRIBUTING-hu.md](CONTRIBUTING-hu.md). A projekt **szigorúan TDD** —
 
 | Verzió | Dátum | Összefoglaló |
 |--------|-------|-------------|
-| 0.5.1 | 2026-07-18 | Tesztszám frissítve a tényleges CI-eredményre: **198 zöld xUnit teszt** (132 Core + 22 Platform.DotNet + 44 Persistence). Pótolva a hiányzó „Validáció a gyakorlatban" szekció (hu/en szinkron). |
-| 0.5 | 2026-05-19 | M0.3 supervision, M0.4 scheduler + per-aktor parallelizmus és M0.5 BCL-only perzisztencia szeletek (`IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) mind leszállítva. **186 zöld xUnit teszt** (120 Core + 22 Platform.DotNet + 44 Persistence). NLnet pályázati draft elkészült. |
+| 0.5.1 | 2026-07-18 | Pótolva a hiányzó „Validáció a gyakorlatban" szekció (hu/en szinkron). |
+| 0.5 | 2026-05-19 | M0.3 supervision, M0.4 scheduler + per-aktor parallelizmus és M0.5 BCL-only perzisztencia szeletek (`IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) mind leszállítva. NLnet pályázati draft elkészült. |
 | 0.1 | 2026-04-16 | Kezdeti repo csontváz. Apache-2.0 licensz, .NET projekt struktúra, első TDD iteráció célja. |
