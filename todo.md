@@ -8,22 +8,20 @@
 
 ## Aktív halasztott elemek
 
-### 1. NLnet draft — EU AI Act compliance "later stage"
+### 1. EU AI Act compliance "later stage"
 
-- **Hivatkozás:** `docs/nlnet-application-draft-en.md` (Abstract / Multi-agent
-  AI infrastructure bekezdés), `docs/nlnet-application-draft-hu.md`
 - **Tartalom:** "actual certification compliance only becomes meaningful at a
   later, more mature project stage — at the 12-month mark Symphact delivers
   an audit-input substrate (structured event log + capability graph), not a
   certified system."
 - **Indoklás:** v0.5 startup-szakaszban az EU AI Act high-risk compliance
-  certification idő előtti — az NLnet 12 hónap **audit-input szubsztrátot**
-  szállít, nem certified rendszert. A certification follow-up grant feladata.
-- **Felülvizsgálat:** follow-up NLnet pályázat M2+ szakasza (2027 H2)
+  certification idő előtti — a 12 hónapos terv **audit-input szubsztrátot**
+  szállít, nem certified rendszert.
+- **Felülvizsgálat:** amikor a projekt a pre-alpha szakaszon túllép
 
-### 2. NLnet draft — M5 NuGet csomag-bontás "deferred to M1.x+"
+### 2. M5 NuGet csomag-bontás "deferred to M1.x+"
 
-- **Hivatkozás:** `docs/nlnet-application-draft-en.md` (M5 sor), `docs/attachments/02-roadmap.md`
+- **Hivatkozás:** `docs/attachments/02-roadmap.md`
 - **Tartalom:** "`Symphact.Security` and `Symphact.Devices` are deliberately
   not separate packages at v0.5 — the capability registry is shared between
   Core / Remoting, and device actors stay inside Core or in samples. Further
@@ -36,17 +34,16 @@
 - **Felülvizsgálat:** M1.x milestone tervezése — amikor konkrét adoption- vagy
   függőség-szétválasztási igény indokolja
 
-### 3. NLnet draft — M6 független biztonsági audit "later stage"
+### 3. M6 független biztonsági audit "later stage"
 
-- **Hivatkozás:** `docs/nlnet-application-draft-en.md` (M6 sor)
 - **Tartalom:** "Groundwork for a later (at maturer project stage) independent
   security audit — at v0.5 startup stage external audit is premature; what
   happens here is only the preparation of audit-input evidence."
 - **Indoklás:** v0.5-ben a külső biztonsági audit idő előtti. Az M6 a TLA+
   spec + TLC model-checker futtatásokkal **audit-input bizonyítékot** készít
   elő (Capability.tla, Supervision.tla, Send.tla) — maga az audit csak
-  érettebb projekt-fázisban értelmes (follow-up grant scope).
-- **Felülvizsgálat:** follow-up NLnet pályázat M3+ (2027 vagy később)
+  érettebb projekt-fázisban értelmes.
+- **Felülvizsgálat:** amikor a projekt a pre-alpha szakaszon túllép
 
 ### 4. Scheduler-szerződés — pre-Attach Signal deferred replay
 

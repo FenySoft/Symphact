@@ -1,6 +1,5 @@
 # Attachment 2 — Roadmap with hour estimates
 
-> NLnet NGI Zero Commons Fund — Symphact application, 13th open call (deadline 2026-06-01).
 > Condensed from `docs/roadmap-en.md` v1.0. Full text: [`roadmap-en.md`](../roadmap-en.md).
 
 ## Summary table

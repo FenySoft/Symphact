@@ -116,7 +116,7 @@ src/Symphact.Persistence/       IJournal, ISnapshotStore + in-memory reference i
 tests/Symphact.Core.Tests/                  xUnit
 tests/Symphact.Platform.DotNet.Tests/       xUnit
 tests/Symphact.Persistence.Tests/           xUnit
-docs/                            architecture, roadmap, trust model, NLnet application draft, osreq-to-cfpu/
+docs/                            architecture, roadmap, trust model, osreq-to-cfpu/
 samples/CounterActor/            minimal runnable end-to-end demo (Increment / Decrement / Query via capability token)
 .github/workflows/ci.yml         multi-OS build + test
 Directory.Build.props            net10.0, warnings-as-errors, docs on
@@ -147,5 +147,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md). The project is **strictly TDD** — runt
 
 | Version | Date | Summary |
 |---------|------|---------|
-| 0.5 | 2026-05-19 | M0.3 supervision, M0.4 scheduler + per-actor parallelism, and M0.5 BCL-only persistence slices (`IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) all delivered. NLnet grant application drafted. |
+| 0.5 | 2026-05-19 | M0.3 supervision, M0.4 scheduler + per-actor parallelism, and M0.5 BCL-only persistence slices (`IJournal` + `TInMemoryJournal`, `ISnapshotStore` + `TInMemorySnapshotStore`) all delivered.|
 | 0.1 | 2026-04-16 | Initial repo scaffolding. Apache-2.0 license, .NET project structure, first TDD iteration target. |

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build all NLnet attachment PDFs from their Markdown sources.
+# Build all attachment PDFs from their Markdown sources.
 #
 # Pipeline:
 #   1. Markdown → HTML via `marked` (run through npx, no global install)
@@ -89,46 +89,6 @@ read -r -d '' CSS << 'EOF' || true
 </style>
 EOF
 
-# Dense CSS — used for the 1-page executive summary only.
-read -r -d '' CSS_DENSE << 'EOF' || true
-<style>
-  @page { size: A4; margin: 8mm 10mm 8mm 10mm; }
-  * { box-sizing: border-box; }
-  html { font-size: 8.2pt; }
-  body {
-    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #222;
-    line-height: 1.22;
-    margin: 0; padding: 0;
-  }
-  h1 { font-size: 12.5pt; margin: 0 0 0.2em 0; border-bottom: 1.5px solid #444; padding-bottom: 2px; }
-  h2 { font-size: 10pt; margin: 0.5em 0 0.2em 0; color: #1a3a5c; }
-  h3 { font-size: 9pt; margin: 0.45em 0 0.15em 0; color: #2c4a6b; }
-  p { margin: 0.22em 0; text-align: justify; }
-  blockquote {
-    border-left: 2px solid #ccc; margin: 0.35em 0;
-    padding: 0.1em 0.6em; color: #555;
-    background: #f7f7f7; font-size: 0.95em;
-  }
-  code { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.87em;
-         background: #f0f0f0; padding: 1px 3px; border-radius: 2px; }
-  pre { font-family: "SF Mono", Menlo, Consolas, monospace; font-size: 0.78em;
-        background: #f5f5f5; border: 1px solid #ddd; border-radius: 3px;
-        padding: 5px 7px; margin: 0.35em 0;
-        white-space: pre-wrap; word-wrap: break-word; }
-  pre code { background: none; padding: 0; }
-  table { border-collapse: collapse; margin: 0.25em 0; width: 100%; font-size: 0.82em; }
-  th, td { border: 1px solid #bbb; padding: 1.5px 4px; text-align: left; vertical-align: top; }
-  th { background: #eaeef2; font-weight: 600; }
-  ul, ol { margin: 0.2em 0 0.2em 1.1em; padding: 0; }
-  li { margin: 0.06em 0; }
-  hr { border: none; border-top: 1px solid #ccc; margin: 0.5em 0; }
-  blockquote { margin: 0.22em 0; padding: 0.05em 0.5em; }
-  a { color: #1a4f8c; text-decoration: none; }
-  strong { font-weight: 600; }
-</style>
-EOF
-
 build_one() {
   local md="$1"
   local base="${md%.md}"
@@ -141,12 +101,6 @@ build_one() {
   local body
   body="$(npx --yes marked "$md")"
 
-  # Pick CSS — dense for the executive summary, default elsewhere
-  local css_for_this="$CSS"
-  if [[ "$base" == "06-executive-summary" ]]; then
-    css_for_this="$CSS_DENSE"
-  fi
-
   # 2. Wrap with full HTML document including print CSS
   cat > "$html" <<HTMLEOF
 <!DOCTYPE html>
@@ -154,7 +108,7 @@ build_one() {
 <head>
 <meta charset="UTF-8">
 <title>${base}</title>
-${css_for_this}
+${CSS}
 </head>
 <body>
 ${body}
@@ -178,10 +132,8 @@ HTMLEOF
 
 for md in 01-architecture-overview.md \
           02-roadmap.md \
-          03-status-snapshot.md \
           04-cli-cpu-symphact-interaction.md \
-          05-threat-model.md \
-          06-executive-summary.md; do
+          05-threat-model.md; do
   if [[ -f "$md" ]]; then
     build_one "$md"
   else

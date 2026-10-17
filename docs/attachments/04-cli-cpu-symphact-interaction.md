@@ -1,6 +1,5 @@
 # Attachment 4 — CLI-CPU ↔ Symphact Interaction Diagram
 
-> NLnet NGI Zero Commons Fund — Symphact application, 13th open call (deadline 2026-06-01).
 > Co-design feedback loop between the Symphact actor runtime and the CLI-CPU / CFPU open silicon.
 
 ## 1. The two repositories, deliberately separated

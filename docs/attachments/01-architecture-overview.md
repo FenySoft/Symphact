@@ -1,6 +1,5 @@
 # Attachment 1 — Architecture Overview
 
-> NLnet NGI Zero Commons Fund — Symphact application, 13th open call (deadline 2026-06-01).
 > Excerpt from `docs/vision-en.md` v1.4. Full text: [`vision-en.md`](../vision-en.md).
 
 ## 1. Design principles

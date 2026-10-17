@@ -1,6 +1,5 @@
 # Attachment 5 — Threat Model Summary
 
-> NLnet NGI Zero Commons Fund — Symphact application, 13th open call (deadline 2026-06-01).
 > Condensed from `docs/trust-model-en.md` v1.1. Full text: [`trust-model-en.md`](../trust-model-en.md).
 
 ## 1. Scope of this document
