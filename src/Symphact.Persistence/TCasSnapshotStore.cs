@@ -38,7 +38,7 @@ public sealed class TCasSnapshotStore : ISnapshotStore
     /// </param>
     public TCasSnapshotStore(string ARootDirectory, IPayloadSerializer? ASerializer = null)
     {
-        FFiles = new TCasFiles(ARootDirectory, "snapshots", ASerializer);
+        FFiles = new TCasFiles(ARootDirectory, TCasFiles.SnapshotsDirectoryName, ASerializer);
     }
 
     /// <inheritdoc />
@@ -59,6 +59,8 @@ public sealed class TCasSnapshotStore : ISnapshotStore
 
         try
         {
+            using var root = await FFiles.EnterRootAsync(ACancellationToken).ConfigureAwait(false);
+
             var chain = TCasFiles.Chain(ReadState(APersistenceId).Chain, ASequenceNr, payloadHash);
 
             FFiles.WriteBlob(payloadHash, bytes);
@@ -111,6 +113,8 @@ public sealed class TCasSnapshotStore : ISnapshotStore
 
         try
         {
+            using var root = await FFiles.EnterRootAsync(ACancellationToken).ConfigureAwait(false);
+
             if (ReadState(APersistenceId).Highest == 0)
             {
                 return;

@@ -41,7 +41,7 @@ public sealed class TCasJournal : IJournal
     /// </param>
     public TCasJournal(string ARootDirectory, IPayloadSerializer? ASerializer = null)
     {
-        FFiles = new TCasFiles(ARootDirectory, "streams", ASerializer);
+        FFiles = new TCasFiles(ARootDirectory, TCasFiles.StreamsDirectoryName, ASerializer);
     }
 
     /// <inheritdoc />
@@ -60,6 +60,8 @@ public sealed class TCasJournal : IJournal
 
         try
         {
+            using var root = await FFiles.EnterRootAsync(ACancellationToken).ConfigureAwait(false);
+
             var state = ReadState(APersistenceId);
             var seq = state.Highest + 1;
             var chain = TCasFiles.Chain(state.Chain, seq, payloadHash);
@@ -122,6 +124,8 @@ public sealed class TCasJournal : IJournal
 
         try
         {
+            using var root = await FFiles.EnterRootAsync(ACancellationToken).ConfigureAwait(false);
+
             if (ReadState(APersistenceId).Highest == 0)
             {
                 return;
@@ -154,6 +158,8 @@ public sealed class TCasJournal : IJournal
         }
     }
 
+    private sealed record TIndexed(long SequenceNr, string PayloadHash, DateTimeOffset Timestamp);
+
     private sealed record TLoaded(long SequenceNr, object Payload, DateTimeOffset Timestamp);
 
     private sealed record TState(long Highest, string Chain, List<TLoaded> Entries);
@@ -162,6 +168,7 @@ public sealed class TCasJournal : IJournal
     {
         var path = FFiles.IndexPath(APersistenceId);
         var entries = new List<TLoaded>();
+        var indexed = new List<TIndexed>();
         long highest = 0;
         long deletedTo = 0;
         var chain = TCasFiles.Genesis;
@@ -197,13 +204,16 @@ public sealed class TCasJournal : IJournal
 
             chain = expected;
             highest = seq;
-            entries.Add(new TLoaded(
+            indexed.Add(new TIndexed(
                 seq,
-                FFiles.LoadBlob(parts[3]),
+                parts[3],
                 new DateTimeOffset(long.Parse(parts[2], CultureInfo.InvariantCulture), TimeSpan.Zero)));
         }
 
-        entries.RemoveAll(e => e.SequenceNr <= deletedTo);
+        foreach (var item in indexed.Where(e => e.SequenceNr > deletedTo))
+        {
+            entries.Add(new TLoaded(item.SequenceNr, FFiles.LoadBlob(item.PayloadHash), item.Timestamp));
+        }
 
         return new TState(highest, chain, entries);
     }

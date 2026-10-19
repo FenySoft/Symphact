@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -12,9 +13,17 @@ namespace Symphact.Persistence;
 /// </summary>
 internal sealed class TCasFiles
 {
+    public const string ObjectsDirectoryName = "objects";
+    public const string StreamsDirectoryName = "streams";
+    public const string SnapshotsDirectoryName = "snapshots";
+    private const string LockFileName = ".sweep.lock";
+
+    private static readonly ConcurrentDictionary<string, SemaphoreSlim> RootLocks = new();
+
     public const string Genesis = "0000000000000000000000000000000000000000000000000000000000000000";
 
     private readonly string FObjects;
+    private readonly string FRoot;
     private readonly string FIndexDirectory;
     private readonly IPayloadSerializer FSerializer;
 
@@ -22,11 +31,65 @@ internal sealed class TCasFiles
     {
         ArgumentException.ThrowIfNullOrEmpty(ARootDirectory);
 
-        FObjects = Path.Combine(ARootDirectory, "objects");
+        FObjects = Path.Combine(ARootDirectory, ObjectsDirectoryName);
+        FRoot = Path.GetFullPath(ARootDirectory);
         FIndexDirectory = Path.Combine(ARootDirectory, AIndexDirectoryName);
         FSerializer = ASerializer ?? new TJsonPayloadSerializer();
         Directory.CreateDirectory(FObjects);
         Directory.CreateDirectory(FIndexDirectory);
+    }
+
+    /// <summary>
+    /// hu: Kizárólagos belépés a gyökérre (folyamaton belül és folyamatok között): az írás és a
+    /// takarítás egymást kizárja.
+    /// <br />
+    /// en: Exclusive entry to the root (in-process and cross-process): writing and sweeping
+    /// exclude each other.
+    /// </summary>
+    public static async Task<IDisposable> EnterRootAsync(string ARootDirectory, CancellationToken ACancellationToken)
+    {
+        var root = Path.GetFullPath(ARootDirectory);
+        var gate = RootLocks.GetOrAdd(root, _ => new SemaphoreSlim(1, 1));
+
+        await gate.WaitAsync(ACancellationToken).ConfigureAwait(false);
+
+        try
+        {
+            Directory.CreateDirectory(root);
+
+            while (true)
+            {
+                try
+                {
+                    var file = new FileStream(Path.Combine(root, LockFileName), FileMode.OpenOrCreate,
+                        FileAccess.ReadWrite, FileShare.None);
+
+                    return new TRootLease(gate, file);
+                }
+                catch (IOException)
+                {
+                    await Task.Delay(5, ACancellationToken).ConfigureAwait(false);
+                }
+            }
+        }
+        catch
+        {
+            gate.Release();
+
+            throw;
+        }
+    }
+
+    public Task<IDisposable> EnterRootAsync(CancellationToken ACancellationToken)
+        => EnterRootAsync(FRoot, ACancellationToken);
+
+    private sealed class TRootLease(SemaphoreSlim AGate, FileStream AFile) : IDisposable
+    {
+        public void Dispose()
+        {
+            AFile.Dispose();
+            AGate.Release();
+        }
     }
 
     public byte[] Serialize(object APayload) => FSerializer.Serialize(APayload);
